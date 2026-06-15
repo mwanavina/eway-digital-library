@@ -22,7 +22,6 @@ interface AllResourcesFilterProps {
   onClearFilters: () => void;
   isOpen: boolean;
   onClose: () => void;
-  resultsCount?: number;
 }
 
 export function AllResourcesFilter({
@@ -35,7 +34,6 @@ export function AllResourcesFilter({
   onClearFilters,
   isOpen,
   onClose,
-  resultsCount,
 }: AllResourcesFilterProps) {
   const [expandedSections, setExpandedSections] = useState({
     school: true,
@@ -113,15 +111,12 @@ export function AllResourcesFilter({
 
   return (
     <aside
-      className={`fixed inset-x-0 bottom-0 z-30 lg:relative lg:inset-auto lg:h-auto bg-white transition-all duration-300 flex flex-col ${
-        isOpen ? 'translate-y-0' : 'translate-y-full'
-      } lg:translate-y-0 lg:w-64 lg:border-r lg:border-gray-200 h-[70vh] max-h-[80vh] lg:h-auto lg:max-h-none rounded-t-2xl lg:rounded-none overflow-hidden lg:overflow-visible`}
+      className={`fixed inset-0 lg:relative lg:inset-auto bg-white transition-all duration-300 ${
+        isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+      } lg:translate-x-0 lg:w-64 lg:border-r lg:border-gray-200 z-30 flex flex-col lg:max-h-[calc(100vh-64px)]`}
     >
-      <div className="lg:hidden p-3 flex items-center justify-center">
-        <div className="w-10 h-0.5 bg-gray-300 rounded-full" />
-      </div>
       <div className="sticky top-0 flex items-center justify-between p-4 bg-gray-50 lg:hidden z-40 border-b border-gray-200">
-        <h2 className="font-bold text-gray-800">Filters</h2>
+        <h2 className="font-bold text-gray-800">All Resources Filters</h2>
         <button
           onClick={onClose}
           className="p-1 hover:bg-gray-200 rounded transition-colors"
@@ -236,20 +231,12 @@ export function AllResourcesFilter({
       </div>
 
       <div className="sticky bottom-0 p-4 bg-white border-t border-gray-200 flex-shrink-0">
-        <div className="flex gap-3">
-          <button
-            onClick={onClearFilters}
-            className="flex-1 px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg font-medium transition-colors"
-          >
-            Clear
-          </button>
-          <button
-            onClick={onClose}
-            className="flex-1 px-4 py-2 bg-[#1782C5] text-white rounded-lg font-medium transition-colors"
-          >
-            {resultsCount !== undefined ? `Show ${resultsCount.toLocaleString()} results` : 'Show results'}
-          </button>
-        </div>
+        <button
+          onClick={onClearFilters}
+          className="w-full px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg font-medium transition-colors"
+        >
+          Clear All Filters
+        </button>
       </div>
     </aside>
   );

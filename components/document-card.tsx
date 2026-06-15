@@ -1,8 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { Download, FileText } from 'lucide-react';
+import { Download, FileText, Share2 } from 'lucide-react';
 import { PDFModal } from './pdf-modal';
+import { ShareModal } from './share-modal';
 
 interface DocumentCardProps {
   id: number;
@@ -33,7 +34,13 @@ export function DocumentCard({
 }: DocumentCardProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const isExternalPdf = filePath && (filePath.startsWith('http') || filePath.startsWith('https'));
+
+  const handleShare = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsShareModalOpen(true);
+  };
 
   const handleCardClick = () => {
     if (isExternalPdf) {
@@ -161,7 +168,7 @@ export function DocumentCard({
       </div>
 
       {/* Footer */}
-      <div className="px-4 py-3 bg-gray-50 border-t border-gray-200">
+      <div className="px-4 py-3 bg-gray-50 border-t border-gray-200 space-y-2">
         <button
           onClick={handleDownload}
           disabled={isDownloading}
@@ -169,6 +176,13 @@ export function DocumentCard({
         >
           <Download size={16} />
           {isDownloading ? 'Downloading...' : 'Download PDF'}
+        </button>
+        <button
+          onClick={handleShare}
+          className="w-full flex items-center justify-center gap-2 bg-white text-[#1782C5] py-2 px-4 rounded-lg border border-[#1782C5] hover:bg-blue-50 transition-colors font-medium text-sm"
+        >
+          <Share2 size={16} />
+          Share
         </button>
       </div>
       </div>
@@ -181,6 +195,14 @@ export function DocumentCard({
         pdfUrl={filePath}
         documentId={id}
         onDownload={trackDownloadCallback}
+      />
+
+      {/* Share Modal */}
+      <ShareModal
+        isOpen={isShareModalOpen}
+        onClose={() => setIsShareModalOpen(false)}
+        title={title}
+        resourceId={id}
       />
     </>
   );

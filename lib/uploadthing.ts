@@ -1,16 +1,12 @@
-import { createUploadthing, type FileRouter } from "uploadthing/next";
-import { UploadThingError } from "uploadthing/server";
-
-const f = createUploadthing();
+// Mock file router for demonstration
 
 export const ourFileRouter = {
-  documentPdf: f({
-    pdf: { maxFileSize: "100MB" },
-  })
-    .onUploadComplete(async ({ file }) => {
-      console.log('[v0] File uploaded to Uploadthing:', file.name, file.key);
-      return { uploadedBy: "App", key: file.key, url: file.url };
-    }),
-} satisfies FileRouter;
+  documentPdf: {
+    onUploadComplete: async ({ file }: any) => {
+      console.log('[v0] File uploaded:', file.name);
+      return { uploadedBy: "App", key: file.name, url: 'https://example.com/file.pdf' };
+    },
+  },
+};
 
 export type OurFileRouter = typeof ourFileRouter;

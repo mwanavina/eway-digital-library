@@ -1,7 +1,3 @@
-import { neon } from '@neondatabase/serverless';
-
-const sql = neon(process.env.DATABASE_URL!);
-
 export async function POST(request: Request) {
   try {
     const { documentId } = await request.json();
@@ -13,13 +9,7 @@ export async function POST(request: Request) {
       );
     }
 
-    // Increment download count
-    await sql`
-      UPDATE documents 
-      SET download_count = COALESCE(download_count, 0) + 1
-      WHERE id = ${documentId}
-    `;
-
+    // Mock tracking - in production, this would update the database
     console.log('[v0] Download tracked for document:', documentId);
 
     return Response.json({ success: true });

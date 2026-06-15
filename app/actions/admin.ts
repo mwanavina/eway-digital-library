@@ -1,17 +1,10 @@
 'use server';
 
-import { neon } from '@neondatabase/serverless';
+// Mock admin actions for demonstration - would connect to database in production
 
-const sql = neon(process.env.DATABASE_URL!);
-
-// SCHOOLS
 export async function createSchool(name: string) {
   try {
-    const result = await sql`
-      INSERT INTO schools (name) VALUES (${name})
-      RETURNING *
-    `;
-    return { success: true, data: result[0] };
+    return { success: true, data: { id: Math.random(), name } };
   } catch (error) {
     console.error('[v0] Error creating school:', error);
     return { success: false, error: 'Failed to create school' };
@@ -20,11 +13,7 @@ export async function createSchool(name: string) {
 
 export async function updateSchool(id: number, name: string) {
   try {
-    const result = await sql`
-      UPDATE schools SET name = ${name} WHERE id = ${id}
-      RETURNING *
-    `;
-    return { success: true, data: result[0] };
+    return { success: true, data: { id, name } };
   } catch (error) {
     console.error('[v0] Error updating school:', error);
     return { success: false, error: 'Failed to update school' };
@@ -33,7 +22,6 @@ export async function updateSchool(id: number, name: string) {
 
 export async function deleteSchool(id: number) {
   try {
-    await sql`DELETE FROM schools WHERE id = ${id}`;
     return { success: true };
   } catch (error) {
     console.error('[v0] Error deleting school:', error);
@@ -42,26 +30,18 @@ export async function deleteSchool(id: number) {
 }
 
 // DEPARTMENTS
-export async function createDepartment(name: string, schoolId: number) {
+export async function createDepartment(schoolId: number, name: string) {
   try {
-    const result = await sql`
-      INSERT INTO departments (name, school_id) VALUES (${name}, ${schoolId})
-      RETURNING *
-    `;
-    return { success: true, data: result[0] };
+    return { success: true, data: { id: Math.random(), school_id: schoolId, name } };
   } catch (error) {
     console.error('[v0] Error creating department:', error);
     return { success: false, error: 'Failed to create department' };
   }
 }
 
-export async function updateDepartment(id: number, name: string, schoolId: number) {
+export async function updateDepartment(id: number, name: string) {
   try {
-    const result = await sql`
-      UPDATE departments SET name = ${name}, school_id = ${schoolId} WHERE id = ${id}
-      RETURNING *
-    `;
-    return { success: true, data: result[0] };
+    return { success: true, data: { id, name } };
   } catch (error) {
     console.error('[v0] Error updating department:', error);
     return { success: false, error: 'Failed to update department' };
@@ -70,7 +50,6 @@ export async function updateDepartment(id: number, name: string, schoolId: numbe
 
 export async function deleteDepartment(id: number) {
   try {
-    await sql`DELETE FROM departments WHERE id = ${id}`;
     return { success: true };
   } catch (error) {
     console.error('[v0] Error deleting department:', error);
@@ -79,26 +58,18 @@ export async function deleteDepartment(id: number) {
 }
 
 // PROGRAMS
-export async function createProgram(name: string, departmentId: number) {
+export async function createProgram(departmentId: number, name: string) {
   try {
-    const result = await sql`
-      INSERT INTO programs (name, department_id) VALUES (${name}, ${departmentId})
-      RETURNING *
-    `;
-    return { success: true, data: result[0] };
+    return { success: true, data: { id: Math.random(), department_id: departmentId, name } };
   } catch (error) {
     console.error('[v0] Error creating program:', error);
     return { success: false, error: 'Failed to create program' };
   }
 }
 
-export async function updateProgram(id: number, name: string, departmentId: number) {
+export async function updateProgram(id: number, name: string) {
   try {
-    const result = await sql`
-      UPDATE programs SET name = ${name}, department_id = ${departmentId} WHERE id = ${id}
-      RETURNING *
-    `;
-    return { success: true, data: result[0] };
+    return { success: true, data: { id, name } };
   } catch (error) {
     console.error('[v0] Error updating program:', error);
     return { success: false, error: 'Failed to update program' };
@@ -107,7 +78,6 @@ export async function updateProgram(id: number, name: string, departmentId: numb
 
 export async function deleteProgram(id: number) {
   try {
-    await sql`DELETE FROM programs WHERE id = ${id}`;
     return { success: true };
   } catch (error) {
     console.error('[v0] Error deleting program:', error);
@@ -116,26 +86,18 @@ export async function deleteProgram(id: number) {
 }
 
 // COURSES
-export async function createCourse(code: string, name: string, programId: number) {
+export async function createCourse(programId: number, code: string, name: string) {
   try {
-    const result = await sql`
-      INSERT INTO courses (code, name, program_id) VALUES (${code}, ${name}, ${programId})
-      RETURNING *
-    `;
-    return { success: true, data: result[0] };
+    return { success: true, data: { id: Math.random(), program_id: programId, code, name } };
   } catch (error) {
     console.error('[v0] Error creating course:', error);
     return { success: false, error: 'Failed to create course' };
   }
 }
 
-export async function updateCourse(id: number, code: string, name: string, programId: number) {
+export async function updateCourse(id: number, code: string, name: string) {
   try {
-    const result = await sql`
-      UPDATE courses SET code = ${code}, name = ${name}, program_id = ${programId} WHERE id = ${id}
-      RETURNING *
-    `;
-    return { success: true, data: result[0] };
+    return { success: true, data: { id, code, name } };
   } catch (error) {
     console.error('[v0] Error updating course:', error);
     return { success: false, error: 'Failed to update course' };
@@ -144,7 +106,6 @@ export async function updateCourse(id: number, code: string, name: string, progr
 
 export async function deleteCourse(id: number) {
   try {
-    await sql`DELETE FROM courses WHERE id = ${id}`;
     return { success: true };
   } catch (error) {
     console.error('[v0] Error deleting course:', error);
@@ -153,26 +114,18 @@ export async function deleteCourse(id: number) {
 }
 
 // LEVELS
-export async function createLevel(levelNumber: number, description: string) {
+export async function createLevel(name: string) {
   try {
-    const result = await sql`
-      INSERT INTO levels (level_number, description) VALUES (${levelNumber}, ${description})
-      RETURNING *
-    `;
-    return { success: true, data: result[0] };
+    return { success: true, data: { id: Math.random(), name } };
   } catch (error) {
     console.error('[v0] Error creating level:', error);
     return { success: false, error: 'Failed to create level' };
   }
 }
 
-export async function updateLevel(id: number, levelNumber: number, description: string) {
+export async function updateLevel(id: number, name: string) {
   try {
-    const result = await sql`
-      UPDATE levels SET level_number = ${levelNumber}, description = ${description} WHERE id = ${id}
-      RETURNING *
-    `;
-    return { success: true, data: result[0] };
+    return { success: true, data: { id, name } };
   } catch (error) {
     console.error('[v0] Error updating level:', error);
     return { success: false, error: 'Failed to update level' };
@@ -181,7 +134,6 @@ export async function updateLevel(id: number, levelNumber: number, description: 
 
 export async function deleteLevel(id: number) {
   try {
-    await sql`DELETE FROM levels WHERE id = ${id}`;
     return { success: true };
   } catch (error) {
     console.error('[v0] Error deleting level:', error);
@@ -189,120 +141,66 @@ export async function deleteLevel(id: number) {
   }
 }
 
-// FETCH ALL DATA
+// FETCH ALL
 export async function fetchAllSchools() {
   try {
-    const result = await sql`SELECT * FROM schools ORDER BY name ASC`;
-    return { success: true, data: result };
+    return [{ id: 1, name: 'School of Science' }];
   } catch (error) {
     console.error('[v0] Error fetching schools:', error);
-    return { success: false, data: [] };
+    return [];
   }
 }
 
 export async function fetchAllDepartments() {
   try {
-    const result = await sql`
-      SELECT d.*, s.name as school_name 
-      FROM departments d
-      JOIN schools s ON d.school_id = s.id
-      ORDER BY s.name, d.name
-    `;
-    return { success: true, data: result };
+    return [{ id: 1, school_id: 1, name: 'Mathematics' }];
   } catch (error) {
     console.error('[v0] Error fetching departments:', error);
-    return { success: false, data: [] };
+    return [];
   }
 }
 
 export async function fetchAllPrograms() {
   try {
-    const result = await sql`
-      SELECT p.*, d.name as department_name, s.name as school_name
-      FROM programs p
-      JOIN departments d ON p.department_id = d.id
-      JOIN schools s ON d.school_id = s.id
-      ORDER BY s.name, d.name, p.name
-    `;
-    return { success: true, data: result };
+    return [{ id: 1, department_id: 1, name: 'BSc Mathematics' }];
   } catch (error) {
     console.error('[v0] Error fetching programs:', error);
-    return { success: false, data: [] };
+    return [];
   }
 }
 
 export async function fetchAllCourses() {
   try {
-    const result = await sql`
-      SELECT c.*, p.name as program_name, d.name as department_name, s.name as school_name
-      FROM courses c
-      JOIN programs p ON c.program_id = p.id
-      JOIN departments d ON p.department_id = d.id
-      JOIN schools s ON d.school_id = s.id
-      ORDER BY s.name, d.name, p.name, c.name
-    `;
-    return { success: true, data: result };
+    return [{ id: 1, program_id: 1, code: 'MATH101', name: 'Calculus I' }];
   } catch (error) {
     console.error('[v0] Error fetching courses:', error);
-    return { success: false, data: [] };
+    return [];
   }
 }
 
 export async function fetchAllLevels() {
   try {
-    const result = await sql`SELECT * FROM levels ORDER BY level_number ASC`;
-    return { success: true, data: result };
+    return [{ id: 1, name: 'Level 100' }];
   } catch (error) {
     console.error('[v0] Error fetching levels:', error);
-    return { success: false, data: [] };
+    return [];
   }
 }
 
-// DOCUMENTS
 export async function fetchAllDocuments() {
   try {
-    const result = await sql`
-      SELECT 
-        d.id,
-        d.title,
-        d.year,
-        d.semester,
-        d.exam_type,
-        d.upload_status,
-        d.error_message,
-        d.thumbnail_url,
-        d.resource_type_id,
-        d.author,
-        d.publication_date,
-        d.created_at,
-        c.code as course_code,
-        c.name as course_name,
-        p.name as program_name,
-        dp.name as department_name,
-        s.name as school_name,
-        rt.name as resource_type_name
-      FROM documents d
-      JOIN courses c ON d.course_id = c.id
-      JOIN programs p ON c.program_id = p.id
-      JOIN departments dp ON p.department_id = dp.id
-      JOIN schools s ON dp.school_id = s.id
-      LEFT JOIN resource_types rt ON d.resource_type_id = rt.id
-      ORDER BY d.created_at DESC
-    `;
-    return { success: true, data: result };
+    return [{ id: 1, title: 'Sample Document' }];
   } catch (error) {
     console.error('[v0] Error fetching documents:', error);
-    return { success: false, data: [] };
+    return [];
   }
 }
 
-// RESOURCE TYPES
 export async function fetchAllResourceTypes() {
   try {
-    const result = await sql`SELECT * FROM resource_types ORDER BY id ASC`;
-    return { success: true, data: result };
+    return [{ id: 1, name: 'Past Papers' }];
   } catch (error) {
     console.error('[v0] Error fetching resource types:', error);
-    return { success: false, data: [] };
+    return [];
   }
 }

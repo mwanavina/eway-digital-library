@@ -1,8 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { Download, FileText, Calendar, User } from 'lucide-react';
+import { Download, FileText, ChevronRight, Share2 } from 'lucide-react';
+import Link from 'next/link';
 import { PDFModal } from './pdf-modal';
+import { ShareModal } from './share-modal';
 
 interface ResourceCardProps {
   id: number;
@@ -43,6 +45,7 @@ export function ResourceCard({
 }: ResourceCardProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const isExternalPdf = filePath && (filePath.startsWith('http') || filePath.startsWith('https'));
 
   const handleCardClick = () => {
@@ -121,146 +124,161 @@ export function ResourceCard({
   const typeColor = typeColors[resourceType] || '#1782C5';
   const typeBackground = typeBackgrounds[resourceType] || '#E3F2FD';
 
+  // Mobile-optimized card with large icon display
   return (
     <>
-      <div
-        onClick={handleCardClick}
-        className={`rounded-lg shadow-md hover:shadow-lg transition-all overflow-hidden border border-gray-100 ${
-          isExternalPdf ? 'cursor-pointer' : ''
-        }`}
-        style={{ backgroundColor: typeBackground }}
-      >
-        {/* Header with Resource Type Badge */}
-        <div className="px-4 pt-3 flex items-start justify-between">
-          <span
-            className="px-3 py-1 text-xs font-semibold text-white rounded-full"
-            style={{ backgroundColor: typeColor }}
-          >
-            {resourceType}
-          </span>
-          {downloadCount !== undefined && (
-            <span className="text-xs text-gray-500">
-              {downloadCount} downloads
-            </span>
-          )}
-        </div>
-
-        {/* Title */}
-        <div className="px-4 pt-2 pb-2">
-          <h3 className="font-bold text-gray-900 line-clamp-2 text-sm">
-            {title}
-          </h3>
-        </div>
-
-        {/* Thumbnail */}
-        <div className="aspect-video bg-gradient-to-b from-gray-50 to-gray-100 border border-gray-200 relative group overflow-hidden rounded-lg mx-4">
-          {thumbnailUrl ? (
-            <img
-              src={thumbnailUrl}
-              alt={title}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-            />
-          ) : (
-            <div
-              className="w-full h-full flex items-center justify-center text-white"
+      <div className="rounded-lg overflow-hidden border border-gray-200 dark:border-slate-700 shadow-sm hover:shadow-md dark:hover:shadow-slate-950 transition-all dark:bg-slate-900">
+        {/* Card Background */}
+        <div className="p-4 dark:bg-slate-800" style={{ backgroundColor: typeBackground }}>
+          {/* Type Badge and Download Count */}
+          <div className="flex items-start justify-between mb-3">
+            <span
+              className="px-2.5 py-1 text-xs font-semibold text-white rounded-full"
               style={{ backgroundColor: typeColor }}
             >
-              <FileText size={32} className="opacity-80" />
-            </div>
-          )}
-        </div>
-
-        {/* Type-Specific Metadata */}
-        <div className="px-4 py-3 space-y-2">
-          {/* Course Info - Common to all */}
-          <div className="text-xs text-gray-600">
-            <p className="font-medium text-gray-900">{courseCode}</p>
-            <p className="text-gray-600 line-clamp-1">{courseName}</p>
-            <p className="text-gray-500 text-xs">{departmentName} • {schoolName}</p>
+              {resourceType}
+            </span>
+            {downloadCount !== undefined && (
+              <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
+                {downloadCount} <span className="text-gray-500 dark:text-gray-600">↓</span>
+              </span>
+            )}
           </div>
 
-          {/* Journals/Research Papers specific */}
-          {['Journals', 'Research Papers'].includes(resourceType) && (
-            <div className="space-y-1 pt-2 border-t border-gray-200">
-              {author && (
-                <div className="flex items-center gap-2 text-xs text-gray-700">
-                  <User size={14} />
-                  <span className="line-clamp-1">{author}</span>
-                </div>
-              )}
-              {publicationDate && (
-                <div className="flex items-center gap-2 text-xs text-gray-700">
-                  <Calendar size={14} />
-                  <span>{new Date(publicationDate).toLocaleDateString()}</span>
-                </div>
-              )}
-              {abstract && (
-                <div className="text-xs text-gray-600 line-clamp-2 mt-2 italic">
-                  {abstract}
-                </div>
-              )}
+          {/* Thumbnail Image Container */}
+          <div className="mb-4 aspect-square bg-gradient-to-b from-gray-50 to-gray-100 dark:from-slate-700 dark:to-slate-800 rounded-lg overflow-hidden border border-gray-200 dark:border-slate-700 flex items-center justify-center">
+            {thumbnailUrl ? (
+              <img
+                src={thumbnailUrl}
+                alt={title}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div
+                className="w-full h-full flex items-center justify-center text-white"
+                style={{ backgroundColor: typeColor }}
+              >
+                <FileText size={48} className="opacity-80" />
+              </div>
+            )}
+          </div>
+
+          {/* Title */}
+          <h3 className="font-bold text-gray-900 dark:text-white text-sm line-clamp-2 mb-3">
+            {title}
+          </h3>
+
+          {/* Course Code and Info */}
+          <div className="text-center text-xs mb-4">
+            <p className="font-semibold text-gray-900 dark:text-white">{courseCode}</p>
+            <p className="text-gray-600 dark:text-gray-400 line-clamp-1">{courseName}</p>
+          </div>
+
+          {/* Metadata Grid */}
+          <div className="grid grid-cols-2 gap-2 mb-4 text-xs text-gray-700 dark:text-gray-300">
+            <div className="bg-white bg-opacity-60 rounded p-2">
+              <p className="text-gray-600 font-medium">School</p>
+              <p className="text-gray-900 font-semibold line-clamp-1">{schoolName}</p>
+            </div>
+            <div className="bg-white bg-opacity-60 rounded p-2">
+              <p className="text-gray-600 font-medium">Department</p>
+              <p className="text-gray-900 font-semibold line-clamp-1">{departmentName}</p>
+            </div>
+          </div>
+
+          {/* Type-Specific Info */}
+          {resourceType === 'Past Papers' && year && (
+            <div className="bg-white bg-opacity-60 rounded p-2 mb-4 text-xs">
+              <p className="text-gray-600 font-medium">Exam Details</p>
+              <p className="text-gray-900 font-semibold">{year} Sem {semester} - {examType}</p>
             </div>
           )}
 
-          {/* Dissertations specific */}
-          {resourceType === 'Dissertations' && (
-            <div className="space-y-1 pt-2 border-t border-gray-200">
-              {author && (
-                <div className="flex items-center gap-2 text-xs text-gray-700">
-                  <User size={14} />
-                  <span>By {author}</span>
-                </div>
-              )}
-              {year && (
-                <div className="flex items-center gap-2 text-xs text-gray-700">
-                  <Calendar size={14} />
-                  <span>Submitted {year}</span>
-                </div>
-              )}
+          {['Journals', 'Research Papers'].includes(resourceType) && author && (
+            <div className="bg-white bg-opacity-60 rounded p-2 mb-4 text-xs">
+              <p className="text-gray-600 font-medium">Author</p>
+              <p className="text-gray-900 font-semibold line-clamp-1">{author}</p>
             </div>
           )}
 
-          {/* Past Papers specific */}
-          {resourceType === 'Past Papers' && (
-            <div className="space-y-1 pt-2 border-t border-gray-200">
-              {year && (
-                <div className="flex items-center gap-2 text-xs text-gray-700">
-                  <Calendar size={14} />
-                  <span>{year} Sem {semester} - {examType}</span>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Course Outlines specific */}
-          {resourceType === 'Course Outlines' && (
-            <div className="space-y-1 pt-2 border-t border-gray-200">
-              {year && (
-                <div className="flex items-center gap-2 text-xs text-gray-700">
-                  <Calendar size={14} />
-                  <span>Academic Year {year}</span>
-                </div>
-              )}
+          {resourceType === 'Dissertations' && author && (
+            <div className="bg-white bg-opacity-60 rounded p-2 mb-4 text-xs">
+              <p className="text-gray-600 font-medium">Author</p>
+              <p className="text-gray-900 font-semibold line-clamp-1">{author}</p>
             </div>
           )}
         </div>
 
-        {/* Footer with Download Button */}
-        <div className="px-4 py-3">
-          <button
-            onClick={handleDownload}
-            disabled={isDownloading}
-            className="w-full flex items-center justify-center gap-2 py-2 px-4 rounded-lg font-medium text-sm transition-all border-2"
-            style={{
-              backgroundColor: 'transparent',
-              color: typeColor,
-              borderColor: typeColor,
-              opacity: isDownloading ? 0.7 : 1,
-            }}
-          >
-            <Download size={16} />
-            {isDownloading ? 'Downloading...' : 'Get'}
-          </button>
+        {/* Action Buttons */}
+        <div className="p-4 bg-white dark:bg-slate-800 border-t border-gray-200 dark:border-slate-700">
+          <div className="flex md:flex-col gap-2 items-stretch">
+            {/* Mobile Row Layout - Icons Only for Get and Share */}
+            <div className="flex md:hidden gap-2 w-full">
+              <button
+                onClick={handleDownload}
+                disabled={isDownloading}
+                className="flex-shrink-0 flex items-center justify-center p-2.5 rounded-lg font-semibold text-white transition-all"
+                style={{
+                  backgroundColor: typeColor,
+                  opacity: isDownloading ? 0.7 : 1,
+                }}
+                title={isDownloading ? 'Loading...' : 'Get'}
+                aria-label="Get resource"
+              >
+                <Download size={18} />
+              </button>
+              <button
+                onClick={() => setIsShareModalOpen(true)}
+                className="flex-shrink-0 flex items-center justify-center p-2.5 rounded-lg font-semibold transition-all border-2 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-slate-700"
+                style={{ borderColor: typeColor }}
+                title="Share resource"
+                aria-label="Share resource"
+              >
+                <Share2 size={18} />
+              </button>
+              <Link
+                href={`/document/${id}`}
+                className="flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg font-semibold text-sm transition-all border-2 text-gray-900 dark:text-white dark:hover:bg-slate-700"
+                style={{ borderColor: typeColor }}
+              >
+                Details
+                <ChevronRight size={16} />
+              </Link>
+            </div>
+
+            {/* Desktop Layout - Single Row */}
+            <div className="hidden md:flex gap-2 w-full">
+              <button
+                onClick={handleDownload}
+                disabled={isDownloading}
+                className="flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg font-semibold text-sm transition-all text-white"
+                style={{
+                  backgroundColor: typeColor,
+                  opacity: isDownloading ? 0.7 : 1,
+                }}
+              >
+                <Download size={16} />
+                {isDownloading ? 'Loading...' : 'Get'}
+              </button>
+              <button
+                onClick={() => setIsShareModalOpen(true)}
+                className="flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg font-semibold text-sm transition-all border-2 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-slate-700"
+                style={{ borderColor: typeColor }}
+                aria-label="Share resource"
+              >
+                <Share2 size={16} />
+                Share
+              </button>
+              <Link
+                href={`/document/${id}`}
+                className="flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg font-semibold text-sm transition-all border-2 text-gray-900 dark:text-white dark:hover:bg-slate-700"
+                style={{ borderColor: typeColor }}
+              >
+                Details
+                <ChevronRight size={16} />
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -272,6 +290,14 @@ export function ResourceCard({
         pdfUrl={filePath}
         documentId={id}
         onDownload={trackDownloadCallback}
+      />
+
+      {/* Share Modal */}
+      <ShareModal
+        isOpen={isShareModalOpen}
+        onClose={() => setIsShareModalOpen(false)}
+        title={title}
+        resourceId={id}
       />
     </>
   );

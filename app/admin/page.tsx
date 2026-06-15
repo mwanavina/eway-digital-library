@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Plus } from 'lucide-react';
+import { Plus, Users, FileText, Folder, BarChart3 } from 'lucide-react';
 import { AdminTable } from '@/components/admin/admin-table';
 import { AdminModal } from '@/components/admin/admin-modal';
 import { ConfirmDialog } from '@/components/admin/confirm-dialog';
@@ -194,17 +194,74 @@ export default function AdminPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
       {/* Header */}
-      <div className="bg-[#1782C5] text-white py-6 px-4 md:px-6">
+      <div className="bg-[#1782C5] dark:bg-slate-900 text-white py-8 px-4 md:px-6">
         <div className="max-w-7xl mx-auto">
-          <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-          <p className="text-blue-100 mt-1">Manage all system resources</p>
+          <h1 className="text-4xl font-bold">Admin Dashboard</h1>
+          <p className="text-blue-100 dark:text-blue-300 mt-1">Manage system resources and monitor platform analytics</p>
+        </div>
+      </div>
+
+      {/* Statistics Section */}
+      <div className="max-w-7xl mx-auto py-8 px-4 md:px-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          {/* Total Documents */}
+          <div className="bg-white dark:bg-slate-800 rounded-lg shadow p-6 border-l-4 border-blue-500">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-gray-600 dark:text-gray-400 text-sm font-medium">Total Documents</p>
+                <p className="text-3xl font-bold text-gray-900 dark:text-white mt-2">{documents.length}</p>
+              </div>
+              <div className="bg-blue-100 dark:bg-blue-900 p-3 rounded-lg">
+                <FileText size={24} className="text-blue-600 dark:text-blue-300" />
+              </div>
+            </div>
+          </div>
+
+          {/* Total Courses */}
+          <div className="bg-white dark:bg-slate-800 rounded-lg shadow p-6 border-l-4 border-purple-500">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-gray-600 dark:text-gray-400 text-sm font-medium">Total Courses</p>
+                <p className="text-3xl font-bold text-gray-900 dark:text-white mt-2">{courses.length}</p>
+              </div>
+              <div className="bg-purple-100 dark:bg-purple-900 p-3 rounded-lg">
+                <Folder size={24} className="text-purple-600 dark:text-purple-300" />
+              </div>
+            </div>
+          </div>
+
+          {/* Total Programs */}
+          <div className="bg-white dark:bg-slate-800 rounded-lg shadow p-6 border-l-4 border-green-500">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-gray-600 dark:text-gray-400 text-sm font-medium">Total Programs</p>
+                <p className="text-3xl font-bold text-gray-900 dark:text-white mt-2">{programs.length}</p>
+              </div>
+              <div className="bg-green-100 dark:bg-green-900 p-3 rounded-lg">
+                <BarChart3 size={24} className="text-green-600 dark:text-green-300" />
+              </div>
+            </div>
+          </div>
+
+          {/* Total Schools */}
+          <div className="bg-white dark:bg-slate-800 rounded-lg shadow p-6 border-l-4 border-orange-500">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-gray-600 dark:text-gray-400 text-sm font-medium">Total Schools</p>
+                <p className="text-3xl font-bold text-gray-900 dark:text-white mt-2">{schools.length}</p>
+              </div>
+              <div className="bg-orange-100 dark:bg-orange-900 p-3 rounded-lg">
+                <Users size={24} className="text-orange-600 dark:text-orange-300" />
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="border-b border-gray-200 bg-white sticky top-0 z-40">
+      <div className="border-b border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 md:px-6">
           <div className="flex overflow-x-auto gap-1">
             {tabs.map((tab) => (
@@ -216,8 +273,8 @@ export default function AdminPage() {
                 }}
                 className={`px-4 py-4 text-sm font-medium whitespace-nowrap border-b-2 transition-colors ${
                   activeTab === tab.id
-                    ? 'border-[#1782C5] text-[#1782C5]'
-                    : 'border-transparent text-gray-600 hover:text-gray-900'
+                    ? 'border-[#1782C5] text-[#1782C5] dark:text-blue-400'
+                    : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
                 }`}
               >
                 {tab.label}
@@ -232,8 +289,8 @@ export default function AdminPage() {
         {/* Upload Tab */}
         {activeTab === 'upload' && (
           <div className="space-y-6">
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-xl font-bold text-gray-900 mb-6">Upload Documents</h2>
+            <div className="bg-white dark:bg-slate-800 rounded-lg shadow p-6">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">Upload Documents</h2>
               <AdminUploadFormEnhanced
                 schools={schools}
                 departments={departments}
@@ -251,17 +308,17 @@ export default function AdminPage() {
 
         {/* Documents Tab */}
         {activeTab === 'documents' && (
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-xl font-bold text-gray-900 mb-6">All Documents</h2>
+          <div className="bg-white dark:bg-slate-800 rounded-lg shadow p-6">
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">All Documents</h2>
             <AdminDocumentList documents={documents} />
           </div>
         )}
 
         {/* Schools Tab */}
         {activeTab === 'schools' && (
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className="bg-white dark:bg-slate-800 rounded-lg shadow p-6">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-gray-900">Schools</h2>
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">Schools</h2>
               <button
                 onClick={openCreateModal}
                 className="flex items-center gap-2 bg-[#1782C5] text-white px-4 py-2 rounded-lg hover:bg-[#1F2557] transition-colors"
@@ -281,9 +338,9 @@ export default function AdminPage() {
 
         {/* Departments Tab */}
         {activeTab === 'departments' && (
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className="bg-white dark:bg-slate-800 rounded-lg shadow p-6">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-gray-900">Departments</h2>
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">Departments</h2>
               <button
                 onClick={openCreateModal}
                 className="flex items-center gap-2 bg-[#1782C5] text-white px-4 py-2 rounded-lg hover:bg-[#1F2557] transition-colors"
@@ -306,9 +363,9 @@ export default function AdminPage() {
 
         {/* Programs Tab */}
         {activeTab === 'programs' && (
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className="bg-white dark:bg-slate-800 rounded-lg shadow p-6">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-gray-900">Programs</h2>
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">Programs</h2>
               <button
                 onClick={openCreateModal}
                 className="flex items-center gap-2 bg-[#1782C5] text-white px-4 py-2 rounded-lg hover:bg-[#1F2557] transition-colors"
@@ -332,9 +389,9 @@ export default function AdminPage() {
 
         {/* Courses Tab */}
         {activeTab === 'courses' && (
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className="bg-white dark:bg-slate-800 rounded-lg shadow p-6">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-gray-900">Courses</h2>
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">Courses</h2>
               <button
                 onClick={openCreateModal}
                 className="flex items-center gap-2 bg-[#1782C5] text-white px-4 py-2 rounded-lg hover:bg-[#1F2557] transition-colors"
@@ -358,9 +415,9 @@ export default function AdminPage() {
 
         {/* Levels Tab */}
         {activeTab === 'levels' && (
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className="bg-white dark:bg-slate-800 rounded-lg shadow p-6">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-gray-900">Levels</h2>
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">Levels</h2>
               <button
                 onClick={openCreateModal}
                 className="flex items-center gap-2 bg-[#1782C5] text-white px-4 py-2 rounded-lg hover:bg-[#1F2557] transition-colors"

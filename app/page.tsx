@@ -6,6 +6,8 @@ import { FilterSidebar } from '@/components/filter-sidebar';
 import { DocumentCard } from '@/components/document-card';
 import { ResourceCard } from '@/components/resource-card';
 import { BottomNav } from '@/components/bottom-nav';
+import { FilterDrawer } from '@/components/filter-drawer';
+import { SearchModal } from '@/components/search-modal';
 import { Spinner } from '@/components/ui/spinner';
 import { Empty } from '@/components/ui/empty';
 import { AllResourcesFilter } from '@/components/filters/all-resources-filter';
@@ -13,7 +15,7 @@ import { PastPapersFilter } from '@/components/filters/past-papers-filter';
 import { JournalsFilter } from '@/components/filters/journals-filter';
 import { DissertationsFilter } from '@/components/filters/dissertations-filter';
 import { CourseOutlinesFilter } from '@/components/filters/course-outlines-filter';
-import { FileText, BookOpen, Book, ClipboardList, Microscope, Menu } from 'lucide-react';
+import { FileText, BookOpen, Book, ClipboardList, Microscope, Menu, Sliders } from 'lucide-react';
 
 interface Document {
   id: number;
@@ -48,6 +50,8 @@ const RESOURCE_TYPES = [
 
 export default function Home() {
   const [documents, setDocuments] = useState<Document[]>([]);
+  const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
+  const [searchModalOpen, setSearchModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -191,14 +195,39 @@ export default function Home() {
       <Header 
         onSearchChange={handleSearchChange} 
         onMenuClick={() => setSidebarOpen(!sidebarOpen)}
-        activeFilterCount={activeFilterCount}
+        onSearchClick={() => setSearchModalOpen(true)}
+        onFilterClick={() => setFilterDrawerOpen(true)} // Mobile filter drawer
       />
-      {/* Bottom Nav - Mobile Only */}
-      <div className="lg:hidden">
-        <BottomNav activeTab="browse" />
-      </div>
+      <BottomNav activeTab="browse" />
 
-      <div className="flex flex-1 overflow-hidden">
+      {/* Search Modal */}
+      <SearchModal
+        isOpen={searchModalOpen}
+        onClose={() => setSearchModalOpen(false)}
+        onSearchChange={handleSearchChange}
+        onFilterClick={() => {
+          setSearchModalOpen(false);
+          setFilterDrawerOpen(true);
+        }}
+        searchQuery={searchQuery}
+      />
+
+      {/* Filter Drawer Modal */}
+      <FilterDrawer
+        isOpen={filterDrawerOpen}
+        onClose={() => setFilterDrawerOpen(false)}
+        resultsCount={documents.length}
+        onFilterChange={handleFilterChange}
+        onClearFilters={handleClearFilters}
+        currentFilters={filters}
+        schools={schools}
+        departments={departments}
+        programs={programs}
+        courses={courses}
+        activeResourceType={activeResourceType}
+      />
+      
+      <div className="flex h-[calc(100vh-64px)] flex-col md:flex-row">
         {/* Sidebar Overlay for Mobile */}
         {sidebarOpen && (
           <div
@@ -207,8 +236,8 @@ export default function Home() {
           />
         )}
 
-        {/* Filter Sidebar - Desktop Only */}
-        <aside className="hidden lg:flex flex-col w-64 border-r border-gray-200 bg-white overflow-y-auto">
+        {/* Filter Sidebar - Resource Specific */}
+        <div className="hidden lg:block lg:w-64 lg:border-r lg:border-gray-200 lg:overflow-hidden lg:bg-white">
           {activeResourceType === 'all' && (
             <AllResourcesFilter
               schools={schools}
@@ -218,9 +247,8 @@ export default function Home() {
               filters={filters}
               onFilterChange={handleFilterChange}
               onClearFilters={handleClearFilters}
-              isOpen={true}
-              onClose={() => {}}
-              resultsCount={documents.length}
+              isOpen={sidebarOpen}
+              onClose={() => setSidebarOpen(false)}
             />
           )}
           {activeResourceType === 'past-papers' && (
@@ -232,9 +260,8 @@ export default function Home() {
               filters={filters}
               onFilterChange={handleFilterChange}
               onClearFilters={handleClearFilters}
-              isOpen={true}
-              onClose={() => {}}
-              resultsCount={documents.length}
+              isOpen={sidebarOpen}
+              onClose={() => setSidebarOpen(false)}
             />
           )}
           {(activeResourceType === 'journals' || activeResourceType === 'research-papers') && (
@@ -246,9 +273,8 @@ export default function Home() {
               filters={filters}
               onFilterChange={handleFilterChange}
               onClearFilters={handleClearFilters}
-              isOpen={true}
-              onClose={() => {}}
-              resultsCount={documents.length}
+              isOpen={sidebarOpen}
+              onClose={() => setSidebarOpen(false)}
             />
           )}
           {activeResourceType === 'dissertations' && (
@@ -260,9 +286,8 @@ export default function Home() {
               filters={filters}
               onFilterChange={handleFilterChange}
               onClearFilters={handleClearFilters}
-              isOpen={true}
-              onClose={() => {}}
-              resultsCount={documents.length}
+              isOpen={sidebarOpen}
+              onClose={() => setSidebarOpen(false)}
             />
           )}
           {activeResourceType === 'course-outlines' && (
@@ -274,12 +299,11 @@ export default function Home() {
               filters={filters}
               onFilterChange={handleFilterChange}
               onClearFilters={handleClearFilters}
-              isOpen={true}
-              onClose={() => {}}
-              resultsCount={documents.length}
+              isOpen={sidebarOpen}
+              onClose={() => setSidebarOpen(false)}
             />
           )}
-        </aside>
+        </div>
 
         {/* Mobile Filter Sidebar */}
         {sidebarOpen && (
@@ -295,7 +319,6 @@ export default function Home() {
                 onClearFilters={handleClearFilters}
                 isOpen={sidebarOpen}
                 onClose={() => setSidebarOpen(false)}
-                resultsCount={documents.length}
               />
             )}
             {activeResourceType === 'past-papers' && (
@@ -309,7 +332,6 @@ export default function Home() {
                 onClearFilters={handleClearFilters}
                 isOpen={sidebarOpen}
                 onClose={() => setSidebarOpen(false)}
-                resultsCount={documents.length}
               />
             )}
             {(activeResourceType === 'journals' || activeResourceType === 'research-papers') && (
@@ -323,7 +345,6 @@ export default function Home() {
                 onClearFilters={handleClearFilters}
                 isOpen={sidebarOpen}
                 onClose={() => setSidebarOpen(false)}
-                resultsCount={documents.length}
               />
             )}
             {activeResourceType === 'dissertations' && (
@@ -337,7 +358,6 @@ export default function Home() {
                 onClearFilters={handleClearFilters}
                 isOpen={sidebarOpen}
                 onClose={() => setSidebarOpen(false)}
-                resultsCount={documents.length}
               />
             )}
             {activeResourceType === 'course-outlines' && (
@@ -351,24 +371,47 @@ export default function Home() {
                 onClearFilters={handleClearFilters}
                 isOpen={sidebarOpen}
                 onClose={() => setSidebarOpen(false)}
-                resultsCount={documents.length}
               />
             )}
           </>
         )}
 
         {/* Main Content - Scrollable */}
-        <main className="flex-1 overflow-y-auto bg-white pb-20 lg:pb-0">
+        <main className="flex-1 overflow-y-auto bg-white pb-24 md:pb-0">
           <div className="p-4 md:p-6">
-            {/* Resource Type Pills - Horizontal Scroll */}
-            <div className="mb-4 lg:mb-6 flex gap-2 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100">
+            {/* Mobile Filter Pills - Horizontally Scrollable */}
+            <div className="md:hidden mb-6 flex gap-2 items-center overflow-x-auto pb-2 -mx-4 px-4">
+              {/* Quick Filter Pills */}
+              {[
+                { id: 'all', label: 'All' },
+                { id: 'past-papers', label: 'Past Papers' },
+                { id: 'journals', label: 'Journals' },
+                { id: 'dissertations', label: 'Dissertations' },
+                { id: 'course-outlines', label: 'Course Outlines' },
+              ].map((type) => (
+                <button
+                  key={type.id}
+                  onClick={() => handleResourceTypeChange(type.id as ResourceType)}
+                  className={`px-4 py-2 rounded-full text-xs font-semibold transition-all flex-shrink-0 whitespace-nowrap ${
+                    activeResourceType === type.id
+                      ? 'bg-[#1782C5] text-white'
+                      : 'bg-gray-100 text-gray-700'
+                  }`}
+                >
+                  {type.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Desktop Resource Type Pills - Horizontally Scrollable */}
+            <div className="hidden md:flex mb-4 lg:mb-6 gap-2 overflow-x-auto pb-2 -mx-6 px-6">
               {RESOURCE_TYPES.map((type) => {
                 const isActive = activeResourceType === type.id;
                 return (
                   <button
                     key={type.id}
                     onClick={() => handleResourceTypeChange(type.id as ResourceType)}
-                    className={`flex-shrink-0 px-3 lg:px-4 py-1.5 lg:py-2 rounded-full text-xs lg:text-sm font-medium transition-all ${
+                    className={`px-3 lg:px-4 py-1.5 lg:py-2 rounded-full text-xs lg:text-sm font-medium transition-all flex-shrink-0 whitespace-nowrap ${
                       isActive
                         ? 'text-white'
                         : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
@@ -381,8 +424,8 @@ export default function Home() {
               })}
             </div>
 
-            {/* Results Header with Sort */}
-            <div className="mb-4 lg:mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            {/* Results Header with Sort - Desktop Only */}
+            <div className="hidden md:flex mb-4 lg:mb-6 flex-col md:flex-row md:items-center md:justify-between gap-3">
               <div>
                 <p className="text-gray-700 text-xs lg:text-sm font-medium">
                   {documents.length.toLocaleString()} results for {searchQuery ? `"${searchQuery}"` : 'all resources'}
@@ -408,7 +451,7 @@ export default function Home() {
                 <Spinner />
               </div>
             ) : documents.length > 0 ? (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                 {documents.map((doc) => (
                   <ResourceCard
                     key={doc.id}

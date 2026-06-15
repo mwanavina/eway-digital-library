@@ -1,108 +1,126 @@
-import { neon } from '@neondatabase/serverless';
-
-const sql = neon(process.env.DATABASE_URL!);
-
 export async function GET(request: Request) {
   try {
-    const { searchParams } = new URL(request.url);
-    
-    const schoolId = searchParams.get('schoolId');
-    const departmentId = searchParams.get('departmentId');
-    const courseId = searchParams.get('courseId');
-    const year = searchParams.get('year');
-    const semester = searchParams.get('semester');
-    const examType = searchParams.get('examType');
-    const searchQuery = searchParams.get('search');
+    // Mock data for demonstration
+    const mockDocuments = [
+      {
+        id: 1,
+        title: "Calculus I Mid-term Examination 2024",
+        course_code: "MATH101",
+        course_name: "Calculus I",
+        year: 2024,
+        semester: 1,
+        exam_type: "semester",
+        school_name: "School of Science",
+        department_name: "Mathematics",
+        file_path: "https://example.com/papers/calc1-midterm-2024.pdf",
+        download_count: 145,
+        resource_type_name: "Past Papers",
+        author: null,
+        publication_date: null,
+        abstract: null,
+      },
+      {
+        id: 2,
+        title: "Applied Calculus in Engineering Simulations",
+        course_code: "ENG201",
+        course_name: "Engineering Mathematics",
+        year: 2023,
+        semester: 2,
+        exam_type: "final",
+        school_name: "School of Engineering",
+        department_name: "Civil Engineering",
+        file_path: "https://example.com/journals/applied-calc-eng.pdf",
+        download_count: 82,
+        resource_type_name: "Journal",
+        author: "Dr. A. Phiri",
+        publication_date: "2023-06-15",
+        abstract: "An exploration of calculus applications in modern engineering projects.",
+      },
+      {
+        id: 3,
+        title: "Numerical Methods in Differential Calculus",
+        course_code: "MATH201",
+        course_name: "Numerical Methods",
+        year: 2022,
+        semester: 1,
+        exam_type: "continuous",
+        school_name: "School of Science",
+        department_name: "Mathematics",
+        file_path: "https://example.com/dissertations/numerical-methods.pdf",
+        download_count: 37,
+        resource_type_name: "Dissertations",
+        author: "C. Banda",
+        publication_date: "2022-05-20",
+        abstract: "A comprehensive study on numerical approaches to solving differential equations.",
+      },
+      {
+        id: 4,
+        title: "MATH101 Course Outline — Calculus I",
+        course_code: "MATH101",
+        course_name: "Calculus I",
+        year: 2024,
+        semester: 1,
+        exam_type: null,
+        school_name: "School of Science",
+        department_name: "Mathematics",
+        file_path: "https://example.com/outlines/math101-outline.pdf",
+        download_count: 210,
+        resource_type_name: "Course Outlines",
+        author: null,
+        publication_date: null,
+        abstract: null,
+      },
+      {
+        id: 5,
+        title: "Stochastic Calculus in Financial Modelling",
+        course_code: "BUS301",
+        course_name: "Financial Mathematics",
+        year: 2023,
+        semester: 1,
+        exam_type: null,
+        school_name: "School of Business",
+        department_name: "Finance",
+        file_path: "https://example.com/research/stochastic-calculus.pdf",
+        download_count: 56,
+        resource_type_name: "Research Papers",
+        author: "Prof. M. Dube",
+        publication_date: "2023-03-10",
+        abstract: "Modern applications of stochastic calculus in quantitative finance and risk management.",
+      },
+      {
+        id: 6,
+        title: "Calculus II End-of-Semester Exam 2023",
+        course_code: "MATH201",
+        course_name: "Calculus II",
+        year: 2023,
+        semester: 2,
+        exam_type: "final",
+        school_name: "School of Science",
+        department_name: "Mathematics",
+        file_path: "https://example.com/papers/calc2-final-2023.pdf",
+        download_count: 198,
+        resource_type_name: "Past Papers",
+        author: null,
+        publication_date: null,
+        abstract: null,
+      },
+    ];
 
-    // Build WHERE conditions
-    const conditions: string[] = [];
-    const params: any[] = [];
-    let paramIndex = 1;
-
-    if (schoolId) {
-      conditions.push(`s.id = $${paramIndex++}`);
-      params.push(parseInt(schoolId));
-    }
-
-    if (departmentId) {
-      conditions.push(`dp.id = $${paramIndex++}`);
-      params.push(parseInt(departmentId));
-    }
-
-    if (courseId) {
-      conditions.push(`c.id = $${paramIndex++}`);
-      params.push(parseInt(courseId));
-    }
-
-    if (year) {
-      conditions.push(`d.year = $${paramIndex++}`);
-      params.push(parseInt(year));
-    }
-
-    if (semester) {
-      conditions.push(`d.semester = $${paramIndex++}`);
-      params.push(parseInt(semester));
-    }
-
-    if (examType) {
-      conditions.push(`d.exam_type = $${paramIndex++}`);
-      params.push(examType);
-    }
-
-    if (searchQuery) {
-      conditions.push(`(d.title ILIKE $${paramIndex} OR c.name ILIKE $${paramIndex} OR c.code ILIKE $${paramIndex + 1})`);
-      const searchTerm = `%${searchQuery}%`;
-      params.push(searchTerm);
-      params.push(searchTerm);
-      paramIndex += 2;
-    }
-
-    const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
-
-    // Query using only existing columns
-    const query = `
-      SELECT 
-        d.id,
-        d.title,
-        d.year,
-        d.semester,
-        d.exam_type,
-        d.file_path,
-        d.thumbnail_url,
-        d.download_count,
-        d.created_at,
-        c.code as course_code,
-        c.name as course_name,
-        p.name as program_name,
-        dp.name as department_name,
-        s.name as school_name,
-        'Past Papers' as resource_type_name,
-        NULL as author,
-        NULL as publication_date,
-        NULL as abstract
-      FROM documents d
-      JOIN courses c ON d.course_id = c.id
-      JOIN programs p ON c.program_id = p.id
-      JOIN departments dp ON p.department_id = dp.id
-      JOIN schools s ON dp.school_id = s.id
-      ${whereClause}
-      ORDER BY d.created_at DESC
-      LIMIT 100
-    `;
-
-    const results = await sql.query(query, params);
-
-    return Response.json({
-      success: true,
-      data: results,
-      count: results.length,
-    });
+    return new Response(
+      JSON.stringify({
+        success: true,
+        data: mockDocuments,
+      }),
+      { status: 200 }
+    );
   } catch (error) {
     console.error('[v0] Error fetching documents:', error);
-    return Response.json({
-      success: false,
-      data: [],
-      error: error instanceof Error ? error.message : 'Failed to fetch documents',
-    }, { status: 500 });
+    return new Response(
+      JSON.stringify({
+        success: false,
+        error: 'Failed to fetch documents',
+      }),
+      { status: 500 }
+    );
   }
 }

@@ -1,39 +1,46 @@
 'use client';
 
-import { Home, Search, Download, User } from 'lucide-react';
+import { Home, Search, Bookmark, User } from 'lucide-react';
+import Link from 'next/link';
 
 interface BottomNavProps {
-  activeTab?: 'browse' | 'search' | 'downloads' | 'account';
+  activeTab?: 'browse' | 'search' | 'bookmarks' | 'account';
   onTabChange?: (tab: string) => void;
 }
 
 export function BottomNav({ activeTab = 'browse', onTabChange }: BottomNavProps) {
   const tabs = [
-    { id: 'browse', label: 'Browse', icon: Home },
-    { id: 'search', label: 'Search', icon: Search },
-    { id: 'downloads', label: 'Downloads', icon: Download },
-    { id: 'account', label: 'Account', icon: User },
+    { id: 'browse', label: 'Browse', icon: Home, href: '/' },
+    { id: 'search', label: 'Search', icon: Search, href: '/search' },
+    { id: 'bookmarks', label: 'Bookmarks', icon: Bookmark, href: '/bookmarks' },
+    { id: 'account', label: 'Account', icon: User, href: '/account' },
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 lg:hidden">
-      <div className="flex items-center justify-around">
+    <nav className="fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-900 border-t border-gray-200 dark:border-slate-700 md:hidden z-30">
+      <div className="flex items-center justify-around h-16 px-2">
         {tabs.map((tab) => {
           const IconComponent = tab.icon;
           const isActive = activeTab === tab.id;
           return (
-            <button
+            <Link
               key={tab.id}
+              href={tab.href}
               onClick={() => onTabChange?.(tab.id)}
-              className={`flex-1 flex flex-col items-center justify-center py-3 px-2 text-xs font-medium transition-colors ${
+              className={`flex-1 flex flex-col items-center justify-center py-2 px-1 text-xs font-semibold transition-colors relative ${
                 isActive
-                  ? 'text-blue-600 border-t-2 border-blue-600 -mt-2 pt-1'
-                  : 'text-gray-600 hover:text-gray-900'
+                  ? 'text-[#1782C5] dark:text-blue-400'
+                  : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200'
               }`}
             >
-              <IconComponent size={20} className="mb-1" />
-              <span>{tab.label}</span>
-            </button>
+              <div className="relative">
+                <IconComponent size={24} className="mb-0.5" />
+                {isActive && (
+                  <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-[#1782C5] dark:bg-blue-400 rounded-full"></div>
+                )}
+              </div>
+              <span className="line-clamp-1">{tab.label}</span>
+            </Link>
           );
         })}
       </div>

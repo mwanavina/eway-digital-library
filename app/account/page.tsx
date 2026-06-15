@@ -1,0 +1,254 @@
+'use client';
+
+import { useState } from 'react';
+import { Header } from '@/components/header';
+import { BottomNav } from '@/components/bottom-nav';
+import { Edit2, Mail, Phone, MapPin, Calendar, FileText } from 'lucide-react';
+
+export default function AccountPage() {
+  const [isEditing, setIsEditing] = useState(false);
+  const [formData, setFormData] = useState({
+    firstName: 'John',
+    lastName: 'Doe',
+    email: 'john.doe@mubas.edu',
+    phone: '+1 (555) 123-4567',
+    country: 'United States',
+    university: 'MUBAS University',
+    dateJoined: 'January 15, 2024',
+  });
+
+  const [tempFormData, setTempFormData] = useState(formData);
+
+  const handleEditClick = () => {
+    setTempFormData(formData);
+    setIsEditing(true);
+  };
+
+  const handleSaveClick = () => {
+    setFormData(tempFormData);
+    setIsEditing(false);
+  };
+
+  const handleCancelClick = () => {
+    setIsEditing(false);
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setTempFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  return (
+    <div className="min-h-screen bg-white flex flex-col">
+      <Header />
+      <BottomNav activeTab="browse" />
+
+      <main className="flex-1 overflow-y-auto pb-24 md:pb-0">
+        <div className="max-w-2xl mx-auto p-4 md:p-6">
+          {/* Profile Header */}
+          <div className="mb-8">
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">My Account</h1>
+            <p className="text-gray-600">Manage your profile information</p>
+          </div>
+
+          {/* Profile Card */}
+          <div className="border border-gray-200 rounded-lg overflow-hidden bg-white">
+            {/* Header with Edit Button */}
+            <div className="flex items-center justify-between px-4 md:px-6 py-4 bg-gray-50 border-b border-gray-200">
+              <h2 className="font-semibold text-gray-900">Profile Information</h2>
+              {!isEditing ? (
+                <button
+                  onClick={handleEditClick}
+                  className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-[#1782C5] hover:bg-blue-50 rounded-lg transition-colors"
+                >
+                  <Edit2 size={16} />
+                  Edit
+                </button>
+              ) : null}
+            </div>
+
+            {/* Profile Content */}
+            <div className="p-4 md:p-6">
+              {isEditing ? (
+                // Edit Form
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        First Name
+                      </label>
+                      <input
+                        type="text"
+                        name="firstName"
+                        value={tempFormData.firstName}
+                        onChange={handleInputChange}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1782C5]"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Last Name
+                      </label>
+                      <input
+                        type="text"
+                        name="lastName"
+                        value={tempFormData.lastName}
+                        onChange={handleInputChange}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1782C5]"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                    <input
+                      type="email"
+                      name="email"
+                      value={tempFormData.email}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1782C5]"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                    <input
+                      type="tel"
+                      name="phone"
+                      value={tempFormData.phone}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1782C5]"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Country
+                      </label>
+                      <input
+                        type="text"
+                        name="country"
+                        value={tempFormData.country}
+                        onChange={handleInputChange}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1782C5]"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        University
+                      </label>
+                      <input
+                        type="text"
+                        name="university"
+                        value={tempFormData.university}
+                        onChange={handleInputChange}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1782C5]"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex gap-3 pt-4">
+                    <button
+                      onClick={handleSaveClick}
+                      className="flex-1 px-4 py-2 bg-[#1782C5] text-white font-medium rounded-lg hover:bg-[#1470a8] transition-colors"
+                    >
+                      Save Changes
+                    </button>
+                    <button
+                      onClick={handleCancelClick}
+                      className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition-colors"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                // View Mode
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <p className="text-sm text-gray-600 mb-1">First Name</p>
+                      <p className="text-base font-medium text-gray-900">{formData.firstName}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-600 mb-1">Last Name</p>
+                      <p className="text-base font-medium text-gray-900">{formData.lastName}</p>
+                    </div>
+                  </div>
+
+                  <div className="pt-4 border-t border-gray-200">
+                    <div className="flex items-center gap-3 mb-4">
+                      <Mail size={18} className="text-gray-400" />
+                      <div>
+                        <p className="text-sm text-gray-600">Email</p>
+                        <p className="text-base text-gray-900">{formData.email}</p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3 mb-4">
+                      <Phone size={18} className="text-gray-400" />
+                      <div>
+                        <p className="text-sm text-gray-600">Phone</p>
+                        <p className="text-base text-gray-900">{formData.phone}</p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3 mb-4">
+                      <MapPin size={18} className="text-gray-400" />
+                      <div>
+                        <p className="text-sm text-gray-600">Country</p>
+                        <p className="text-base text-gray-900">{formData.country}</p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3 mb-4">
+                      <FileText size={18} className="text-gray-400" />
+                      <div>
+                        <p className="text-sm text-gray-600">University</p>
+                        <p className="text-base text-gray-900">{formData.university}</p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                      <Calendar size={18} className="text-gray-400" />
+                      <div>
+                        <p className="text-sm text-gray-600">Member Since</p>
+                        <p className="text-base text-gray-900">{formData.dateJoined}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Activity Card */}
+          <div className="mt-6 border border-gray-200 rounded-lg overflow-hidden bg-white">
+            <div className="px-4 md:px-6 py-4 bg-gray-50 border-b border-gray-200">
+              <h2 className="font-semibold text-gray-900">Activity</h2>
+            </div>
+            <div className="p-4 md:p-6 space-y-3">
+              <div className="flex justify-between items-center">
+                <span className="text-gray-700">Downloads</span>
+                <span className="font-semibold text-gray-900">24</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-gray-700">Saved Resources</span>
+                <span className="font-semibold text-gray-900">12</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-gray-700">Last Access</span>
+                <span className="font-semibold text-gray-900">Today</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  );
+}
