@@ -8,9 +8,9 @@ const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-mono" });
 
 export const metadata: Metadata = {
-  title: 'MUBAS Digital Library',
-  description: 'Access academic resources from MUBAS - Past papers, dissertations, and research materials',
-  generator: 'v0.app',
+  title: 'Eway Digital Library',
+  description: 'Access academic resources from Eway - Past papers, dissertations, and research materials',
+  generator: 'Next.js',
   icons: {
     icon: '/icon.svg',
     apple: '/apple-icon.png',

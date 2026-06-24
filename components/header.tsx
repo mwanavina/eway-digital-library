@@ -26,9 +26,9 @@ export function Header({ onSearchChange, onMenuClick, onSearchClick, onFilterCli
         {/* Logo */}
         <div className="flex items-center gap-2 flex-shrink-0">
           <div className="w-7 h-7 bg-[#EDD899] rounded-full flex items-center justify-center font-bold text-[#1F2557] text-sm">
-            M
+            E
           </div>
-          <h1 className="hidden sm:block text-sm md:text-base font-bold">MUBAS Library</h1>
+          <h1 className="hidden sm:block text-sm md:text-base font-bold">Eway Library</h1>
         </div>
 
         {/* Right Icons - Search, Filter, Settings, User */}

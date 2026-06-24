@@ -2,7 +2,7 @@
 
 ## Overview
 
-The MUBAS Digital Library uses **Neon PostgreSQL** as its primary database. This document provides a comprehensive reference for all tables, columns, relationships, and data types.
+The Eway Digital Library uses **Neon PostgreSQL** as its primary database. This document provides a comprehensive reference for all tables, columns, relationships, and data types.
 
 **Database Type:** PostgreSQL  
 **Hosting:** Neon (Serverless PostgreSQL)  
