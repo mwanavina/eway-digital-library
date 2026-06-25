@@ -30,7 +30,7 @@ export async function deleteSchool(id: number) {
 }
 
 // DEPARTMENTS
-export async function createDepartment(schoolId: number, name: string) {
+export async function createDepartment(name: string, schoolId: number) {
   try {
     return { success: true, data: { id: Math.random(), school_id: schoolId, name } };
   } catch (error) {
@@ -58,7 +58,7 @@ export async function deleteDepartment(id: number) {
 }
 
 // PROGRAMS
-export async function createProgram(departmentId: number, name: string) {
+export async function createProgram(name: string, departmentId: number) {
   try {
     return { success: true, data: { id: Math.random(), department_id: departmentId, name } };
   } catch (error) {
@@ -86,7 +86,7 @@ export async function deleteProgram(id: number) {
 }
 
 // COURSES
-export async function createCourse(programId: number, code: string, name: string) {
+export async function createCourse(code: string, name: string, programId: number) {
   try {
     return { success: true, data: { id: Math.random(), program_id: programId, code, name } };
   } catch (error) {
@@ -114,9 +114,9 @@ export async function deleteCourse(id: number) {
 }
 
 // LEVELS
-export async function createLevel(name: string) {
+export async function createLevel(levelNumber: number, description: string) {
   try {
-    return { success: true, data: { id: Math.random(), name } };
+    return { success: true, data: { id: Math.random(), level_number: levelNumber, description } };
   } catch (error) {
     console.error('[v0] Error creating level:', error);
     return { success: false, error: 'Failed to create level' };
@@ -144,63 +144,63 @@ export async function deleteLevel(id: number) {
 // FETCH ALL
 export async function fetchAllSchools() {
   try {
-    return [{ id: 1, name: 'School of Science' }];
+    return { success: true, data: [{ id: 1, name: 'School of Science' }] };
   } catch (error) {
     console.error('[v0] Error fetching schools:', error);
-    return [];
+    return { success: false, error: 'Failed to fetch schools' };
   }
 }
 
 export async function fetchAllDepartments() {
   try {
-    return [{ id: 1, school_id: 1, name: 'Mathematics' }];
+    return { success: true, data: [{ id: 1, school_id: 1, name: 'Mathematics' }] };
   } catch (error) {
     console.error('[v0] Error fetching departments:', error);
-    return [];
+    return { success: false, error: 'Failed to fetch departments' };
   }
 }
 
 export async function fetchAllPrograms() {
   try {
-    return [{ id: 1, department_id: 1, name: 'BSc Mathematics' }];
+    return { success: true, data: [{ id: 1, department_id: 1, name: 'BSc Mathematics' }] };
   } catch (error) {
     console.error('[v0] Error fetching programs:', error);
-    return [];
+    return { success: false, error: 'Failed to fetch programs' };
   }
 }
 
 export async function fetchAllCourses() {
   try {
-    return [{ id: 1, program_id: 1, code: 'MATH101', name: 'Calculus I' }];
+    return { success: true, data: [{ id: 1, program_id: 1, code: 'MATH101', name: 'Calculus I' }] };
   } catch (error) {
     console.error('[v0] Error fetching courses:', error);
-    return [];
+    return { success: false, error: 'Failed to fetch courses' };
   }
 }
 
 export async function fetchAllLevels() {
   try {
-    return [{ id: 1, name: 'Level 100' }];
+    return { success: true, data: [{ id: 1, name: 'Level 100' }] };
   } catch (error) {
     console.error('[v0] Error fetching levels:', error);
-    return [];
+    return { success: false, error: 'Failed to fetch levels' };
   }
 }
 
 export async function fetchAllDocuments() {
   try {
-    return [{ id: 1, title: 'Sample Document' }];
+    return { success: true, data: [{ id: 1, title: 'Sample Document' }] };
   } catch (error) {
     console.error('[v0] Error fetching documents:', error);
-    return [];
+    return { success: false, error: 'Failed to fetch documents' };
   }
 }
 
 export async function fetchAllResourceTypes() {
   try {
-    return [{ id: 1, name: 'Past Papers' }];
+    return { success: true, data: [{ id: 1, name: 'Past Papers' }] };
   } catch (error) {
     console.error('[v0] Error fetching resource types:', error);
-    return [];
+    return { success: false, error: 'Failed to fetch resource types' };
   }
 }

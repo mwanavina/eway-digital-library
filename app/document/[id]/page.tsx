@@ -75,12 +75,12 @@ export default function DocumentDetailPage() {
 
       // Create a blob URL and trigger download
       const blobUrl = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
+      const link = globalThis.document.createElement('a');
       link.href = blobUrl;
       link.download = `${document.title}.pdf`;
-      document.body.appendChild(link);
+      globalThis.document.body.appendChild(link);
       link.click();
-      document.body.removeChild(link);
+      globalThis.document.body.removeChild(link);
       window.URL.revokeObjectURL(blobUrl);
 
       console.log('[v0] PDF downloaded:', document.title);

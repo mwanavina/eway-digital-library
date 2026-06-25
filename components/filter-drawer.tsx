@@ -28,6 +28,8 @@ interface FilterDrawerProps {
   activeResourceType: ResourceType;
 }
 
+type ExpandedSection = 'school' | 'department' | 'program' | 'course' | 'year' | 'semester' | 'examType';
+
 export interface FilterState {
   school: string;
   year: string;
@@ -47,7 +49,7 @@ export function FilterDrawer({
   courses,
   activeResourceType,
 }: FilterDrawerProps) {
-  const [expandedSections, setExpandedSections] = useState({
+  const [expandedSections, setExpandedSections] = useState<Record<ExpandedSection, boolean>>({
     school: true,
     department: false,
     program: false,
@@ -69,7 +71,7 @@ export function FilterDrawer({
     ? courses.filter((c) => c.program_id === parseInt(currentFilters.programId))
     : [];
 
-  const toggleSection = (section: string) => {
+  const toggleSection = (section: ExpandedSection) => {
     setExpandedSections((prev) => ({
       ...prev,
       [section]: !prev[section],
@@ -83,7 +85,7 @@ export function FilterDrawer({
     filterKey,
   }: {
     title: string;
-    section: string;
+    section: ExpandedSection;
     options: any[];
     filterKey: string;
   }) => (

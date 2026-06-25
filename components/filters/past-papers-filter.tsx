@@ -8,7 +8,7 @@ interface PastPapersFilterProps {
   departments: any[];
   programs: any[];
   courses: any[];
-  levels: any[];
+  levels?: any[];
   filters: {
     schoolId: string;
     departmentId: string;

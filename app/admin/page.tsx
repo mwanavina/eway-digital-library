@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { Plus, Users, FileText, Folder, BarChart3 } from 'lucide-react';
 import { AdminTable } from '@/components/admin/admin-table';
 import { AdminModal } from '@/components/admin/admin-modal';
@@ -39,6 +40,7 @@ interface FormData {
 }
 
 export default function AdminPage() {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<Tab>('upload');
   const [schools, setSchools] = useState<any[]>([]);
   const [departments, setDepartments] = useState<any[]>([]);
@@ -54,10 +56,34 @@ export default function AdminPage() {
   const [formData, setFormData] = useState<FormData>({});
   const [loading, setLoading] = useState(false);
 
-  // Load data
   useEffect(() => {
-    loadAllData();
-  }, []);
+    let isActive = true;
+
+    async function verifyAccess() {
+      try {
+        const response = await fetch('/api/admin', { cache: 'no-store' });
+        if (!isActive) {
+          return;
+        }
+
+        if (!response.ok) {
+          router.replace('/dashboard');
+          return;
+        }
+      } catch {
+        if (isActive) {
+          router.replace('/dashboard');
+        }
+      }
+    }
+
+    void verifyAccess();
+    void loadAllData();
+
+    return () => {
+      isActive = false;
+    };
+  }, [router]);
 
   async function loadAllData() {
     const [schoolsRes, depsRes, progsRes, coursesRes, levelsRes, resourceTypesRes] = await Promise.all([

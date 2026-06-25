@@ -41,7 +41,9 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     }
   }, [mounted, theme, toggleTheme]);
 
-  if (!mounted) return null;
+  if (!mounted) {
+    return <>{children}</>;
+  }
 
   return <>{children}</>;
 }

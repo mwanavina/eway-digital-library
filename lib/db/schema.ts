@@ -23,6 +23,7 @@ export const user = pgTable("user", {
   email: text("email").notNull().unique(),
   emailVerified: boolean("email_verified").default(false).notNull(),
   image: text("image"),
+  role: varchar("role", { length: 32 }).default("user").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at")
     .defaultNow()
@@ -164,11 +165,65 @@ export const downloadLogs = pgTable("download_logs", {
   downloadedAt: timestamp("downloaded_at", { withTimezone: false }).defaultNow().notNull(),
 });
 
-export const userRelations = relations(user, ({ many }) => ({
+export const userProfiles = pgTable("user_profiles", {
+  id: serial("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .unique()
+    .references(() => user.id, { onDelete: "cascade" }),
+  fullName: varchar("full_name", { length: 255 }),
+  role: varchar("role", { length: 32 }).default("user").notNull(),
+  schoolId: integer("school_id").references(() => schools.id, {
+    onDelete: "set null",
+  }),
+  departmentId: integer("department_id").references(() => departments.id, {
+    onDelete: "set null",
+  }),
+  programId: integer("program_id").references(() => programs.id, {
+    onDelete: "set null",
+  }),
+  levelId: integer("level_id").references(() => levels.id, {
+    onDelete: "set null",
+  }),
+  onboardingCompleted: boolean("onboarding_completed").default(false).notNull(),
+  createdAt: timestamp("created_at", { withTimezone: false })
+    .defaultNow()
+    .notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: false })
+    .defaultNow()
+    .$onUpdate(() => new Date())
+    .notNull(),
+});
+
+export const userRelations = relations(user, ({ one, many }) => ({
   sessions: many(session),
   accounts: many(account),
+  profile: one(userProfiles),
   uploadedDocuments: many(documents),
   downloadLogs: many(downloadLogs),
+}));
+
+export const userProfilesRelations = relations(userProfiles, ({ one }) => ({
+  user: one(user, {
+    fields: [userProfiles.userId],
+    references: [user.id],
+  }),
+  school: one(schools, {
+    fields: [userProfiles.schoolId],
+    references: [schools.id],
+  }),
+  department: one(departments, {
+    fields: [userProfiles.departmentId],
+    references: [departments.id],
+  }),
+  program: one(programs, {
+    fields: [userProfiles.programId],
+    references: [programs.id],
+  }),
+  level: one(levels, {
+    fields: [userProfiles.levelId],
+    references: [levels.id],
+  }),
 }));
 
 export const sessionRelations = relations(session, ({ one }) => ({

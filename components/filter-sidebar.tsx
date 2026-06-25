@@ -14,6 +14,8 @@ interface FilterOption {
   code?: string;
 }
 
+type FilterSectionKey = 'school' | 'department' | 'program' | 'course' | 'year';
+
 interface FilterSidebarProps {
   onFiltersChange: (filters: Record<string, any>) => void;
   onClearFilters?: () => void;
@@ -42,7 +44,7 @@ export function FilterSidebar({ onFiltersChange, onClearFilters, isOpen = true, 
     examType: '',
   });
 
-  const [expandedSections, setExpandedSections] = useState({
+  const [expandedSections, setExpandedSections] = useState<Record<FilterSectionKey, boolean>>({
     school: true,
     department: true,
     course: true,
@@ -117,7 +119,7 @@ export function FilterSidebar({ onFiltersChange, onClearFilters, isOpen = true, 
     onFiltersChange(newFilters);
   };
 
-  const toggleSection = (section: string) => {
+  const toggleSection = (section: FilterSectionKey) => {
     setExpandedSections((prev) => ({
       ...prev,
       [section]: !prev[section],
@@ -132,7 +134,7 @@ export function FilterSidebar({ onFiltersChange, onClearFilters, isOpen = true, 
     showCode,
   }: {
     title: string;
-    section: string;
+    section: FilterSectionKey;
     options: FilterOption[];
     filterKey: string;
     showCode?: boolean;
