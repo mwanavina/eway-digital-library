@@ -103,17 +103,20 @@ async function initializeDatabase() {
     `
     console.log('[v0] Created sessions table')
 
-    // Create users table (for future auth)
+    // Create user table for auth
     await sql`
-      CREATE TABLE IF NOT EXISTS users (
-        id SERIAL PRIMARY KEY,
-        email VARCHAR(255) NOT NULL UNIQUE,
-        username VARCHAR(255),
-        role VARCHAR(50) DEFAULT 'student',
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      CREATE TABLE IF NOT EXISTS "user" (
+        id text PRIMARY KEY,
+        name text NOT NULL,
+        email text NOT NULL UNIQUE,
+        email_verified boolean DEFAULT false NOT NULL,
+        image text,
+        role varchar(32) DEFAULT 'user' NOT NULL,
+        created_at timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
+        updated_at timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL
       )
     `
-    console.log('[v0] Created users table')
+    console.log('[v0] Created user table')
 
     console.log('[v0] Database initialization completed successfully!')
   } catch (error) {

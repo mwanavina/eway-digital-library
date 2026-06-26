@@ -74,32 +74,35 @@ CREATE TABLE IF NOT EXISTS documents (
 );
 
 -- 7. Users
-CREATE TABLE IF NOT EXISTS users (
-  id SERIAL PRIMARY KEY,
-  username VARCHAR(100) NOT NULL UNIQUE,
-  email VARCHAR(255) NOT NULL UNIQUE,
-  role VARCHAR(50) DEFAULT 'user' NOT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+CREATE TABLE IF NOT EXISTS "user" (
+  id text PRIMARY KEY,
+  name text NOT NULL,
+  email text NOT NULL UNIQUE,
+  email_verified boolean DEFAULT false NOT NULL,
+  image text,
+  role varchar(32) DEFAULT 'user' NOT NULL,
+  created_at timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
+  updated_at timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
 -- 8. Sessions
 CREATE TABLE IF NOT EXISTS sessions (
   id SERIAL PRIMARY KEY,
-  user_id INTEGER NOT NULL,
+  user_id text NOT NULL,
   token VARCHAR(500) NOT NULL UNIQUE,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
   expires_at TIMESTAMP NOT NULL,
-  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE
+  FOREIGN KEY (user_id) REFERENCES "user"(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 -- 9. Download Logs
 CREATE TABLE IF NOT EXISTS download_logs (
   id SERIAL PRIMARY KEY,
   document_id INTEGER NOT NULL,
-  user_id INTEGER NOT NULL,
+  user_id text NOT NULL,
   downloaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
   FOREIGN KEY (document_id) REFERENCES documents(id) ON DELETE CASCADE ON UPDATE CASCADE,
-  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE
+  FOREIGN KEY (user_id) REFERENCES "user"(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 -- ============================================================================
@@ -139,7 +142,7 @@ ADD CONSTRAINT chk_semester CHECK (semester IS NULL OR semester IN (1, 2));
 ALTER TABLE documents
 ADD CONSTRAINT chk_upload_status CHECK (upload_status IN ('pending', 'completed', 'failed'));
 
-ALTER TABLE users
+ALTER TABLE "user"
 ADD CONSTRAINT chk_role CHECK (role IN ('admin', 'user'));
 
 ALTER TABLE levels
