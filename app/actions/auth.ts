@@ -1,58 +1,105 @@
 "use server";
 
-import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 
+import { auth } from "@/lib/auth";
+import { signInSchema, signUpSchema } from "@/lib/validations/auth";
+
 export async function signUp(formData: FormData) {
-	try {
-		const email = String(formData.get("email") ?? "").trim();
-		const password = String(formData.get("password") ?? "").trim();
-		const name = String(formData.get("name") ?? "").trim();
+  try {
+    const parsed = signUpSchema.safeParse({
+      name: formData.get("name"),
+      email: formData.get("email"),
+      password: formData.get("password"),
+    });
 
-		if (!email || !password || !name) {
-			return { success: false as const, error: "Please fill in all fields." };
-		}
+    if (!parsed.success) {
+      return {
+        success: false as const,
+        error: parsed.error.issues[0]?.message ?? "Invalid form data.",
+      };
+    }
 
-		await auth.api.signUpEmail({
-			body: {
-				email,
-				password,
-				name,
-			},
-			headers: await headers(),
-		});
+    const { name, email, password } = parsed.data;
 
-		return { success: true as const, email };
-	} catch (error) {
-		const message = error instanceof Error ? error.message : "Unable to create account.";
-		return { success: false as const, error: message };
-	}
+    await auth.api.signUpEmail({
+      body: {
+        name,
+        email,
+        password,
+      },
+      headers: await headers(),
+    });
+
+    return {
+      success: true as const,
+      email,
+    };
+  } catch (error) {
+    return {
+      success: false as const,
+      error:
+        error instanceof Error
+          ? error.message
+          : "Unable to create account.",
+    };
+  }
 }
 
 export async function signIn(formData: FormData) {
-	try {
-		await auth.api.signInEmail({
-			body: {
-				email: String(formData.get("email") ?? "").trim(),
-				password: String(formData.get("password") ?? "").trim(),
-			},
-			headers: await headers(),
-		});
+  try {
+    const parsed = signInSchema.safeParse({
+      email: formData.get("email"),
+      password: formData.get("password"),
+    });
 
-		return { success: true as const };
-	} catch (error) {
-		const message = error instanceof Error ? error.message : "Unable to sign in.";
-		return { success: false as const, error: message };
-	}
+    if (!parsed.success) {
+      return {
+        success: false as const,
+        error: parsed.error.issues[0]?.message ?? "Invalid form data.",
+      };
+    }
+
+    const { email, password } = parsed.data;
+
+    await auth.api.signInEmail({
+      body: {
+        email,
+        password,
+      },
+      headers: await headers(),
+    });
+
+    return {
+      success: true as const,
+    };
+  } catch (error) {
+    return {
+      success: false as const,
+      error:
+        error instanceof Error
+          ? error.message
+          : "Unable to sign in.",
+    };
+  }
 }
 
 export async function signOut() {
-    try {
-        await auth.api.signOut({
-            headers: await headers(),
-        });
-    } catch (error) {
-        const message = error instanceof Error ? error.message : "Unable to sign out.";
-        return { success: false as const, error: message };
-    }
+  try {
+    await auth.api.signOut({
+      headers: await headers(),
+    });
+
+    return {
+      success: true as const,
+    };
+  } catch (error) {
+    return {
+      success: false as const,
+      error:
+        error instanceof Error
+          ? error.message
+          : "Unable to sign out.",
+    };
+  }
 }

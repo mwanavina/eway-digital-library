@@ -3,103 +3,172 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { signIn } from "@/lib/auth/sign-in";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+import { signIn } from "@/app/actions/auth";
+import {
+  signInSchema,
+  type SignInSchema,
+} from "@/lib/validations/auth";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 
 export function SignInForm() {
   const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  async function handleSubmit(event: React.FormEvent) {
-    event.preventDefault();
+  const form = useForm<SignInSchema>({
+    resolver: zodResolver(signInSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
+
+  async function onSubmit(values: SignInSchema) {
     setError(null);
     setLoading(true);
 
-    const { error: signInError } = await signIn(email, password);
+    const formData = new FormData();
+
+    formData.append("email", values.email);
+    formData.append("password", values.password);
+
+    const result = await signIn(formData);
+
     setLoading(false);
 
-    if (signInError) {
-      const message = signInError.message ?? "Could not sign in. Please try again.";
+    if (!result.success) {
+      const message = result.error;
+
       if (message.toLowerCase().includes("verify")) {
-        router.push(`/check-email?email=${encodeURIComponent(email)}`);
+        router.push(
+          `/check-email?email=${encodeURIComponent(values.email)}`
+        );
         return;
       }
+
       setError(message);
       return;
     }
 
     const profileResponse = await fetch("/api/onboarding");
+
     if (profileResponse.ok) {
       const data = await profileResponse.json();
-      router.push(data.profile?.onboardingCompleted ? "/" : "/onboarding");
+
+      router.push(
+        data.profile?.onboardingCompleted
+          ? "/"
+          : "/onboarding"
+      );
     } else {
       router.push("/onboarding");
     }
+
     router.refresh();
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-      {error && (
-        <Alert variant="destructive">
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
+    <Form {...form}>
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="flex flex-col gap-4"
+      >
+        {error && (
+          <Alert variant="destructive">
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
 
-      <div className="flex flex-col gap-1.5">
-        <Label htmlFor="signin-email" className="text-xs uppercase tracking-wider">
-          Email
-        </Label>
-        <Input
-          id="signin-email"
-          type="email"
-          placeholder="Your school email…"
-          autoComplete="email"
-          required
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="h-11 bg-muted"
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-xs uppercase tracking-wider">
+                Email
+              </FormLabel>
+
+              <FormControl>
+                <Input
+                  type="email"
+                  placeholder="Enter your email"
+                  autoComplete="email"
+                  className="h-11 bg-muted"
+                  {...field}
+                />
+              </FormControl>
+
+              <FormMessage />
+            </FormItem>
+          )}
         />
-      </div>
 
-      <div className="flex flex-col gap-1.5">
-        <Label htmlFor="signin-password" className="text-xs uppercase tracking-wider">
-          Password
-        </Label>
-        <Input
-          id="signin-password"
-          type="password"
-          placeholder="Your password"
-          autoComplete="current-password"
-          required
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="h-11 bg-muted"
+        <FormField
+          control={form.control}
+          name="password"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-xs uppercase tracking-wider">
+                Password
+              </FormLabel>
+
+              <FormControl>
+                <Input
+                  type="password"
+                  placeholder="Your password"
+                  autoComplete="current-password"
+                  className="h-11 bg-muted"
+                  {...field}
+                />
+              </FormControl>
+
+              <FormMessage />
+            </FormItem>
+          )}
         />
-      </div>
 
-      <p className="-mt-1 text-right text-xs">
-        <Link href="/forgot-password" className="text-muted-foreground hover:text-primary">
-          Forgot password?
-        </Link>
-      </p>
+        <p className="-mt-1 text-right text-xs">
+          <Link
+            href="/forgot-password"
+            className="text-muted-foreground hover:text-primary"
+          >
+            Forgot password?
+          </Link>
+        </p>
 
-      <Button type="submit" className="h-11 font-bold" disabled={loading}>
-        {loading ? "Signing in…" : "Log In"}
-      </Button>
+        <Button
+          type="submit"
+          className="h-11 font-bold"
+          disabled={loading}
+        >
+          {loading ? "Signing in..." : "Log In"}
+        </Button>
 
-      <p className="text-center text-sm text-muted-foreground">
-        Don&apos;t have an account?{" "}
-        <Link href="/sign-up" className="font-semibold text-primary hover:underline">
-          Sign Up
-        </Link>
-      </p>
-    </form>
+        <p className="text-center text-sm text-muted-foreground">
+          Don't have an account?{" "}
+          <Link
+            href="/sign-up"
+            className="font-semibold text-primary hover:underline"
+          >
+            Sign Up
+          </Link>
+        </p>
+      </form>
+    </Form>
   );
 }

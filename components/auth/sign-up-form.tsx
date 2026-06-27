@@ -3,110 +3,165 @@
 import { useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { signUp } from "@/app/actions/auth"; // Update this path
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+import { signUp } from "@/app/actions/auth";
+
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
+import {
+  signUpSchema,
+  type SignUpSchema,
+} from "@/lib/validations/auth";
+
 export function SignUpForm() {
-	const router = useRouter();
-	const [isPending, startTransition] = useTransition();
-	const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
+  const [error, setError] = useState<string | null>(null);
 
-	// You can keep controlled inputs or switch to uncontrolled
-	const [fullName, setFullName] = useState("");
-	const [email, setEmail] = useState("");
-	const [password, setPassword] = useState("");
+  const form = useForm<SignUpSchema>({
+    resolver: zodResolver(signUpSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      password: "",
+    },
+  });
 
-	async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-		event.preventDefault();
-		setError(null);
+  async function onSubmit(values: SignUpSchema) {
+    setError(null);
 
-		const formData = new FormData(event.currentTarget);
+    const formData = new FormData();
 
-		startTransition(async () => {
-			const result = await signUp(formData);
+    formData.append("name", values.name);
+    formData.append("email", values.email);
+    formData.append("password", values.password);
 
-			if (!result.success) {
-				setError(result.error ?? "Unable to create account.");
-				return;
-			}
+    startTransition(async () => {
+      const result = await signUp(formData);
 
-			router.push(`/check-email?email=${encodeURIComponent(result.email)}`);
-		});
-	}
+      if (!result.success) {
+        setError(result.error ?? "Unable to create account.");
+        return;
+      }
 
-	return (
-		<form onSubmit={handleSubmit} className="flex flex-col gap-4">
-			{error && (
-				<Alert variant="destructive">
-					<AlertDescription>{error}</AlertDescription>
-				</Alert>
-			)}
+      router.push(`/check-email?email=${encodeURIComponent(result.email)}`);
+    });
+  }
 
-			<div className="flex flex-col gap-1.5">
-				<Label htmlFor="signup-full-name" className="text-xs uppercase tracking-wider">
-					Full Name
-				</Label>
-				<Input
-					id="signup-full-name"
-					name="name"
-					type="text"
-					placeholder="Enter your full name"
-					autoComplete="name"
-					required
-					value={fullName}
-					onChange={(e) => setFullName(e.target.value)}
-					className="h-11 bg-muted"
-				/>
-			</div>
+  return (
+    <Form {...form}>
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="flex flex-col gap-4"
+      >
+        {error && (
+          <Alert variant="destructive">
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
 
-			<div className="flex flex-col gap-1.5">
-				<Label htmlFor="signup-email" className="text-xs uppercase tracking-wider">
-					Email
-				</Label>
-				<Input
-					id="signup-email"
-					name="email"
-					type="email"
-					placeholder="Use school email only…"
-					autoComplete="email"
-					required
-					value={email}
-					onChange={(e) => setEmail(e.target.value)}
-					className="h-11 bg-muted"
-				/>
-			</div>
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-xs uppercase tracking-wider">
+                Full Name
+              </FormLabel>
 
-			<div className="flex flex-col gap-1.5">
-				<Label htmlFor="signup-password" className="text-xs uppercase tracking-wider">
-					Password
-				</Label>
-				<Input
-					id="signup-password"
-					name="password"
-					type="password"
-					placeholder="Create a password (min. 8 characters)"
-					autoComplete="new-password"
-					minLength={8}
-					required
-					value={password}
-					onChange={(e) => setPassword(e.target.value)}
-					className="h-11 bg-muted"
-				/>
-			</div>
+              <FormControl>
+                <Input
+                  placeholder="Enter your full name"
+                  autoComplete="name"
+                  className="h-11 bg-muted"
+                  {...field}
+                />
+              </FormControl>
 
-			<Button type="submit" className="h-11 font-bold" disabled={isPending}>
-				{isPending ? "Creating account…" : "Sign Up"}
-			</Button>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-			<p className="text-center text-sm text-muted-foreground">
-				Already have an account?{' '}
-				<Link href="/sign-in" className="font-semibold text-primary hover:underline">
-					Log in
-				</Link>
-			</p>
-		</form>
-	);
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-xs uppercase tracking-wider">
+                Email
+              </FormLabel>
+
+              <FormControl>
+                <Input
+                  type="email"
+                  placeholder="Use school email only..."
+                  autoComplete="email"
+                  className="h-11 bg-muted"
+                  {...field}
+                />
+              </FormControl>
+
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="password"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-xs uppercase tracking-wider">
+                Password
+              </FormLabel>
+
+              <FormControl>
+                <Input
+                  type="password"
+                  placeholder="Create a password"
+                  autoComplete="new-password"
+                  className="h-11 bg-muted"
+                  {...field}
+                />
+              </FormControl>
+
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <Button
+          type="submit"
+          disabled={isPending}
+          className="h-11 font-bold"
+        >
+          {isPending ? "Creating account..." : "Sign Up"}
+        </Button>
+
+        <p className="text-center text-sm text-muted-foreground">
+          Already have an account?{" "}
+          <Link
+            href="/sign-in"
+            className="font-semibold text-primary hover:underline"
+          >
+            Log in
+          </Link>
+        </p>
+      </form>
+    </Form>
+  );
 }
