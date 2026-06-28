@@ -36,6 +36,6 @@ export const config = {
 		"/dashboard/:path*",
 		"/admin/:path*",
 		"/api/admin/:path*",
-		"/((?!api|_next/static|_next/image|favicon.ico|sign-in|sign-up|check-email|forgot-password|reset-password).*)",
+		"/((?!api|_next/static|_next/image|favicon.ico|.*\.(?:png|jpg|jpeg|svg|ico|webp|gif|css|js|json|txt|woff2?|woff|ttf|eot)|sign-in|sign-up|check-email|forgot-password|reset-password).*)",
 	],
 };
