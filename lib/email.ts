@@ -1,6 +1,5 @@
 import nodemailer from "nodemailer";
 
-// Initialize the SMTP transport layer
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
@@ -9,20 +8,20 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+// Update this interface right here 👇
 interface SendEmailParams {
   to: string;
   subject: string;
-  text: string;
+  html: string; // Change 'text' to 'html'
 }
 
-export async function sendEmail({ to, subject, text }: SendEmailParams) {
+export async function sendEmail({ to, subject, html }: SendEmailParams) {
   try {
     const info = await transporter.sendMail({
-      // This MUST match your SMTP_USER or Gmail will block the request
       from: `"Eway Digital Library" <${process.env.SMTP_USER}>`, 
       to: to,
       subject: subject,
-      text: text,
+      html: html, // Map it correctly to Nodemailer's HTML property
     });
     
     return { success: true, info };

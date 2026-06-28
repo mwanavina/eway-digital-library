@@ -3,7 +3,19 @@
 import { useState } from 'react';
 import { Search, Settings, User, Sliders, BarChart3, Shield } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { ThemeSwitcher } from './theme-switcher';
+import Image from 'next/image';
+import { Button } from '@/components/ui/button';
+import {
+  Popover,
+  PopoverContent,
+  PopoverDescription,
+  PopoverHeader,
+  PopoverTitle,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import { signOut } from '@/lib/auth/sign-in';
 
 interface HeaderProps {
   onSearchChange?: (query: string) => void;
@@ -13,11 +25,26 @@ interface HeaderProps {
 }
 
 export function Header({ onSearchChange, onMenuClick, onSearchClick, onFilterClick }: HeaderProps) {
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
+  const [signingOut, setSigningOut] = useState(false);
 
   const handleSearchChange = (value: string) => {
     setSearchQuery(value);
     onSearchChange?.(value);
+  };
+
+  const handleSignOut = async () => {
+    setSigningOut(true);
+
+    try {
+      await signOut();
+      router.push('/sign-in');
+    } catch (error) {
+      console.error('Sign out failed', error);
+    } finally {
+      setSigningOut(false);
+    }
   };
 
   return (
@@ -26,7 +53,7 @@ export function Header({ onSearchChange, onMenuClick, onSearchClick, onFilterCli
         {/* Logo */}
         <div className="flex items-center gap-2 flex-shrink-0">
           <div className="w-7 h-7 bg-[#EDD899] rounded-full flex items-center justify-center font-bold text-[#1F2557] text-sm">
-            E
+            <Image src="/eway-logo.png" alt="Eway Library Logo" width={28} height={28} />
           </div>
           <h1 className="hidden sm:block text-sm md:text-base font-bold">Eway Library</h1>
         </div>
@@ -92,14 +119,38 @@ export function Header({ onSearchChange, onMenuClick, onSearchClick, onFilterCli
             <Settings size={18} />
           </Link>
 
-          {/* User Profile Button - Desktop Only with Link */}
-          <Link
-            href="/account"
-            className="hidden md:flex p-2 hover:bg-[#1F2557] dark:hover:bg-slate-700 rounded-lg transition-colors"
-            aria-label="User profile"
-          >
-            <User size={18} />
-          </Link>
+          {/* User Profile Button - Desktop Only with Popover */}
+          <Popover>
+            <PopoverTrigger
+              type="button"
+              className="hidden md:flex p-2 hover:bg-[#1F2557] dark:hover:bg-slate-700 rounded-lg transition-colors"
+              aria-label="User menu"
+            >
+              <User size={18} />
+            </PopoverTrigger>
+            <PopoverContent className="w-56">
+              <PopoverHeader className="space-y-1">
+                <PopoverTitle>Account</PopoverTitle>
+                <PopoverDescription>
+                  Manage your profile or sign out.
+                </PopoverDescription>
+              </PopoverHeader>
+
+              <div className="mt-3 flex flex-col gap-2">
+                <Button asChild variant="outline" className="w-full">
+                  <Link href="/account">Go to account</Link>
+                </Button>
+                <Button
+                  onClick={handleSignOut}
+                  variant="destructive"
+                  className="w-full"
+                  disabled={signingOut}
+                >
+                  {signingOut ? 'Signing out...' : 'Sign out'}
+                </Button>
+              </div>
+            </PopoverContent>
+          </Popover>
         </div>
       </div>
     </header>
