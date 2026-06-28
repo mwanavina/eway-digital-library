@@ -38,7 +38,7 @@ export default function CheckEmailPage() {
 
   return (
     <AuthShell>
-      <div className="space-y-4 text-center">
+      <div className="space-y-3 text-center">
         <h1 className="text-xl font-semibold text-foreground">Check your email</h1>
         <p className="text-sm text-muted-foreground">
           We sent a verification link{email ? ` to ${email}` : ""}. Check your inbox and

@@ -65,7 +65,7 @@ export function SignUpForm() {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="flex flex-col gap-4"
+        className="flex flex-col gap-3"
       >
         {error && (
           <Alert variant="destructive">
