@@ -3,6 +3,7 @@ import { drizzleAdapter } from "@better-auth/drizzle-adapter";
 import { db } from "@/lib/db";
 import { sendEmail } from "@/lib/email";
 import { nextCookies } from "better-auth/next-js";
+import { redirect } from "next/dist/client/components/navigation";
 
 interface AuthEmailParams {
   user: {
@@ -11,6 +12,13 @@ interface AuthEmailParams {
   };
   url: string;
   token: string;
+}
+
+interface AuthResetPasswordParams {
+  user: {
+    email: string;
+  };
+  url: string;
 }
 
 export const auth = betterAuth({
@@ -30,6 +38,105 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: true,
+    sendResetPassword: async ({ user, url}: AuthResetPasswordParams) => {
+			// Send email with the reset link
+			void sendEmail({
+				to: user.email,
+				subject: "Reset your password",
+				html: `
+              <!DOCTYPE html>
+              <html lang="en">
+                <head>
+                  <meta charset="UTF-8" />
+                  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                  <title>Reset your password</title>
+                </head>
+                <body style="margin:0;padding:0;background-color:#f4f4f5;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Roboto','Oxygen','Ubuntu','Cantarell','Fira Sans','Droid Sans','Helvetica Neue',sans-serif;">
+                  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                    <tr>
+                      <td align="center" style="padding:40px 20px;">
+                        <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;background-color:#ffffff;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.1);">
+                          <!-- Header -->
+                          <tr>
+                            <td style="padding:40px 40px 20px;">
+                              <h1 style="color:#111827;font-size:24px;font-weight:700;margin:0;line-height:1.3;">
+                                Reset your password
+                              </h1>
+                            </td>
+                          </tr>
+                          
+                          <!-- Body -->
+                          <tr>
+                            <td style="padding:0 40px 20px;">
+                              <p style="color:#6b7280;font-size:16px;line-height:1.6;margin:0;">
+                                You requested a password reset for your account. Click the button below to set a new password:
+                              </p>
+                            </td>
+                          </tr>
+                          
+                          <!-- Button -->
+                          <tr>
+                            <td style="padding:20px 40px 40px;">
+                              <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                                <tr>
+                                  <td style="border-radius:6px;background-color:#000000;">
+                                    <a href="${url}" 
+                                      style="display:inline-block;padding:14px 32px;color:#ffffff;text-decoration:none;font-size:16px;font-weight:600;border-radius:6px;">
+                                      Reset Password
+                                    </a>
+                                  </td>
+                                </tr>
+                              </table>
+                            </td>
+                          </tr>
+                          
+                          <!-- Fallback Link -->
+                          <tr>
+                            <td style="padding:0 40px 40px;">
+                              <p style="color:#6b7280;font-size:14px;line-height:1.5;margin:0 0 10px;">
+                                If the button doesn't work, copy and paste this link into your browser:
+                              </p>
+                              <p style="margin:0;">
+                                <a href="${url}" style="color:#2563eb;font-size:14px;word-break:break-all;">
+                                  ${url}
+                                </a>
+                              </p>
+                            </td>
+                          </tr>
+                          
+                          <!-- Footer -->
+                          <tr>
+                            <td style="padding:20px 40px;border-top:1px solid #e5e7eb;">
+                              <p style="color:#9ca3af;font-size:13px;line-height:1.5;margin:0;">
+                                If you didn't request a password reset, you can safely ignore this email. Your password will remain unchanged.
+                              </p>
+                            </td>
+                          </tr>
+                        </table>
+                        
+                        <!-- Copyright -->
+                        <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;margin-top:20px;">
+                          <tr>
+                            <td align="center" style="color:#9ca3af;font-size:12px;">
+                              <p style="margin:0;">© 2024 Your App Name. All rights reserved.</p>
+                            </td>
+                          </tr>
+                        </table>
+                      </td>
+                    </tr>
+                  </table>
+                </body>
+              </html>
+                `,
+			});
+		},
+		// Optional: Revoke all sessions when password is reset
+		revokeSessionsOnPasswordReset: true,
+		// Optional: Callback after successful reset
+		onPasswordReset: async ({ user }: { user: { email: string } }) => {
+			console.log(`Password reset for ${user.email}`);
+      redirect("/sign-in");
+		},
   },
   emailVerification: {
     sendOnSignUp: true,
