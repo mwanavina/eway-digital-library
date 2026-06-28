@@ -28,6 +28,7 @@ export function AuthBrand() {
           src="/eway-logo.png"
           alt="E-way logo"
           fill
+          loading="eager"
           sizes="(max-width: 640px) 80px, (max-width: 768px) 96px, (max-width: 1024px) 112px, 128px"
           className="object-contain"
         />
