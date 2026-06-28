@@ -1,5 +1,5 @@
 import { betterAuth } from "better-auth";
-import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { drizzleAdapter } from "@better-auth/drizzle-adapter";
 import { db } from "@/lib/db";
 import { sendEmail } from "@/lib/email";
 import { nextCookies } from "better-auth/next-js";
@@ -28,7 +28,7 @@ export const auth = betterAuth({
       void sendEmail({
         to: user.email,
         subject: "Verify your Eway account",
-        text: `Welcome to Eway Digital Library.\n\nClick the link below to verify your school email:\n${url}\n\nIf you did not create an account, you can ignore this email.`,
+        text: `Welcome to Eway Digital Library.\n\nClick the link below to verify your email:\n${url}\n\nIf you did not create an account, you can ignore this email.`,
       });
     },
   },
