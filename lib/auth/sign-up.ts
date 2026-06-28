@@ -38,8 +38,20 @@ export async function signUp(email: string, password: string, fullName?: string)
 }
 
 export async function resendVerificationEmail(email: string) {
-  return authClient.sendVerificationEmail({
-    email,
-    callbackURL: "/sign-in",
-  });
+  try {
+    const response = await authClient.sendVerificationEmail({
+      email,
+      callbackURL: "/sign-in",
+    });
+
+    if (response && typeof response === "object" && "error" in response && response.error) {
+      return { error: response.error };
+    }
+
+    return { error: null };
+  } catch (error) {
+    return {
+      error: error instanceof Error ? error : new Error("Could not resend verification email."),
+    };
+  }
 }

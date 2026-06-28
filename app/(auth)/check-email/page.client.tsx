@@ -33,7 +33,7 @@ export default function CheckEmailPage() {
       return;
     }
 
-    setMessage("Verification email sent. Check your inbox.");
+    setMessage("Verification email sent. Check your inbox or spam folder.");
   }
 
   return (
@@ -41,8 +41,9 @@ export default function CheckEmailPage() {
       <div className="space-y-4 text-center">
         <h1 className="text-xl font-semibold text-foreground">Check your email</h1>
         <p className="text-sm text-muted-foreground">
-          We sent a verification link{email ? ` to ${email}` : ""}. Open it to activate
-          your account, then sign in to complete your profile.
+          We sent a verification link{email ? ` to ${email}` : ""}. Check your inbox and
+          your spam folder if you don’t see it right away. Open the link to activate your
+          account, then sign in to complete your profile.
         </p>
 
         {message && (
