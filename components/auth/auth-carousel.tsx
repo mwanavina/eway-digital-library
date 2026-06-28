@@ -6,33 +6,39 @@ import { cn } from "@/lib/utils";
 const SLIDES = [
   {
     image:
-      "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=900&q=80",
-    title: "Welcome to MUBAS e-way Management System",
+      "/pexels-yaroslav-shuraev-6279974.jpg?w=900&q=80",
+    title: "Welcome to Eway Management System",
     sub: "Find library e-resources here",
   },
   {
     image:
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=900&q=80",
+      "/pexels-yankrukov-8199249.jpg?w=900&q=80",
     title: "Access Academic Resources Anytime",
-    sub: "Journals, textbooks, and more at your fingertips",
+    sub: "Past-Papers, Course-Outlines and more at your fingertips",
   },
   {
     image:
-      "https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=900&q=80",
+      "/pexels-mikhail-nilov-9158716.jpg?w=900&q=80",
     title: "Learn Without Limits",
     sub: "Your gateway to knowledge across all disciplines",
   },
   {
     image:
       "https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=900&q=80",
-    title: "Research Made Easy",
+    title: "Learning Made Easy",
     sub: "Thousands of papers and study materials available",
   },
   {
     image:
-      "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=900&q=80",
+      "/pexels-mikhail-nilov-8653642.jpg?w=900&q=80",
     title: "Stay Connected to Your Campus",
-    sub: "Track borrowings, reservations, and reading lists",
+    sub: "Share resources with peers",
+  },
+  {
+    image:
+      "/pexels-yankrukov-8199256.jpg?w=900&q=80",
+    title: "Your Library, Your Way",
+    sub: "Access your library resources anytime, anywhere",
   },
 ];
 
