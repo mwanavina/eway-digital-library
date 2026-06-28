@@ -16,6 +16,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { signOut } from '@/lib/auth/sign-in';
+import { authClient } from '@/lib/auth-client';
 
 interface HeaderProps {
   onSearchChange?: (query: string) => void;
@@ -27,7 +28,6 @@ interface HeaderProps {
 export function Header({ onSearchChange, onMenuClick, onSearchClick, onFilterClick }: HeaderProps) {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
-  const [signingOut, setSigningOut] = useState(false);
 
   const handleSearchChange = (value: string) => {
     setSearchQuery(value);
@@ -35,16 +35,14 @@ export function Header({ onSearchChange, onMenuClick, onSearchClick, onFilterCli
   };
 
   const handleSignOut = async () => {
-    setSigningOut(true);
-
-    try {
-      await signOut();
-      router.push('/sign-in');
-    } catch (error) {
-      console.error('Sign out failed', error);
-    } finally {
-      setSigningOut(false);
-    }
+    await authClient.signOut({
+      fetchOptions:{
+        onSuccess: () => {
+          // setSigningOut(false);
+          router.push('/sign-in');
+        },
+      }
+    });
   };
 
   return (
@@ -144,9 +142,8 @@ export function Header({ onSearchChange, onMenuClick, onSearchClick, onFilterCli
                   onClick={handleSignOut}
                   variant="destructive"
                   className="w-full"
-                  disabled={signingOut}
                 >
-                  {signingOut ? 'Signing out...' : 'Sign out'}
+                  Sign out
                 </Button>
               </div>
             </PopoverContent>
