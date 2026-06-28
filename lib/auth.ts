@@ -38,91 +38,85 @@ export const auth = betterAuth({
     enabled: true,
     requireEmailVerification: true,
     sendResetPassword: async ({ user, url}: AuthResetPasswordParams) => {
-			// Send email with the reset link
+			const logoUrl = "https://m69autqsig.ufs.sh/f/t72WtywUos4eXLAxoQGv9WBJEhIsCXFmzL05UfyeSAo2bPQR";
+
 			void sendEmail({
 				to: user.email,
-				subject: "Reset your password",
+				subject: "Reset your Eway password",
 				html: `
-              <!DOCTYPE html>
-              <html lang="en">
+              <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+              <html dir="ltr" lang="en">
                 <head>
-                  <meta charset="UTF-8" />
-                  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-                  <title>Reset your password</title>
+                  <meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
+                  <meta name="x-apple-disable-message-reformatting" />
+                  <title>Reset your Eway password</title>
                 </head>
-                <body style="margin:0;padding:0;background-color:#f4f4f5;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Roboto','Oxygen','Ubuntu','Cantarell','Fira Sans','Droid Sans','Helvetica Neue',sans-serif;">
-                  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
-                    <tr>
-                      <td align="center" style="padding:40px 20px;">
-                        <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;background-color:#ffffff;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.1);">
-                          <!-- Header -->
-                          <tr>
-                            <td style="padding:40px 40px 20px;">
-                              <h1 style="color:#111827;font-size:24px;font-weight:700;margin:0;line-height:1.3;">
-                                Reset your password
-                              </h1>
-                            </td>
-                          </tr>
-                          
-                          <!-- Body -->
-                          <tr>
-                            <td style="padding:0 40px 20px;">
-                              <p style="color:#6b7280;font-size:16px;line-height:1.6;margin:0;">
-                                You requested a password reset for your account. Click the button below to set a new password:
-                              </p>
-                            </td>
-                          </tr>
-                          
-                          <!-- Button -->
-                          <tr>
-                            <td style="padding:20px 40px 40px;">
-                              <table role="presentation" cellpadding="0" cellspacing="0" border="0">
-                                <tr>
-                                  <td style="border-radius:6px;background-color:#000000;">
-                                    <a href="${url}" 
-                                      style="display:inline-block;padding:14px 32px;color:#ffffff;text-decoration:none;font-size:16px;font-weight:600;border-radius:6px;">
+                <body dir="ltr" lang="en" style="background-color:rgb(255,255,255);margin:0;padding:0;">
+                  <table border="0" width="100%" cellpadding="0" cellspacing="0" role="presentation" align="center">
+                    <tbody>
+                      <tr>
+                        <td dir="ltr" lang="en" style='background-color:rgb(255,255,255);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Roboto","Helvetica Neue",sans-serif;margin:0 auto;'>
+                          <table align="center" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="max-width:37.5em;margin:0 auto;">
+                            <tbody>
+                              <tr style="width:100%">
+                                <td style="padding:0 20px;">
+                                  <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="margin-top:32px">
+                                    <tbody>
+                                      <tr>
+                                        <td>
+                                          <img alt="Eway Digital Library" height="64" src="${logoUrl}" style="display:block;outline:none;border:none;text-decoration:none;height:64px;width:auto;" />
+                                        </td>
+                                      </tr>
+                                    </tbody>
+                                  </table>
+
+                                  <h1 style="color:rgb(29,28,29);font-size:32px;line-height:38px;font-weight:700;margin:30px 0;padding:0;">
+                                    Reset your password
+                                  </h1>
+
+                                  <p style="font-size:16px;line-height:26px;margin-bottom:20px;color:rgb(45,45,45);">
+                                    We received a request to reset the password for your Eway Digital Library account. Click the button below to choose a new password.
+                                  </p>
+
+                                  <p style="margin:24px 0;">
+                                    <a href="${url}" target="_blank" style="background-color:#2563eb;color:white;padding:12px 24px;border-radius:4px;text-decoration:none;display:inline-block;font-weight:600;font-size:16px;">
                                       Reset Password
                                     </a>
-                                  </td>
-                                </tr>
-                              </table>
-                            </td>
-                          </tr>
-                          
-                          <!-- Fallback Link -->
-                          <tr>
-                            <td style="padding:0 40px 40px;">
-                              <p style="color:#6b7280;font-size:14px;line-height:1.5;margin:0 0 10px;">
-                                If the button doesn't work, copy and paste this link into your browser:
-                              </p>
-                              <p style="margin:0;">
-                                <a href="${url}" style="color:#2563eb;font-size:14px;word-break:break-all;">
-                                  ${url}
-                                </a>
-                              </p>
-                            </td>
-                          </tr>
-                          
-                          <!-- Footer -->
-                          <tr>
-                            <td style="padding:20px 40px;border-top:1px solid #e5e7eb;">
-                              <p style="color:#9ca3af;font-size:13px;line-height:1.5;margin:0;">
-                                If you didn't request a password reset, you can safely ignore this email. Your password will remain unchanged.
-                              </p>
-                            </td>
-                          </tr>
-                        </table>
-                        
-                        <!-- Copyright -->
-                        <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;margin-top:20px;">
-                          <tr>
-                            <td align="center" style="color:#9ca3af;font-size:12px;">
-                              <p style="margin:0;">© 2024 Your App Name. All rights reserved.</p>
-                            </td>
-                          </tr>
-                        </table>
-                      </td>
-                    </tr>
+                                  </p>
+
+                                  <p style="font-size:14px;line-height:22px;margin-top:28px;margin-bottom:8px;color:rgb(45,45,45);">
+                                    If the button above doesn’t work, copy and paste the following link into your browser:
+                                  </p>
+                                  <p style="font-size:14px;line-height:20px;margin-bottom:24px;word-break:break-all;">
+                                    <a href="${url}" target="_blank" style="color:#2563eb;text-decoration:underline;">
+                                      ${url}
+                                    </a>
+                                  </p>
+
+                                  <p style="font-size:14px;line-height:22px;color:rgb(100,100,100);margin:16px 0;">
+                                    If you didn’t request this change, you can safely ignore this email. Your password will remain unchanged.
+                                  </p>
+
+                                  <hr style="border-top:1px solid #e5e7eb;margin:30px 0;" />
+
+                                  <table align="center" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation">
+                                    <tbody>
+                                      <tr>
+                                        <td>
+                                          <p style="font-size:12px;line-height:16px;text-align:left;margin-bottom:50px;color:rgb(150,150,150);">
+                                            © ${new Date().getFullYear()} Eway Digital Library. All rights reserved.
+                                          </p>
+                                        </td>
+                                      </tr>
+                                    </tbody>
+                                  </table>
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </td>
+                      </tr>
+                    </tbody>
                   </table>
                 </body>
               </html>
