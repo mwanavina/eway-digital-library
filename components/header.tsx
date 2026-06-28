@@ -15,7 +15,6 @@ import {
   PopoverTitle,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { signOut } from '@/lib/auth/sign-in';
 import { authClient } from '@/lib/auth-client';
 
 interface HeaderProps {
