@@ -3,7 +3,6 @@ import { drizzleAdapter } from "@better-auth/drizzle-adapter";
 import { db } from "@/lib/db";
 import { sendEmail } from "@/lib/email";
 import { nextCookies } from "better-auth/next-js";
-import { redirect } from "next/dist/client/components/navigation";
 
 interface AuthEmailParams {
   user: {
@@ -135,7 +134,8 @@ export const auth = betterAuth({
 		// Optional: Callback after successful reset
 		onPasswordReset: async ({ user }: { user: { email: string } }) => {
 			console.log(`Password reset for ${user.email}`);
-      redirect("/sign-in");
+      // redirect("/sign-in");
+      
 		},
   },
   emailVerification: {
