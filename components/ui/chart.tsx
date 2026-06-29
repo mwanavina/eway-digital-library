@@ -118,8 +118,16 @@ function ChartTooltipContent({
   color,
   nameKey,
   labelKey,
-}: React.ComponentProps<typeof RechartsPrimitive.Tooltip> &
+}: Omit<React.ComponentProps<typeof RechartsPrimitive.Tooltip>, 'payload'> &
   React.ComponentProps<'div'> & {
+    payload?: Array<{
+      dataKey?: string
+      name?: string
+      value?: number | string
+      color?: string
+      payload?: Record<string, unknown>
+      [key: string]: unknown
+    }>
     hideLabel?: boolean
     hideIndicator?: boolean
     indicator?: 'line' | 'dot' | 'dashed'
@@ -144,7 +152,7 @@ function ChartTooltipContent({
     if (labelFormatter) {
       return (
         <div className={cn('font-medium', labelClassName)}>
-          {labelFormatter(value, payload)}
+          {labelFormatter(value, payload as never)}
         </div>
       )
     }
@@ -182,7 +190,8 @@ function ChartTooltipContent({
         {payload.map((item, index) => {
           const key = `${nameKey || item.name || item.dataKey || 'value'}`
           const itemConfig = getPayloadConfigFromPayload(config, item, key)
-          const indicatorColor = color || item.payload.fill || item.color
+          const itemPayload = item.payload as Record<string, unknown> | undefined
+          const indicatorColor = color || (itemPayload?.fill as string | undefined) || item.color
 
           return (
             <div
@@ -193,7 +202,7 @@ function ChartTooltipContent({
               )}
             >
               {formatter && item?.value !== undefined && item.name ? (
-                formatter(item.value, item.name, item, index, item.payload)
+                formatter(item.value, item.name, item as never, index, item.payload as never)
               ) : (
                 <>
                   {itemConfig?.icon ? (
@@ -256,11 +265,17 @@ function ChartLegendContent({
   payload,
   verticalAlign = 'bottom',
   nameKey,
-}: React.ComponentProps<'div'> &
-  Pick<RechartsPrimitive.LegendProps, 'payload' | 'verticalAlign'> & {
-    hideIcon?: boolean
-    nameKey?: string
-  }) {
+}: React.ComponentProps<'div'> & {
+  payload?: Array<{
+    dataKey?: string
+    value?: string | number
+    color?: string
+    [key: string]: unknown
+  }> 
+  verticalAlign?: 'top' | 'bottom' | 'middle'
+  hideIcon?: boolean
+  nameKey?: string
+}) {
   const { config } = useChart()
 
   if (!payload?.length) {
