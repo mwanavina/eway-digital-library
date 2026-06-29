@@ -30,7 +30,7 @@ export function PDFPreview({ pdfUrl, fileName, onDownload, isOpen, onClose }: PD
         setLoading(true);
         setError('');
         
-        const pdf = await pdfjsLib.getDocument(pdfUrl).promise;
+        const pdf = await pdfjsLib.getDocument({ url: pdfUrl }).promise;
         const page = await pdf.getPage(1);
         
         const scale = 1.5;
@@ -45,8 +45,8 @@ export function PDFPreview({ pdfUrl, fileName, onDownload, isOpen, onClose }: PD
         canvas.height = viewport.height;
         
         await page.render({
-          canvasContext: context,
-          viewport: viewport,
+          canvas,
+          viewport,
         }).promise;
         
         setThumbnail(canvas.toDataURL());
@@ -141,7 +141,7 @@ export function PDFThumbnail({ pdfUrl, fileName, onPreview }: PDFThumbnailProps)
   useEffect(() => {
     const loadThumbnail = async () => {
       try {
-        const pdf = await pdfjsLib.getDocument(pdfUrl).promise;
+        const pdf = await pdfjsLib.getDocument({ url: pdfUrl }).promise;
         const page = await pdf.getPage(1);
         
         const scale = 1.2;
@@ -156,8 +156,8 @@ export function PDFThumbnail({ pdfUrl, fileName, onPreview }: PDFThumbnailProps)
         canvas.height = viewport.height;
         
         await page.render({
-          canvasContext: context,
-          viewport: viewport,
+          canvas,
+          viewport,
         }).promise;
         
         setThumbnail(canvas.toDataURL());
