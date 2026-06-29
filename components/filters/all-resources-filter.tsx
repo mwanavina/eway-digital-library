@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { X } from 'lucide-react';
 
+type SectionKey = 'school' | 'department' | 'program' | 'course' | 'year' | 'semester';
+
 interface AllResourcesFilterProps {
   schools: any[];
   departments: any[];
@@ -35,7 +37,7 @@ export function AllResourcesFilter({
   isOpen,
   onClose,
 }: AllResourcesFilterProps) {
-  const [expandedSections, setExpandedSections] = useState({
+  const [expandedSections, setExpandedSections] = useState<Record<SectionKey, boolean>>({
     school: true,
     department: false,
     program: false,
@@ -56,7 +58,7 @@ export function AllResourcesFilter({
     ? courses.filter((c) => c.program_id === parseInt(filters.programId))
     : [];
 
-  const toggleSection = (section: string) => {
+  const toggleSection = (section: SectionKey) => {
     setExpandedSections((prev) => ({
       ...prev,
       [section]: !prev[section],
@@ -70,7 +72,7 @@ export function AllResourcesFilter({
     filterKey,
   }: {
     title: string;
-    section: string;
+    section: SectionKey;
     options: any[];
     filterKey: string;
   }) => (
