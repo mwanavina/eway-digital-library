@@ -1,8 +1,9 @@
+import * as React from 'react'
 import { cva, type VariantProps } from 'class-variance-authority'
 
 import { cn } from '@/lib/utils'
 
-interface EmptyProps extends React.ComponentProps<'div'> {
+interface EmptyProps extends Omit<React.ComponentProps<'div'>, 'title'> {
   title?: React.ReactNode
   description?: React.ReactNode
 }
