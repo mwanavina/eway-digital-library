@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { X } from 'lucide-react';
 
+type SectionKey = 'school' | 'department' | 'program' | 'course';
+
 interface JournalsFilterProps {
   schools: any[];
   departments: any[];
@@ -31,7 +33,7 @@ export function JournalsFilter({
   isOpen,
   onClose,
 }: JournalsFilterProps) {
-  const [expandedSections, setExpandedSections] = useState({
+  const [expandedSections, setExpandedSections] = useState<Record<SectionKey, boolean>>({
     school: true,
     department: false,
     program: false,
@@ -50,7 +52,7 @@ export function JournalsFilter({
     ? courses.filter((c) => c.program_id === parseInt(filters.programId))
     : [];
 
-  const toggleSection = (section: string) => {
+  const toggleSection = (section: SectionKey) => {
     setExpandedSections((prev) => ({
       ...prev,
       [section]: !prev[section],
@@ -64,7 +66,7 @@ export function JournalsFilter({
     filterKey,
   }: {
     title: string;
-    section: string;
+    section: SectionKey;
     options: any[];
     filterKey: string;
   }) => (

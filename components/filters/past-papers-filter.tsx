@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { X } from 'lucide-react';
 
+type SectionKey = 'school' | 'department' | 'program' | 'course' | 'year' | 'semester' | 'examType';
+
 interface PastPapersFilterProps {
   schools: any[];
   departments: any[];
@@ -35,7 +37,7 @@ export function PastPapersFilter({
   isOpen,
   onClose,
 }: PastPapersFilterProps) {
-  const [expandedSections, setExpandedSections] = useState({
+  const [expandedSections, setExpandedSections] = useState<Record<SectionKey, boolean>>({
     school: true,
     department: false,
     program: false,
@@ -57,7 +59,7 @@ export function PastPapersFilter({
     ? courses.filter((c) => c.program_id === parseInt(filters.programId))
     : [];
 
-  const toggleSection = (section: string) => {
+  const toggleSection = (section: SectionKey) => {
     setExpandedSections((prev) => ({
       ...prev,
       [section]: !prev[section],
@@ -71,7 +73,7 @@ export function PastPapersFilter({
     filterKey,
   }: {
     title: string;
-    section: string;
+    section: SectionKey;
     options: any[];
     filterKey: string;
   }) => (
