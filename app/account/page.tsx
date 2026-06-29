@@ -1,11 +1,14 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Header } from '@/components/header';
 import { BottomNav } from '@/components/bottom-nav';
-import { Edit2, Mail, Phone, MapPin, Calendar, FileText } from 'lucide-react';
+import { Edit2, Mail, Phone, MapPin, Calendar, FileText, LogOut } from 'lucide-react';
+import { authClient } from '@/lib/auth-client';
 
 export default function AccountPage() {
+  const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     firstName: 'John',
@@ -39,6 +42,16 @@ export default function AccountPage() {
       ...prev,
       [name]: value,
     }));
+  };
+
+  const handleSignOut = async () => {
+    await authClient.signOut({
+      fetchOptions: {
+        onSuccess: () => {
+          router.push('/sign-in');
+        },
+      },
+    });
   };
 
   return (
@@ -246,6 +259,16 @@ export default function AccountPage() {
                 <span className="font-semibold text-gray-900">Today</span>
               </div>
             </div>
+          </div>
+
+          <div className="mt-6 border border-red-200 rounded-lg bg-red-50 p-4 md:p-6">
+            <button
+              onClick={handleSignOut}
+              className="flex items-center gap-2 text-red-600 font-medium hover:text-red-700 transition-colors"
+            >
+              <LogOut size={18} />
+              Sign out
+            </button>
           </div>
         </div>
       </main>
