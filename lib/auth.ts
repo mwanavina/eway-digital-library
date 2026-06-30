@@ -40,7 +40,7 @@ export const auth = betterAuth({
     sendResetPassword: async ({ user, url}: AuthResetPasswordParams) => {
 			const logoUrl = "https://m69autqsig.ufs.sh/f/t72WtywUos4eXLAxoQGv9WBJEhIsCXFmzL05UfyeSAo2bPQR";
 
-			void sendEmail({
+			await sendEmail({
 				to: user.email,
 				subject: "Reset your Eway password",
 				html: `
