@@ -5,30 +5,42 @@ import { auth } from "@/lib/auth";
 export async function proxy(request: NextRequest) {
 	const session = await auth.api.getSession({
 		headers: await headers()
-	})
-    // console.log("Proxy Middleware: Session:", session);
-	// 1. Not logged in -> sign-in
-	if (!session) {
-		return NextResponse.redirect(new URL("/sign-in", request.url));
-	}
+	});
 
 	const path = request.nextUrl.pathname;
-	const isAdmin = session.user.role === "admin";
+	const isAuthRoute =
+		path.startsWith("/sign-in") ||
+		path.startsWith("/sign-up") ||
+		path.startsWith("/check-email") ||
+		path.startsWith("/forgot-password") ||
+		path.startsWith("/reset-password");
 
-    // console.log("Proxy Middleware: Path:", path, "Is Admin:", isAdmin);
+	if (session) {
+		const isAdmin = session.user.role === "admin";
 
-	// 2. Admin users accessing root or dashboard -> redirect to /admin
-	if (isAdmin && (path === "/" || path.startsWith("/dashboard"))) {
-		return NextResponse.redirect(new URL("/admin", request.url));
+		if (isAuthRoute) {
+			return NextResponse.redirect(new URL(isAdmin ? "/admin" : "/", request.url));
+		}
+
+		// Admin users accessing root or dashboard -> redirect to /admin
+		if (isAdmin && (path === "/" || path.startsWith("/dashboard"))) {
+			return NextResponse.redirect(new URL("/admin", request.url));
+		}
+
+		// Non-admin users trying to access admin -> redirect to /dashboard
+		if (!isAdmin && (path.startsWith("/admin") || path.startsWith("/api/admin"))) {
+			return NextResponse.redirect(new URL("/dashboard", request.url));
+		}
+
+		return NextResponse.next();
 	}
 
-	// 3. Non-admin users trying to access admin -> redirect to /dashboard
-	if (!isAdmin && (path.startsWith("/admin") || path.startsWith("/api/admin"))) {
-		return NextResponse.redirect(new URL("/dashboard", request.url));
+	// Unauthenticated users should only be redirected away from protected routes.
+	if (isAuthRoute) {
+		return NextResponse.next();
 	}
 
-	// 4. Allow access
-	return NextResponse.next();
+	return NextResponse.redirect(new URL("/sign-in", request.url));
 }
 
 export const config = {
