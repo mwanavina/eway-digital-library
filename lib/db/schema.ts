@@ -171,8 +171,6 @@ export const userProfiles = pgTable("user_profiles", {
     .notNull()
     .unique()
     .references(() => user.id, { onDelete: "cascade" }),
-  fullName: varchar("full_name", { length: 255 }),
-  role: varchar("role", { length: 32 }).default("user").notNull(),
   schoolId: integer("school_id").references(() => schools.id, {
     onDelete: "set null",
   }),
