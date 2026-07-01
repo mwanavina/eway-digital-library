@@ -94,7 +94,7 @@ export default function DocumentDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center pb-20">
+      <div className="min-h-screen bg-background dark:bg-slate-950 flex items-center justify-center pb-20">
         <Spinner />
       </div>
     );
@@ -102,8 +102,8 @@ export default function DocumentDetailPage() {
 
   if (!document) {
     return (
-      <div className="min-h-screen bg-white pb-20">
-        <div className="sticky top-0 z-40 bg-white border-b border-gray-200">
+      <div className="min-h-screen bg-background dark:bg-slate-950 pb-20">
+        <div className="sticky top-0 z-40 bg-background dark:bg-slate-950 border-b border-gray-200 dark:border-slate-700">
           <Link href="/" className="p-4 inline-flex items-center gap-2 text-blue-600 hover:text-blue-700">
             <ArrowLeft size={20} />
             Back
@@ -127,9 +127,9 @@ export default function DocumentDetailPage() {
   const typeColor = typeColors[document.resource_type_name || 'Past Papers'] || '#1782C5';
 
   return (
-    <div className="min-h-screen bg-white pb-24 md:pb-6">
+    <div className="min-h-screen bg-background dark:bg-slate-950 pb-24 md:pb-6">
       {/* Header */}
-      <div className="sticky top-0 z-40 bg-white border-b border-gray-200">
+      <div className="sticky top-0 z-40 bg-background dark:bg-slate-950 border-b border-gray-200 dark:border-slate-700">
         <Link href="/" className="p-4 inline-flex items-center gap-2 text-blue-600 hover:text-blue-700">
           <ArrowLeft size={20} />
           Back
