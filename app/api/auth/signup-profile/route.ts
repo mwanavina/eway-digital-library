@@ -26,13 +26,11 @@ export async function POST(request: Request) {
     if (existingProfile) {
       await db
         .update(userProfiles)
-        .set({ fullName: name, role })
+        .set({ onboardingCompleted: false })
         .where(eq(userProfiles.userId, userId));
     } else {
       await db.insert(userProfiles).values({
         userId,
-        fullName: name,
-        role,
         onboardingCompleted: false,
       });
     }

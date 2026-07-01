@@ -2,14 +2,7 @@ import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { getServerSession } from "@/lib/auth/session";
 import { db } from "@/lib/db";
-import {
-  departments,
-  levels,
-  programs,
-  schools,
-  user,
-  userProfiles,
-} from "@/lib/db/schema";
+import { levels, schools, userProfiles } from "@/lib/db/schema";
 
 export async function GET() {
   const session = await getServerSession();
@@ -30,6 +23,7 @@ export async function GET() {
 
   return NextResponse.json({
     profile: profile ?? null,
+    userName: session.user.name ?? "",
     schools: schoolRows,
     levels: levelRows,
   });
@@ -42,23 +36,17 @@ export async function POST(request: Request) {
   }
 
   const body = await request.json();
-  const fullName = String(body.fullName ?? "").trim();
   const schoolId = Number(body.schoolId);
   const departmentId = Number(body.departmentId);
   const programId = Number(body.programId);
   const levelId = Number(body.levelId);
 
-  if (!fullName || !schoolId || !departmentId || !programId || !levelId) {
+  if (!schoolId || !departmentId || !programId || !levelId) {
     return NextResponse.json(
       { error: "Please complete all required fields." },
       { status: 400 },
     );
   }
-
-  await db
-    .update(user)
-    .set({ name: fullName })
-    .where(eq(user.id, session.user.id));
 
   const [existing] = await db
     .select({ id: userProfiles.id })
@@ -67,7 +55,6 @@ export async function POST(request: Request) {
     .limit(1);
 
   const profileData = {
-    fullName,
     schoolId,
     departmentId,
     programId,
