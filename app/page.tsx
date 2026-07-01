@@ -191,7 +191,7 @@ export default function Home() {
 
 
   return (
-    <div className="min-h-screen bg-white flex flex-col">
+    <div className="min-h-screen bg-background dark:bg-slate-950 flex flex-col">
       <Header 
         onSearchChange={handleSearchChange} 
         onMenuClick={() => setSidebarOpen(!sidebarOpen)}
@@ -237,7 +237,7 @@ export default function Home() {
         )}
 
         {/* Filter Sidebar - Resource Specific */}
-        <div className="hidden lg:block lg:w-64 lg:border-r lg:border-gray-200 lg:overflow-hidden lg:bg-white">
+        <div className="hidden lg:block lg:w-64 lg:border-r lg:border-gray-200 lg:overflow-hidden lg:bg-background dark:lg:bg-slate-950">
           {activeResourceType === 'all' && (
             <AllResourcesFilter
               schools={schools}
@@ -377,7 +377,7 @@ export default function Home() {
         )}
 
         {/* Main Content - Scrollable */}
-        <main className="flex-1 overflow-y-auto bg-white pb-24 md:pb-0">
+        <main className="flex-1 overflow-y-auto bg-background dark:bg-slate-950 pb-24 md:pb-0">
           <div className="p-4 md:p-6">
             {/* Mobile Filter Pills - Horizontally Scrollable */}
             <div className="md:hidden mb-6 flex gap-2 items-center overflow-x-auto pb-2 -mx-4 px-4">
