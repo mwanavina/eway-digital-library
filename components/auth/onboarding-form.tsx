@@ -26,7 +26,7 @@ export function OnboardingForm() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const [fullName, setFullName] = useState("");
+  const [userName, setUserName] = useState("");
   const [schoolId, setSchoolId] = useState("");
   const [departmentId, setDepartmentId] = useState("");
   const [programId, setProgramId] = useState("");
@@ -53,7 +53,7 @@ export function OnboardingForm() {
 
       setSchools(data.schools ?? []);
       setLevels(data.levels ?? []);
-      if (data.profile?.fullName) setFullName(data.profile.fullName);
+      setUserName(data.userName ?? "");
       setLoading(false);
     }
 
@@ -106,7 +106,6 @@ export function OnboardingForm() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        fullName,
         schoolId: Number(schoolId),
         departmentId: Number(departmentId),
         programId: Number(programId),
@@ -157,9 +156,8 @@ export function OnboardingForm() {
           </Label>
           <Input
             id="fullName"
-            required
-            value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
+            value={userName}
+            readOnly
             placeholder="Your full name"
             className="h-11 bg-muted"
           />
