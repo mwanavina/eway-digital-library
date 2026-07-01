@@ -1,50 +1,48 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Moon, Sun } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Monitor, Moon, Sun } from 'lucide-react';
+import { useTheme } from 'next-themes';
 
 export function ThemeSwitcher() {
   const [mounted, setMounted] = useState(false);
-  const [theme, setTheme] = useState<'light' | 'dark'>('light');
+  const { theme, setTheme, resolvedTheme } = useTheme();
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null;
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const initialTheme = savedTheme || (prefersDark ? 'dark' : 'light');
-    setTheme(initialTheme);
-    applyTheme(initialTheme);
     setMounted(true);
   }, []);
 
-  const applyTheme = (newTheme: 'light' | 'dark') => {
-    const html = document.documentElement;
-    if (newTheme === 'dark') {
-      html.classList.add('dark');
-    } else {
-      html.classList.remove('dark');
-    }
-    localStorage.setItem('theme', newTheme);
-  };
-
-  const toggleTheme = () => {
-    const newTheme = theme === 'light' ? 'dark' : 'light';
-    setTheme(newTheme);
-    applyTheme(newTheme);
-  };
-
   if (!mounted) return null;
+
+  const cycleTheme = () => {
+    if (theme === 'light') {
+      setTheme('dark');
+      return;
+    }
+
+    if (theme === 'dark') {
+      setTheme('system');
+      return;
+    }
+
+    setTheme('light');
+  };
+
+  const currentTheme = theme === 'system' ? resolvedTheme : theme;
 
   return (
     <button
-      onClick={toggleTheme}
+      onClick={cycleTheme}
       className="inline-flex items-center justify-center p-2 rounded-lg bg-white bg-opacity-20 hover:bg-opacity-30 transition-colors dark:bg-slate-800 dark:hover:bg-slate-700"
-      aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
-      title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+      aria-label="Toggle theme"
+      title="Toggle theme"
     >
-      {theme === 'light' ? (
-        <Moon size={20} className="text-slate-700 dark:text-yellow-300" />
-      ) : (
+      {theme === 'system' ? (
+        <Monitor size={20} className="text-slate-700 dark:text-yellow-300" />
+      ) : currentTheme === 'dark' ? (
         <Sun size={20} className="text-yellow-300" />
+      ) : (
+        <Moon size={20} className="text-slate-700 dark:text-yellow-300" />
       )}
     </button>
   );
