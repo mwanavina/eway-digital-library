@@ -55,7 +55,7 @@ export default function AccountPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white flex flex-col">
+    <div className="min-h-screen bg-background dark:bg-slate-950 flex flex-col">
       <Header />
       <BottomNav activeTab="browse" />
 
@@ -68,7 +68,7 @@ export default function AccountPage() {
           </div>
 
           {/* Profile Card */}
-          <div className="border border-gray-200 rounded-lg overflow-hidden bg-white">
+          <div className="border border-gray-200 dark:border-slate-700 rounded-lg overflow-hidden bg-card dark:bg-slate-900">
             {/* Header with Edit Button */}
             <div className="flex items-center justify-between px-4 md:px-6 py-4 bg-gray-50 border-b border-gray-200">
               <h2 className="font-semibold text-gray-900">Profile Information</h2>

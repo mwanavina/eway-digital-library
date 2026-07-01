@@ -72,7 +72,7 @@ export default function BookmarksPage() {
   return (
     <>
       <Header onSearchClick={() => {}} />
-      <main className="bg-white min-h-screen pb-20">
+      <main className="bg-background dark:bg-slate-950 min-h-screen pb-20">
         {/* Header */}
         <div className="bg-gradient-to-r from-[#1782C5] to-[#1F2557] text-white p-4">
           <div className="flex items-center gap-3 mb-4">
@@ -101,7 +101,7 @@ export default function BookmarksPage() {
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-0 border-b border-gray-200 px-4 sticky top-16 z-20 bg-white">
+        <div className="flex gap-0 border-b border-gray-200 dark:border-slate-700 px-4 sticky top-16 z-20 bg-background dark:bg-slate-950">
           <button
             onClick={() => setActiveTab('bookmarks')}
             className={`flex-1 py-4 text-sm font-semibold border-b-2 transition-colors ${
