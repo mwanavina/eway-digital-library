@@ -1,8 +1,34 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Plus, Users, FileText, Folder, BarChart3 } from 'lucide-react';
+import Image from 'next/image';
+import {
+  Plus,
+  Users,
+  FileText,
+  Folder,
+  BarChart3,
+  LayoutGrid,
+  UploadCloud,
+  Database,
+  Sparkles,
+  Home,
+  LogOut,
+  UserCircle2,
+} from 'lucide-react';
+import { ThemeSwitcher } from '@/components/theme-switcher';
+import { Button } from '@/components/ui/button';
+import {
+  Popover,
+  PopoverContent,
+  PopoverDescription,
+  PopoverHeader,
+  PopoverTitle,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import { authClient } from '@/lib/auth-client';
 import { AdminTable } from '@/components/admin/admin-table';
 import { AdminModal } from '@/components/admin/admin-modal';
 import { ConfirmDialog } from '@/components/admin/confirm-dialog';
@@ -110,6 +136,16 @@ export default function AdminPage() {
     } catch (error) {
       console.error('[v0] Error loading documents:', error);
     }
+  }
+
+  async function handleSignOut() {
+    await authClient.signOut({
+      fetchOptions: {
+        onSuccess: () => {
+          router.push('/sign-in');
+        },
+      },
+    });
   }
 
   // Handle CRUD operations
@@ -220,250 +256,372 @@ export default function AdminPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
-      {/* Header */}
-      <div className="bg-[#1782C5] dark:bg-slate-900 text-white py-8 px-4 md:px-6">
-        <div className="max-w-7xl mx-auto">
-          <h1 className="text-4xl font-bold">Admin Dashboard</h1>
-          <p className="text-blue-100 dark:text-blue-300 mt-1">Manage system resources and monitor platform analytics</p>
-        </div>
-      </div>
-
-      {/* Statistics Section */}
-      <div className="max-w-7xl mx-auto py-8 px-4 md:px-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {/* Total Documents */}
-          <div className="bg-white dark:bg-slate-800 rounded-lg shadow p-6 border-l-4 border-blue-500">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-600 dark:text-gray-400 text-sm font-medium">Total Documents</p>
-                <p className="text-3xl font-bold text-gray-900 dark:text-white mt-2">{documents.length}</p>
-              </div>
-              <div className="bg-blue-100 dark:bg-blue-900 p-3 rounded-lg">
-                <FileText size={24} className="text-blue-600 dark:text-blue-300" />
-              </div>
-            </div>
-          </div>
-
-          {/* Total Courses */}
-          <div className="bg-white dark:bg-slate-800 rounded-lg shadow p-6 border-l-4 border-purple-500">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-600 dark:text-gray-400 text-sm font-medium">Total Courses</p>
-                <p className="text-3xl font-bold text-gray-900 dark:text-white mt-2">{courses.length}</p>
-              </div>
-              <div className="bg-purple-100 dark:bg-purple-900 p-3 rounded-lg">
-                <Folder size={24} className="text-purple-600 dark:text-purple-300" />
-              </div>
-            </div>
-          </div>
-
-          {/* Total Programs */}
-          <div className="bg-white dark:bg-slate-800 rounded-lg shadow p-6 border-l-4 border-green-500">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-600 dark:text-gray-400 text-sm font-medium">Total Programs</p>
-                <p className="text-3xl font-bold text-gray-900 dark:text-white mt-2">{programs.length}</p>
-              </div>
-              <div className="bg-green-100 dark:bg-green-900 p-3 rounded-lg">
-                <BarChart3 size={24} className="text-green-600 dark:text-green-300" />
-              </div>
-            </div>
-          </div>
-
-          {/* Total Schools */}
-          <div className="bg-white dark:bg-slate-800 rounded-lg shadow p-6 border-l-4 border-orange-500">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-600 dark:text-gray-400 text-sm font-medium">Total Schools</p>
-                <p className="text-3xl font-bold text-gray-900 dark:text-white mt-2">{schools.length}</p>
-              </div>
-              <div className="bg-orange-100 dark:bg-orange-900 p-3 rounded-lg">
-                <Users size={24} className="text-orange-600 dark:text-orange-300" />
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Tabs */}
-      <div className="border-b border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 md:px-6">
-          <div className="flex overflow-x-auto gap-1">
-            {tabs.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => {
-                  setActiveTab(tab.id);
-                  if (tab.id === 'documents') loadDocuments();
-                }}
-                className={`px-4 py-4 text-sm font-medium whitespace-nowrap border-b-2 transition-colors ${
-                  activeTab === tab.id
-                    ? 'border-[#1782C5] text-[#1782C5] dark:text-blue-400'
-                    : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
-                }`}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Content */}
-      <div className="max-w-7xl mx-auto py-8 px-4 md:px-6">
-        {/* Upload Tab */}
-        {activeTab === 'upload' && (
-          <div className="space-y-6">
-            <div className="bg-white dark:bg-slate-800 rounded-lg shadow p-6">
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">Upload Documents</h2>
-              <AdminUploadFormEnhanced
-                schools={schools}
-                departments={departments}
-                programs={programs}
-                courses={courses}
-                resourceTypes={resourceTypes}
-                onSuccess={() => {
-                  setActiveTab('documents');
-                  loadDocuments();
-                }}
+    <div className="min-h-screen bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
+      <header className="border-b border-slate-200/70 bg-[#1782C5] text-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 md:px-6">
+          <div className="flex items-center gap-3">
+            <div className="flex h-11 w-11 items-center justify-center rounded-full bg-white/95 p-1.5 shadow-sm">
+              <Image
+                src="/eway-logo.png"
+                alt="Eway Library Logo"
+                width={40}
+                height={40}
+                priority
+                className="h-8 w-8 object-contain"
               />
             </div>
-          </div>
-        )}
-
-        {/* Documents Tab */}
-        {activeTab === 'documents' && (
-          <div className="bg-white dark:bg-slate-800 rounded-lg shadow p-6">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">All Documents</h2>
-            <AdminDocumentList documents={documents} />
-          </div>
-        )}
-
-        {/* Schools Tab */}
-        {activeTab === 'schools' && (
-          <div className="bg-white dark:bg-slate-800 rounded-lg shadow p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white">Schools</h2>
-              <button
-                onClick={openCreateModal}
-                className="flex items-center gap-2 bg-[#1782C5] text-white px-4 py-2 rounded-lg hover:bg-[#1F2557] transition-colors"
-              >
-                <Plus size={20} />
-                Add School
-              </button>
+            <div>
+              <p className="text-base font-semibold">Eway Library</p>
+              <p className="text-xs text-blue-100">Admin control center</p>
             </div>
-            <AdminTable
-              columns={[{ key: 'name', label: 'Name' }]}
-              data={schools}
-              onEdit={openEditModal}
-              onDelete={(item) => setConfirmDelete(item)}
-            />
           </div>
-        )}
 
-        {/* Departments Tab */}
-        {activeTab === 'departments' && (
-          <div className="bg-white dark:bg-slate-800 rounded-lg shadow p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white">Departments</h2>
-              <button
-                onClick={openCreateModal}
-                className="flex items-center gap-2 bg-[#1782C5] text-white px-4 py-2 rounded-lg hover:bg-[#1F2557] transition-colors"
+          <div className="flex items-center gap-2">
+            <Link
+              href="/dashboard"
+              className="hidden items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-white/20 sm:flex"
+            >
+              <Home size={16} />
+              Back to app
+            </Link>
+            <ThemeSwitcher />
+            <Popover>
+              <PopoverTrigger
+                type="button"
+                className="flex items-center gap-2 rounded-full border border-white/20 bg-white/10 p-2 transition-colors hover:bg-white/20"
+                aria-label="Admin profile"
               >
-                <Plus size={20} />
-                Add Department
-              </button>
-            </div>
-            <AdminTable
-              columns={[
-                { key: 'name', label: 'Department' },
-                { key: 'school_name', label: 'School' },
-              ]}
-              data={departments}
-              onEdit={openEditModal}
-              onDelete={(item) => setConfirmDelete(item)}
-            />
+                <UserCircle2 size={18} />
+              </PopoverTrigger>
+              <PopoverContent className="w-56">
+                <PopoverHeader className="space-y-1">
+                  <PopoverTitle>Admin account</PopoverTitle>
+                  <PopoverDescription>Manage your workspace and sign out safely.</PopoverDescription>
+                </PopoverHeader>
+                <div className="mt-3 flex flex-col gap-2">
+                  <Button asChild variant="outline" className="w-full">
+                    <Link href="/account">View account</Link>
+                  </Button>
+                  <Button onClick={handleSignOut} variant="destructive" className="w-full">
+                    <LogOut size={16} className="mr-2" />
+                    Sign out
+                  </Button>
+                </div>
+              </PopoverContent>
+            </Popover>
           </div>
-        )}
+        </div>
+      </header>
 
-        {/* Programs Tab */}
-        {activeTab === 'programs' && (
-          <div className="bg-white dark:bg-slate-800 rounded-lg shadow p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white">Programs</h2>
-              <button
-                onClick={openCreateModal}
-                className="flex items-center gap-2 bg-[#1782C5] text-white px-4 py-2 rounded-lg hover:bg-[#1F2557] transition-colors"
-              >
-                <Plus size={20} />
-                Add Program
-              </button>
+      <main className="mx-auto max-w-7xl px-4 py-6 md:px-6 lg:px-8 lg:py-8">
+        <section className="overflow-hidden rounded-3xl bg-gradient-to-br from-[#1782C5] via-[#1F2557] to-slate-900 p-6 text-white shadow-xl">
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+            <div className="max-w-2xl">
+              <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-sm font-medium backdrop-blur">
+                <Sparkles size={16} />
+                System overview
+              </div>
+              <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">Admin dashboard</h1>
+              <p className="mt-3 text-sm text-blue-100 sm:text-base">
+                Manage uploads, organize academic structures, and keep the library running smoothly from one place.
+              </p>
             </div>
-            <AdminTable
-              columns={[
-                { key: 'name', label: 'Program' },
-                { key: 'department_name', label: 'Department' },
-                { key: 'school_name', label: 'School' },
-              ]}
-              data={programs}
-              onEdit={openEditModal}
-              onDelete={(item) => setConfirmDelete(item)}
-            />
+            <div className="grid gap-3 sm:grid-cols-3">
+              <div className="rounded-2xl bg-white/10 p-3 backdrop-blur">
+                <p className="text-xs uppercase tracking-[0.2em] text-blue-100">Documents</p>
+                <p className="mt-1 text-2xl font-semibold">{documents.length}</p>
+              </div>
+              <div className="rounded-2xl bg-white/10 p-3 backdrop-blur">
+                <p className="text-xs uppercase tracking-[0.2em] text-blue-100">Courses</p>
+                <p className="mt-1 text-2xl font-semibold">{courses.length}</p>
+              </div>
+              <div className="rounded-2xl bg-white/10 p-3 backdrop-blur">
+                <p className="text-xs uppercase tracking-[0.2em] text-blue-100">Schools</p>
+                <p className="mt-1 text-2xl font-semibold">{schools.length}</p>
+              </div>
+            </div>
           </div>
-        )}
+        </section>
 
-        {/* Courses Tab */}
-        {activeTab === 'courses' && (
-          <div className="bg-white dark:bg-slate-800 rounded-lg shadow p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white">Courses</h2>
-              <button
-                onClick={openCreateModal}
-                className="flex items-center gap-2 bg-[#1782C5] text-white px-4 py-2 rounded-lg hover:bg-[#1F2557] transition-colors"
-              >
-                <Plus size={20} />
-                Add Course
-              </button>
+        <section className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Total documents</p>
+                <p className="mt-2 text-3xl font-semibold">{documents.length}</p>
+              </div>
+              <div className="rounded-2xl bg-blue-50 p-3 text-blue-600 dark:bg-blue-950/40 dark:text-blue-300">
+                <FileText size={20} />
+              </div>
             </div>
-            <AdminTable
-              columns={[
-                { key: 'code', label: 'Code' },
-                { key: 'name', label: 'Course' },
-                { key: 'program_name', label: 'Program' },
-              ]}
-              data={courses}
-              onEdit={openEditModal}
-              onDelete={(item) => setConfirmDelete(item)}
-            />
           </div>
-        )}
+          <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Total courses</p>
+                <p className="mt-2 text-3xl font-semibold">{courses.length}</p>
+              </div>
+              <div className="rounded-2xl bg-violet-50 p-3 text-violet-600 dark:bg-violet-950/40 dark:text-violet-300">
+                <Folder size={20} />
+              </div>
+            </div>
+          </div>
+          <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Programs</p>
+                <p className="mt-2 text-3xl font-semibold">{programs.length}</p>
+              </div>
+              <div className="rounded-2xl bg-emerald-50 p-3 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-300">
+                <BarChart3 size={20} />
+              </div>
+            </div>
+          </div>
+          <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Academic units</p>
+                <p className="mt-2 text-3xl font-semibold">{schools.length + departments.length}</p>
+              </div>
+              <div className="rounded-2xl bg-amber-50 p-3 text-amber-600 dark:bg-amber-950/40 dark:text-amber-300">
+                <Users size={20} />
+              </div>
+            </div>
+          </div>
+        </section>
 
-        {/* Levels Tab */}
-        {activeTab === 'levels' && (
-          <div className="bg-white dark:bg-slate-800 rounded-lg shadow p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white">Levels</h2>
-              <button
-                onClick={openCreateModal}
-                className="flex items-center gap-2 bg-[#1782C5] text-white px-4 py-2 rounded-lg hover:bg-[#1F2557] transition-colors"
-              >
-                <Plus size={20} />
-                Add Level
-              </button>
+        <section className="mt-6 grid gap-6 lg:grid-cols-[260px_minmax(0,1fr)]">
+          <aside className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+            <div className="mb-4">
+              <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500 dark:text-slate-400">Quick actions</p>
+              <div className="mt-3 space-y-2">
+                <button
+                  onClick={() => setActiveTab('upload')}
+                  className="flex w-full items-center gap-3 rounded-2xl border border-slate-200 px-3 py-2.5 text-left text-sm font-medium text-slate-700 transition-colors hover:border-[#1782C5] hover:bg-blue-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
+                >
+                  <UploadCloud size={16} className="text-[#1782C5]" />
+                  Upload documents
+                </button>
+                <button
+                  onClick={() => {
+                    setActiveTab('schools');
+                    openCreateModal();
+                  }}
+                  className="flex w-full items-center gap-3 rounded-2xl border border-slate-200 px-3 py-2.5 text-left text-sm font-medium text-slate-700 transition-colors hover:border-[#1782C5] hover:bg-blue-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
+                >
+                  <Database size={16} className="text-[#1782C5]" />
+                  Add academic structure
+                </button>
+              </div>
             </div>
-            <AdminTable
-              columns={[
-                { key: 'level_number', label: 'Level' },
-                { key: 'description', label: 'Description' },
-              ]}
-              data={levels}
-              onEdit={openEditModal}
-              onDelete={(item) => setConfirmDelete(item)}
-            />
+
+            <div className="rounded-2xl bg-slate-50 p-3 dark:bg-slate-800/70">
+              <div className="flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-slate-300">
+                <LayoutGrid size={16} className="text-[#1782C5]" />
+                Workspace modules
+              </div>
+              <div className="mt-3 flex flex-col gap-1">
+                {tabs.map((tab) => (
+                  <button
+                    key={tab.id}
+                    onClick={() => {
+                      setActiveTab(tab.id);
+                      if (tab.id === 'documents') loadDocuments();
+                    }}
+                    className={`rounded-xl px-3 py-2 text-left text-sm transition-colors ${
+                      activeTab === tab.id
+                        ? 'bg-[#1782C5] text-white'
+                        : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-700'
+                    }`}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </aside>
+
+          <div className="space-y-6">
+            <div className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900 md:p-5">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <p className="text-sm font-semibold text-slate-900 dark:text-white">Workspace controls</p>
+                  <p className="text-sm text-slate-500 dark:text-slate-400">Move between management areas and keep the library organized.</p>
+                </div>
+                <div className="rounded-full bg-emerald-50 px-3 py-1 text-sm font-medium text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300">
+                  Live workspace
+                </div>
+              </div>
+            </div>
+
+            <div className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900 md:p-6">
+              {activeTab === 'upload' && (
+                <div className="space-y-6">
+                  <div>
+                    <h2 className="text-xl font-bold text-gray-900 dark:text-white">Upload documents</h2>
+                    <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Add new papers, journals, and other academic resources to the library.</p>
+                  </div>
+                  <AdminUploadFormEnhanced
+                    schools={schools}
+                    departments={departments}
+                    programs={programs}
+                    courses={courses}
+                    resourceTypes={resourceTypes}
+                    onSuccess={() => {
+                      setActiveTab('documents');
+                      loadDocuments();
+                    }}
+                  />
+                </div>
+              )}
+
+              {activeTab === 'documents' && (
+                <div className="space-y-6">
+                  <div>
+                    <h2 className="text-xl font-bold text-gray-900 dark:text-white">All documents</h2>
+                    <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Review and manage every uploaded resource in one place.</p>
+                  </div>
+                  <AdminDocumentList documents={documents} />
+                </div>
+              )}
+
+              {activeTab === 'schools' && (
+                <div className="space-y-6">
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                      <h2 className="text-xl font-bold text-gray-900 dark:text-white">Schools</h2>
+                      <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Create and manage the schools that power the platform.</p>
+                    </div>
+                    <button
+                      onClick={openCreateModal}
+                      className="flex items-center gap-2 rounded-lg bg-[#1782C5] px-4 py-2 text-white transition-colors hover:bg-[#1F2557]"
+                    >
+                      <Plus size={18} />
+                      Add school
+                    </button>
+                  </div>
+                  <AdminTable
+                    columns={[{ key: 'name', label: 'Name' }]}
+                    data={schools}
+                    onEdit={openEditModal}
+                    onDelete={(item) => setConfirmDelete(item)}
+                  />
+                </div>
+              )}
+
+              {activeTab === 'departments' && (
+                <div className="space-y-6">
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                      <h2 className="text-xl font-bold text-gray-900 dark:text-white">Departments</h2>
+                      <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Keep departments aligned with the right school.</p>
+                    </div>
+                    <button
+                      onClick={openCreateModal}
+                      className="flex items-center gap-2 rounded-lg bg-[#1782C5] px-4 py-2 text-white transition-colors hover:bg-[#1F2557]"
+                    >
+                      <Plus size={18} />
+                      Add department
+                    </button>
+                  </div>
+                  <AdminTable
+                    columns={[
+                      { key: 'name', label: 'Department' },
+                      { key: 'school_name', label: 'School' },
+                    ]}
+                    data={departments}
+                    onEdit={openEditModal}
+                    onDelete={(item) => setConfirmDelete(item)}
+                  />
+                </div>
+              )}
+
+              {activeTab === 'programs' && (
+                <div className="space-y-6">
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                      <h2 className="text-xl font-bold text-gray-900 dark:text-white">Programs</h2>
+                      <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Manage the academic programs students can browse.</p>
+                    </div>
+                    <button
+                      onClick={openCreateModal}
+                      className="flex items-center gap-2 rounded-lg bg-[#1782C5] px-4 py-2 text-white transition-colors hover:bg-[#1F2557]"
+                    >
+                      <Plus size={18} />
+                      Add program
+                    </button>
+                  </div>
+                  <AdminTable
+                    columns={[
+                      { key: 'name', label: 'Program' },
+                      { key: 'department_name', label: 'Department' },
+                      { key: 'school_name', label: 'School' },
+                    ]}
+                    data={programs}
+                    onEdit={openEditModal}
+                    onDelete={(item) => setConfirmDelete(item)}
+                  />
+                </div>
+              )}
+
+              {activeTab === 'courses' && (
+                <div className="space-y-6">
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                      <h2 className="text-xl font-bold text-gray-900 dark:text-white">Courses</h2>
+                      <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Organize the course catalog and their program links.</p>
+                    </div>
+                    <button
+                      onClick={openCreateModal}
+                      className="flex items-center gap-2 rounded-lg bg-[#1782C5] px-4 py-2 text-white transition-colors hover:bg-[#1F2557]"
+                    >
+                      <Plus size={18} />
+                      Add course
+                    </button>
+                  </div>
+                  <AdminTable
+                    columns={[
+                      { key: 'code', label: 'Code' },
+                      { key: 'name', label: 'Course' },
+                      { key: 'program_name', label: 'Program' },
+                    ]}
+                    data={courses}
+                    onEdit={openEditModal}
+                    onDelete={(item) => setConfirmDelete(item)}
+                  />
+                </div>
+              )}
+
+              {activeTab === 'levels' && (
+                <div className="space-y-6">
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                      <h2 className="text-xl font-bold text-gray-900 dark:text-white">Levels</h2>
+                      <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Define the student progression levels used across the platform.</p>
+                    </div>
+                    <button
+                      onClick={openCreateModal}
+                      className="flex items-center gap-2 rounded-lg bg-[#1782C5] px-4 py-2 text-white transition-colors hover:bg-[#1F2557]"
+                    >
+                      <Plus size={18} />
+                      Add level
+                    </button>
+                  </div>
+                  <AdminTable
+                    columns={[
+                      { key: 'level_number', label: 'Level' },
+                      { key: 'description', label: 'Description' },
+                    ]}
+                    data={levels}
+                    onEdit={openEditModal}
+                    onDelete={(item) => setConfirmDelete(item)}
+                  />
+                </div>
+              )}
+            </div>
           </div>
-        )}
-      </div>
+        </section>
+      </main>
 
       {/* Create/Edit Modal */}
       <AdminModal
