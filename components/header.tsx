@@ -49,15 +49,15 @@ export function Header({ onSearchChange, onMenuClick, onSearchClick, onFilterCli
       <div className="flex items-center justify-between h-16 px-4 md:px-6 gap-4">
         {/* Logo */}
         <div className="flex items-center gap-2.5 flex-shrink-0">
-          <div className="flex items-center justify-center overflow-hidden rounded-2xl bg-white/95 p-1.5 shadow-sm ring-1 ring-white/70 md:p-2">
+          <div className="flex items-center justify-center overflow-hidden rounded-md bg-white/95 p-0.5 shadow-none ring-0 md:p-0.5">
             <Image
               src="/eway-logo.png"
               alt="Eway Library Logo"
               width={64}
               height={64}
               priority
-              sizes="(max-width: 768px) 56px, 72px"
-              className="h-12 w-12 object-contain md:h-14 md:w-14"
+              sizes="(max-width: 768px) 48px, 56px"
+              className="h-10 w-10 object-contain md:h-12 md:w-12"
             />
           </div>
           <h1 className="hidden sm:block text-sm font-bold tracking-tight text-white md:text-base">Eway Library</h1>
