@@ -230,7 +230,6 @@ export default function AdminPage() {
             courses={courses}
             levels={levels}
             documents={documents}
-            resourceTypes={resourceTypes}
             loading={loading}
             onCreateClick={openCreateModal}
             onEdit={openEditModal}
