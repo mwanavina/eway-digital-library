@@ -2,7 +2,7 @@
 
 import { Plus } from 'lucide-react';
 import { AdminTable } from '@/components/admin/admin-table';
-import { AdminUploadFormEnhanced } from '@/components/admin/upload-form-enhanced';
+import { AdminUploadForm } from '@/components/admin/upload-form';
 import { AdminDocumentList } from '@/components/admin/document-list';
 import { Tab, AdminItem } from '@/components/admin/admin-types';
 
@@ -14,7 +14,6 @@ interface AdminContentProps {
   courses: AdminItem[];
   levels: AdminItem[];
   documents: AdminItem[];
-  resourceTypes: AdminItem[];
   loading: boolean;
   onCreateClick: () => void;
   onEdit: (item: AdminItem) => void;
@@ -30,7 +29,6 @@ export function AdminContent({
   courses,
   levels,
   documents,
-  resourceTypes,
   loading,
   onCreateClick,
   onEdit,
@@ -96,12 +94,11 @@ export function AdminContent({
               <h2 className="text-xl font-bold text-gray-900 dark:text-white">{activeMeta.title}</h2>
               <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{activeMeta.subtitle}</p>
             </div>
-            <AdminUploadFormEnhanced
+            <AdminUploadForm
               schools={schools}
               departments={departments}
               programs={programs}
               courses={courses}
-              resourceTypes={resourceTypes}
               onSuccess={onUploadSuccess}
             />
           </div>
