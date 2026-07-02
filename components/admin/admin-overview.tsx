@@ -1,5 +1,7 @@
 'use client';
 
+import { BookOpen, FileText, BarChart3, Users } from 'lucide-react';
+
 interface AdminOverviewProps {
   documentsCount: number;
   coursesCount: number;
@@ -54,7 +56,7 @@ export function AdminOverview({
             </div>
             <div className="rounded-2xl bg-blue-50 p-3 text-blue-600 dark:bg-blue-950/40 dark:text-blue-300">
               <span className="sr-only">Documents</span>
-              📄
+              <FileText size={24} />
             </div>
           </div>
         </div>
@@ -67,7 +69,7 @@ export function AdminOverview({
             </div>
             <div className="rounded-2xl bg-violet-50 p-3 text-violet-600 dark:bg-violet-950/40 dark:text-violet-300">
               <span className="sr-only">Courses</span>
-              📚
+              <BookOpen size={24} />
             </div>
           </div>
         </div>
@@ -80,7 +82,7 @@ export function AdminOverview({
             </div>
             <div className="rounded-2xl bg-emerald-50 p-3 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-300">
               <span className="sr-only">Programs</span>
-              📈
+              <BarChart3 size={24} />
             </div>
           </div>
         </div>
@@ -93,7 +95,7 @@ export function AdminOverview({
             </div>
             <div className="rounded-2xl bg-amber-50 p-3 text-amber-600 dark:bg-amber-950/40 dark:text-amber-300">
               <span className="sr-only">Academic units</span>
-              🧑‍🏫
+              <Users size={24} />
             </div>
           </div>
         </div>
