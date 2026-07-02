@@ -10,6 +10,7 @@ interface CreateDocumentInput {
   examType: string;
   fileKey: string;
   fileUrl: string;
+  levelId?: number;
   resourceTypeId?: number;
   author?: string | null;
   publicationDate?: string | null;
@@ -27,10 +28,7 @@ export async function createDocument(input: CreateDocumentInput): Promise<any> {
       id: Math.floor(Math.random() * 10000),
       title: input.title,
       course_id: input.courseId,
-      year: input.year,
-      semester: input.semester,
-      exam_type: input.examType,
-      file_path: input.fileUrl,
+        level_id: input.levelId || null,
       file_key: input.fileKey,
       upload_status: 'completed',
       resource_type_id: input.resourceTypeId || 1,

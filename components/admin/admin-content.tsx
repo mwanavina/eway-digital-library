@@ -99,6 +99,7 @@ export function AdminContent({
               departments={departments}
               programs={programs}
               courses={courses}
+              levels={levels}
               onSuccess={onUploadSuccess}
             />
           </div>
