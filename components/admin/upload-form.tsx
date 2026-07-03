@@ -11,6 +11,7 @@ interface UploadFormProps {
   departments: any[];
   programs: any[];
   courses: any[];
+  levels: any[];
   onSuccess?: () => void;
 }
 
@@ -19,12 +20,14 @@ export function AdminUploadForm({
   departments,
   programs,
   courses,
+  levels,
   onSuccess,
 }: UploadFormProps) {
   const [selectedSchool, setSelectedSchool] = useState('');
   const [selectedDepartment, setSelectedDepartment] = useState('');
   const [selectedProgram, setSelectedProgram] = useState('');
   const [selectedCourse, setSelectedCourse] = useState('');
+  const [selectedLevel, setSelectedLevel] = useState('');
   const [year, setYear] = useState(new Date().getFullYear().toString());
   const [semester, setSemester] = useState('1');
   const [examType, setExamType] = useState('Mid-semester');
@@ -60,14 +63,23 @@ export function AdminUploadForm({
       return;
     }
 
+    if (!selectedLevel) {
+      setError('Please select a level before uploading');
+      return;
+    }
+
     setIsUploading(true);
     setError('');
     setSuccess('');
 
     try {
+      const selectedCourseName = courses.find((c) => c.id === parseInt(selectedCourse))?.name;
+      const selectedLevelName = levels.find((l) => l.id === parseInt(selectedLevel))?.name;
+
       const result = await createDocument({
-        title: `${courses.find((c) => c.id === parseInt(selectedCourse))?.name} - ${year} Sem${semester} ${examType}`,
+        title: `${selectedCourseName ?? 'Document'} - ${selectedLevelName ?? ''} ${year} Sem${semester} ${examType}`.trim(),
         courseId: parseInt(selectedCourse),
+        levelId: parseInt(selectedLevel),
         year: parseInt(year),
         semester: parseInt(semester),
         examType,
@@ -82,6 +94,7 @@ export function AdminUploadForm({
         setSelectedDepartment('');
         setSelectedProgram('');
         setSelectedCourse('');
+        setSelectedLevel('');
         setYear(new Date().getFullYear().toString());
         setSemester('1');
         setExamType('Mid-semester');
@@ -217,6 +230,23 @@ export function AdminUploadForm({
           </select>
         </div>
 
+        {/* Level Selection */}
+        <div className="space-y-2">
+          <label className="block text-sm font-medium text-foreground">Level</label>
+          <select
+            value={selectedLevel}
+            onChange={(e) => setSelectedLevel(e.target.value)}
+            className="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-[#1782C5] focus:border-transparent"
+          >
+            <option value="">Select a level...</option>
+            {levels.map((level) => (
+              <option key={level.id} value={level.id}>
+                {level.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
         {/* Semester Selection */}
         <div className="space-y-2">
           <label className="block text-sm font-medium text-foreground">Semester</label>
@@ -234,8 +264,8 @@ export function AdminUploadForm({
       {/* Exam Type Selection */}
       <div className="space-y-2">
         <label className="block text-sm font-medium text-foreground">Exam Type</label>
-        <div className="flex gap-4">
-          {['Mid-semester', 'End-semester'].map((type) => (
+        <div className="flex flex-wrap gap-4">
+          {['Mid-semester', 'End-semester', 'Supplementary', 'Deferred'].map((type) => (
             <label key={type} className="flex items-center gap-2 cursor-pointer">
               <input
                 type="radio"
