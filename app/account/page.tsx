@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Header } from '@/components/header';
 import { BottomNav } from '@/components/bottom-nav';
-import { Edit2, Mail, Phone, MapPin, Calendar, FileText, LogOut } from 'lucide-react';
+import { Edit2, Mail, Calendar, LogOut } from 'lucide-react';
 import { authClient } from '@/lib/auth-client';
 
 export default function AccountPage() {
@@ -93,10 +93,27 @@ export default function AccountPage() {
         <div className="max-w-2xl mx-auto p-4 md:p-6">
           {/* Profile Header */}
           <div className="mb-8">
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">My Account</h1>
-            <p className="text-gray-600">
-              {currentUser?.name ? `Signed in as ${currentUser.name}` : 'Manage your profile information'}
-            </p>
+            <div className="flex items-center gap-4">
+              <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full border border-slate-200 bg-slate-100 shadow-sm">
+                {currentUser?.image ? (
+                  <img
+                    src={currentUser.image}
+                    alt={currentUser.name ?? 'User profile'}
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <span className="text-lg font-semibold text-slate-600">
+                    {currentUser?.name?.charAt(0)?.toUpperCase() ?? 'U'}
+                  </span>
+                )}
+              </div>
+              <div>
+                <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">My Account</h1>
+                <p className="text-gray-600">
+                  {currentUser?.name ? `Signed in as ${currentUser.name}` : 'Manage your profile information'}
+                </p>
+              </div>
+            </div>
           </div>
 
           {/* Profile Card */}
