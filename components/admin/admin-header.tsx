@@ -17,8 +17,19 @@ import {
 interface AdminHeaderProps {
   onSignOut: () => void;
 }
+interface UserSessionProps {
+  user: {
+    id: string;
+    createdAt: Date;
+    updatedAt: Date;
+    email: string;
+    emailVerified: boolean;
+    name: string;
+    image?: string | null | undefined;
+  };
+}
 
-export function AdminHeader({ onSignOut }: AdminHeaderProps) {
+export function AdminHeader({ onSignOut, userSession }: AdminHeaderProps & { userSession: UserSessionProps }) {
   return (
     <header className="border-b border-slate-200/70 bg-[#1782C5] text-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 md:px-6">
@@ -54,11 +65,24 @@ export function AdminHeader({ onSignOut }: AdminHeaderProps) {
               className="flex items-center gap-2 rounded-full border border-white/20 bg-white/10 p-2 transition-colors hover:bg-white/20"
               aria-label="Admin profile"
             >
-              <UserCircle2 size={18} />
+              {/* // Display user image if available, otherwise show a default icon */}
+              {userSession.user.image ? (
+                <Image
+                  src={userSession.user.image}
+                  alt="Admin profile"
+                  width={24}
+                  height={24}
+                  className="h-6 w-6 rounded-full"
+                />
+              ) : (
+                <UserCircle2 size={18} />
+              )}
             </PopoverTrigger>
             <PopoverContent className="w-56">
               <PopoverHeader className="space-y-1">
                 <PopoverTitle>Admin account</PopoverTitle>
+                <p className="text-sm text-slate-500 dark:text-slate-400">{userSession.user.name}</p>
+                <p className="text-sm text-slate-500 dark:text-slate-400">{userSession.user.email}</p>
                 <PopoverDescription>Manage your workspace and sign out safely.</PopoverDescription>
               </PopoverHeader>
               <div className="mt-3 flex flex-col gap-2">
