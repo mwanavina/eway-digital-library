@@ -56,8 +56,10 @@ export default function AdminPage() {
 
   if (isPending) {
     return (
+      // spinnner
       <div className="flex h-screen items-center justify-center">
         <p className="text-lg font-semibold text-slate-700 dark:text-slate-300">Loading...</p>
+        <div className="ml-2 h-4 w-4 animate-bounce rounded-full bg-slate-700 dark:bg-slate-300"></div>
       </div>
     );
   }
