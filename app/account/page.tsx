@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Header } from '@/components/header';
 import { BottomNav } from '@/components/bottom-nav';
@@ -9,18 +9,48 @@ import { authClient } from '@/lib/auth-client';
 
 export default function AccountPage() {
   const router = useRouter();
+  const { data: session } = authClient.useSession();
+  const currentUser = session?.user;
+
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
-    firstName: 'John',
-    lastName: 'Doe',
-    email: 'john.doe@mubas.edu',
-    phone: '+1 (555) 123-4567',
-    country: 'United States',
-    university: 'MUBAS University',
-    dateJoined: 'January 15, 2024',
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    country: '',
+    university: '',
+    dateJoined: '',
   });
 
   const [tempFormData, setTempFormData] = useState(formData);
+
+  useEffect(() => {
+    if (!currentUser) return;
+
+    const [firstName = '', ...lastNameParts] = currentUser.name?.split(/\s+/) ?? [];
+    const lastName = lastNameParts.join(' ');
+    const joinedDate = currentUser.createdAt
+      ? new Date(currentUser.createdAt).toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+        })
+      : '';
+
+    const nextProfile = {
+      firstName,
+      lastName,
+      email: currentUser.email ?? '',
+      phone: '',
+      country: '',
+      university: '',
+      dateJoined: joinedDate,
+    };
+
+    setFormData(nextProfile);
+    setTempFormData(nextProfile);
+  }, [currentUser?.name, currentUser?.email, currentUser?.createdAt]);
 
   const handleEditClick = () => {
     setTempFormData(formData);
@@ -64,7 +94,9 @@ export default function AccountPage() {
           {/* Profile Header */}
           <div className="mb-8">
             <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">My Account</h1>
-            <p className="text-gray-600">Manage your profile information</p>
+            <p className="text-gray-600">
+              {currentUser?.name ? `Signed in as ${currentUser.name}` : 'Manage your profile information'}
+            </p>
           </div>
 
           {/* Profile Card */}
@@ -126,44 +158,6 @@ export default function AccountPage() {
                     />
                   </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
-                    <input
-                      type="tel"
-                      name="phone"
-                      value={tempFormData.phone}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1782C5]"
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Country
-                      </label>
-                      <input
-                        type="text"
-                        name="country"
-                        value={tempFormData.country}
-                        onChange={handleInputChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1782C5]"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        University
-                      </label>
-                      <input
-                        type="text"
-                        name="university"
-                        value={tempFormData.university}
-                        onChange={handleInputChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1782C5]"
-                      />
-                    </div>
-                  </div>
-
                   {/* Action Buttons */}
                   <div className="flex gap-3 pt-4">
                     <button
@@ -208,22 +202,6 @@ export default function AccountPage() {
                       <div>
                         <p className="text-sm text-gray-600">Phone</p>
                         <p className="text-base text-gray-900">{formData.phone}</p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-3 mb-4">
-                      <MapPin size={18} className="text-gray-400" />
-                      <div>
-                        <p className="text-sm text-gray-600">Country</p>
-                        <p className="text-base text-gray-900">{formData.country}</p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-3 mb-4">
-                      <FileText size={18} className="text-gray-400" />
-                      <div>
-                        <p className="text-sm text-gray-600">University</p>
-                        <p className="text-base text-gray-900">{formData.university}</p>
                       </div>
                     </div>
 
