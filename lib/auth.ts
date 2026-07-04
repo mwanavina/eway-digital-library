@@ -21,7 +21,7 @@ interface AuthResetPasswordParams {
 }
 
 export const auth = betterAuth({
-  database: drizzleAdapter(db, {
+    database: drizzleAdapter(db, {
     provider: "pg",
   }),
   user: {
@@ -34,8 +34,8 @@ export const auth = betterAuth({
 			},
 		},
 	},
-  emailAndPassword: {
-    enabled: true,
+    emailAndPassword: {
+        enabled: true,
     requireEmailVerification: true,
     sendResetPassword: async ({ user, url}: AuthResetPasswordParams) => {
 			const logoUrl = "https://m69autqsig.ufs.sh/f/t72WtywUos4eXLAxoQGv9WBJEhIsCXFmzL05UfyeSAo2bPQR";
