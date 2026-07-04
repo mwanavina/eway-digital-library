@@ -1,6 +1,7 @@
 'use client';
 
 import { Home, Search, Bookmark, User } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 
 interface BottomNavProps {
@@ -8,7 +9,20 @@ interface BottomNavProps {
   onTabChange?: (tab: string) => void;
 }
 
-export function BottomNav({ activeTab = 'browse', onTabChange }: BottomNavProps) {
+interface UserSessionProps {
+  user: {
+    id: string;
+    createdAt: Date;
+    updatedAt: Date;
+    email: string;
+    emailVerified: boolean;
+    name: string;
+    image?: string | null | undefined;
+  };
+}
+
+export function BottomNav({ activeTab = 'browse', onTabChange, UserSession }: BottomNavProps & { UserSession?: UserSessionProps }) {
+  const currentUser = UserSession?.user;
   const tabs = [
     { id: 'browse', label: 'Browse', icon: Home, href: '/' },
     { id: 'search', label: 'Search', icon: Search, href: '/search' },
@@ -34,7 +48,17 @@ export function BottomNav({ activeTab = 'browse', onTabChange }: BottomNavProps)
               }`}
             >
               <div className="relative">
-                <IconComponent size={24} className="mb-0.5" />
+                {tab.id === 'account' && currentUser?.image ? (
+                  <Image
+                    src={currentUser.image}
+                    alt="User profile"
+                    width={24}
+                    height={24}
+                    className="mb-0.5 h-6 w-6 rounded-full object-cover"
+                  />
+                ) : (
+                  <IconComponent size={24} className="mb-0.5" />
+                )}
                 {isActive && (
                   <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-[#1782C5] dark:bg-blue-400 rounded-full"></div>
                 )}
