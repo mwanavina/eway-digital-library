@@ -3,6 +3,7 @@
 import { Home, Search, Bookmark, User } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { authClient } from '@/lib/auth-client';
 
 interface BottomNavProps {
   activeTab?: 'browse' | 'search' | 'bookmarks' | 'account';
@@ -22,7 +23,8 @@ interface UserSessionProps {
 }
 
 export function BottomNav({ activeTab = 'browse', onTabChange, UserSession }: BottomNavProps & { UserSession?: UserSessionProps }) {
-  const currentUser = UserSession?.user;
+  const { data: session } = authClient.useSession();
+  const currentUser = UserSession?.user ?? session?.user;
   const tabs = [
     { id: 'browse', label: 'Browse', icon: Home, href: '/' },
     { id: 'search', label: 'Search', icon: Search, href: '/search' },
