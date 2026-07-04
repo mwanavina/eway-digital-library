@@ -232,7 +232,7 @@ export default function Home() {
         onSearchClick={() => setSearchModalOpen(true)}
         onFilterClick={() => setFilterDrawerOpen(true)} // Mobile filter drawer
       />
-      <BottomNav activeTab="browse" />
+      <BottomNav activeTab="browse" UserSession={{ user }} />
 
       {/* Search Modal */}
       <SearchModal
