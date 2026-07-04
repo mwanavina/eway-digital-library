@@ -23,10 +23,23 @@ interface HeaderProps {
   onSearchClick?: () => void;
   onFilterClick?: () => void;
 }
+interface UserSessionProps {
+  user: {
+    id: string;
+    createdAt: Date;
+    updatedAt: Date;
+    email: string;
+    emailVerified: boolean;
+    name: string;
+    image?: string | null | undefined;
+  };
+}
 
-export function Header({ onSearchChange, onMenuClick, onSearchClick, onFilterClick }: HeaderProps) {
+export function Header({ onSearchChange, onMenuClick, onSearchClick, onFilterClick, UserSession }: HeaderProps & { UserSession?: UserSessionProps }) {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
+  const { data: session } = authClient.useSession();
+  const currentUser = UserSession?.user ?? session?.user;
 
   const handleSearchChange = (value: string) => {
     setSearchQuery(value);
@@ -131,7 +144,17 @@ export function Header({ onSearchChange, onMenuClick, onSearchClick, onFilterCli
               className="hidden md:flex p-2 hover:bg-[#1F2557] dark:hover:bg-slate-700 rounded-lg transition-colors"
               aria-label="User menu"
             >
-              <User size={18} />
+              {currentUser?.image ? (
+                <Image
+                  src={currentUser.image}
+                  alt="User profile"
+                  width={24}
+                  height={24}
+                  className="h-6 w-6 rounded-full"
+                />
+              ) : (
+                <User size={18} />
+              )}
             </PopoverTrigger>
             <PopoverContent className="w-56">
               <PopoverHeader className="space-y-1">
@@ -139,6 +162,8 @@ export function Header({ onSearchChange, onMenuClick, onSearchClick, onFilterCli
                 <PopoverDescription>
                   Manage your profile or sign out.
                 </PopoverDescription>
+                <p className="text-sm text-slate-500 dark:text-slate-400">{currentUser?.name ?? 'Account'}</p>
+                <p className="text-sm text-slate-500 dark:text-slate-400">{currentUser?.email ?? 'Sign in to manage your account'}</p>
               </PopoverHeader>
 
               <div className="mt-3 flex flex-col gap-2">

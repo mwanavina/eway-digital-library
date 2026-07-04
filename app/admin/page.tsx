@@ -33,6 +33,12 @@ import { Tab, AdminItem, AdminFormData } from '@/components/admin/admin-types';
 
 export default function AdminPage() {
   const router = useRouter();
+  const {
+    data: session,
+    isPending,
+    error,
+  } = authClient.useSession();
+
   const [activeTab, setActiveTab] = useState<Tab>('upload');
   const [schools, setSchools] = useState<AdminItem[]>([]);
   const [departments, setDepartments] = useState<AdminItem[]>([]);
@@ -48,29 +54,58 @@ export default function AdminPage() {
   const [formData, setFormData] = useState<AdminFormData>({});
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    let isActive = true;
+  if (isPending) {
+    return (
+      // spinnner
+      <div className="flex h-screen items-center justify-center">
+        <p className="text-lg font-semibold text-slate-700 dark:text-slate-300">Loading...</p>
+        <div className="ml-2 h-4 w-4 animate-bounce rounded-full bg-slate-700 dark:bg-slate-300"></div>
+      </div>
+    );
+  }
 
-    async function verifyAccess() {
-      try {
-        const response = await fetch('/api/admin', { cache: 'no-store' });
-        if (!isActive) return;
+  if (error) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <p className="text-lg font-semibold text-red-600 dark:text-red-400">Error: {error.message}</p>
+      </div>
+    );
+  }
 
-        if (!response.ok) {
-          router.replace('/dashboard');
-        }
-      } catch {
-        if (isActive) router.replace('/dashboard');
-      }
-    }
+  const user = session?.user;
+  if (!user) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <p className="text-lg font-semibold text-slate-700 dark:text-slate-300">
+          Please sign in to access the admin area.
+        </p>
+      </div>
+    );
+  }
 
-    void verifyAccess();
-    void loadAllData();
+  // useEffect(() => {
+  //   let isActive = true;
 
-    return () => {
-      isActive = false;
-    };
-  }, [router]);
+  //   async function verifyAccess() {
+  //     try {
+  //       const response = await fetch('/api/admin', { cache: 'no-store' });
+  //       if (!isActive) return;
+
+  //       if (!response.ok) {
+  //         router.replace('/dashboard');
+  //       }
+  //     } catch {
+  //       if (isActive) router.replace('/dashboard');
+  //     }
+  //   }
+
+  //   void verifyAccess();
+  //   void loadAllData();
+
+  //   return () => {
+  //     isActive = false;
+  //   };
+  // }, [router]);
 
   async function loadAllData() {
     const [schoolsRes, depsRes, progsRes, coursesRes, levelsRes, resourceTypesRes] = await Promise.all([
@@ -199,7 +234,7 @@ export default function AdminPage() {
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
-      <AdminHeader onSignOut={handleSignOut} />
+      <AdminHeader onSignOut={handleSignOut} userSession={{ user }} />
 
       <main className="mx-auto max-w-7xl px-4 py-6 md:px-6 lg:px-8 lg:py-8">
         <AdminOverview
