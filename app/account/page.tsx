@@ -197,14 +197,6 @@ export default function AccountPage() {
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-3 mb-4">
-                      <Phone size={18} className="text-gray-400" />
-                      <div>
-                        <p className="text-sm text-gray-600">Phone</p>
-                        <p className="text-base text-gray-900">{formData.phone}</p>
-                      </div>
-                    </div>
-
                     <div className="flex items-center gap-3">
                       <Calendar size={18} className="text-gray-400" />
                       <div>
