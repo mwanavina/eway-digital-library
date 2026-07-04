@@ -16,6 +16,7 @@ import { JournalsFilter } from '@/components/filters/journals-filter';
 import { DissertationsFilter } from '@/components/filters/dissertations-filter';
 import { CourseOutlinesFilter } from '@/components/filters/course-outlines-filter';
 import { FileText, BookOpen, Book, ClipboardList, Microscope, Menu, Sliders } from 'lucide-react';
+import { authClient } from '@/lib/auth-client';
 
 interface Document {
   id: number;
@@ -49,6 +50,12 @@ const RESOURCE_TYPES = [
 ];
 
 export default function Home() {
+    const {
+      data: session,
+      isPending,
+      error,
+    } = authClient.useSession();
+
   const [documents, setDocuments] = useState<Document[]>([]);
   const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
   const [searchModalOpen, setSearchModalOpen] = useState(false);
@@ -187,12 +194,39 @@ export default function Home() {
 
   // Calculate active filter count
   const activeFilterCount = Object.values(filters).filter((v) => v !== '').length + (searchQuery ? 1 : 0);
+  
+  if (isPending) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <p className="text-lg font-semibold text-slate-700 dark:text-slate-300">Loading...</p>
+      </div>
+    );
+  }
 
+  if (error) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <p className="text-lg font-semibold text-red-600 dark:text-red-400">Error: {error.message}</p>
+      </div>
+    );
+  }
+
+  const user = session?.user;
+  if (!user) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <p className="text-lg font-semibold text-slate-700 dark:text-slate-300">
+          Please sign in to access your account.
+        </p>
+      </div>
+    );
+  }
 
 
   return (
     <div className="min-h-screen bg-background dark:bg-slate-950 flex flex-col">
       <Header 
+        UserSession={{ user }}
         onSearchChange={handleSearchChange} 
         onMenuClick={() => setSidebarOpen(!sidebarOpen)}
         onSearchClick={() => setSearchModalOpen(true)}
