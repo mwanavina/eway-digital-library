@@ -38,7 +38,8 @@ interface UserSessionProps {
 export function Header({ onSearchChange, onMenuClick, onSearchClick, onFilterClick, UserSession }: HeaderProps & { UserSession?: UserSessionProps }) {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
-  const currentUser = UserSession?.user;
+  const { data: session } = authClient.useSession();
+  const currentUser = UserSession?.user ?? session?.user;
 
   const handleSearchChange = (value: string) => {
     setSearchQuery(value);
