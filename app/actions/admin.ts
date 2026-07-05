@@ -1,5 +1,6 @@
 'use server';
 
+import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { db } from "@/lib/db";
 import { schools } from "@/lib/db/schema";
@@ -27,6 +28,7 @@ export async function createSchool(input: string | { name: string }) {
       createdAt: schools.createdAt,
     });
 
+    revalidatePath('/admin');
     return { success: true, data: createdSchool };
   } catch (error) {
     console.error('Error creating school:', error);
