@@ -1,14 +1,27 @@
 'use server';
 
+import { z } from 'zod';
 import { db } from "@/lib/db";
-import { schools } from "@/migrations/schema";
+import { schools } from "@/lib/db/schema";
+
 type NewSchool = typeof schools.$inferInsert;
+
+const schoolSchema = z.object({
+  name: z.string().trim().min(2, 'School name must be at least 2 characters').max(100),
+});
 
 // Mock admin actions for demonstration - would connect to database in production
 
-export async function createSchool(name: string) {
+export async function createSchool(input: string | { name: string }) {
+  const parsed = typeof input === 'string' ? { name: input } : input;
+  const result = schoolSchema.safeParse(parsed);
+
+  if (!result.success) {
+    return { success: false, error: result.error.issues[0]?.message ?? 'Invalid school data' };
+  }
+
   try {
-    const [createdSchool] = await db.insert(schools).values({ name }).returning({
+    const [createdSchool] = await db.insert(schools).values({ name: result.data.name }).returning({
       id: schools.id,
       name: schools.name,
       createdAt: schools.createdAt,
