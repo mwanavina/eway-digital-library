@@ -73,7 +73,7 @@ export function AdminForm({
     formState: { errors },
     reset,
   } = useForm<AdminFormData>({
-    resolver: zodResolver(schema as z.ZodTypeAny),
+    resolver: zodResolver(schema as any),
     defaultValues: formData,
   });
 

@@ -11,4 +11,12 @@ export interface AdminTabConfig {
   label: string;
 }
 
-export type AdminFormData = Record<string, any>;
+export interface AdminFormData {
+  name?: string;
+  school_id?: string;
+  department_id?: string;
+  program_id?: string;
+  code?: string;
+  level_number?: string;
+  description?: string;
+}

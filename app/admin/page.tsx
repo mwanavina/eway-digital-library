@@ -153,16 +153,16 @@ export default function AdminPage() {
           await createSchool({ name: data.name ?? '' });
           break;
         case 'departments':
-          await createDepartment({ name: data.name ?? '', schoolId: parseInt(data.school_id, 10) });
+          await createDepartment({ name: data.name ?? '', schoolId: Number.parseInt(data.school_id ?? '0', 10) });
           break;
         case 'programs':
-          await createProgram({ name: data.name ?? '', departmentId: parseInt(data.department_id, 10) });
+          await createProgram({ name: data.name ?? '', departmentId: Number.parseInt(data.department_id ?? '0', 10) });
           break;
         case 'courses':
-          await createCourse({ code: data.code ?? '', name: data.name ?? '', programId: parseInt(data.program_id, 10) });
+          await createCourse({ code: data.code ?? '', name: data.name ?? '', programId: Number.parseInt(data.program_id ?? '0', 10) });
           break;
         case 'levels':
-          await createLevel({ levelNumber: parseInt(data.level_number, 10), description: data.description ?? '' });
+          await createLevel({ levelNumber: Number.parseInt(data.level_number ?? '0', 10), description: data.description ?? '' });
           break;
       }
 
