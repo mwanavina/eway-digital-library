@@ -144,26 +144,25 @@ export default function AdminPage() {
     });
   }
 
-  async function handleCreate(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
+  async function handleCreate(data: AdminFormData) {
     setLoading(true);
 
     try {
       switch (activeTab) {
         case 'schools':
-          await createSchool(formData.name);
+          await createSchool({ name: data.name ?? '' });
           break;
         case 'departments':
-          await createDepartment(formData.name, parseInt(formData.school_id, 10));
+          await createDepartment({ name: data.name ?? '', schoolId: Number.parseInt(data.school_id ?? '0', 10) });
           break;
         case 'programs':
-          await createProgram(formData.name, parseInt(formData.department_id, 10));
+          await createProgram({ name: data.name ?? '', departmentId: Number.parseInt(data.department_id ?? '0', 10) });
           break;
         case 'courses':
-          await createCourse(formData.code, formData.name, parseInt(formData.program_id, 10));
+          await createCourse({ code: data.code ?? '', name: data.name ?? '', programId: Number.parseInt(data.program_id ?? '0', 10) });
           break;
         case 'levels':
-          await createLevel(parseInt(formData.level_number, 10), formData.description);
+          await createLevel({ levelNumber: Number.parseInt(data.level_number ?? '0', 10), description: data.description ?? '' });
           break;
       }
 

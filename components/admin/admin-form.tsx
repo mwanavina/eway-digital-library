@@ -1,5 +1,9 @@
 'use client';
 
+import { useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import { AdminFormData, AdminItem, Tab } from '@/components/admin/admin-types';
 
 interface AdminFormProps {
@@ -8,11 +12,36 @@ interface AdminFormProps {
   setFormData: (data: AdminFormData) => void;
   loading: boolean;
   onCancel: () => void;
-  onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
+  onSubmit: (data: AdminFormData) => Promise<void>;
   schools: AdminItem[];
   departments: AdminItem[];
   programs: AdminItem[];
 }
+
+const schoolSchema = z.object({
+  name: z.string().trim().min(2, 'School name must be at least 2 characters').max(100),
+});
+
+const departmentSchema = z.object({
+  school_id: z.string().min(1, 'Please select a school'),
+  name: z.string().trim().min(2, 'Department name must be at least 2 characters').max(100),
+});
+
+const programSchema = z.object({
+  department_id: z.string().min(1, 'Please select a department'),
+  name: z.string().trim().min(2, 'Program name must be at least 2 characters').max(100),
+});
+
+const courseSchema = z.object({
+  program_id: z.string().min(1, 'Please select a program'),
+  code: z.string().trim().min(2, 'Course code is required').max(20),
+  name: z.string().trim().min(2, 'Course name is required').max(100),
+});
+
+const levelSchema = z.object({
+  level_number: z.string().min(1, 'Level number is required'),
+  description: z.string().trim().min(2, 'Description is required').max(200),
+});
 
 export function AdminForm({
   activeTab,
@@ -25,26 +54,57 @@ export function AdminForm({
   departments,
   programs,
 }: AdminFormProps) {
+  const schema =
+    activeTab === 'schools'
+      ? schoolSchema
+      : activeTab === 'departments'
+        ? departmentSchema
+        : activeTab === 'programs'
+          ? programSchema
+          : activeTab === 'courses'
+            ? courseSchema
+            : activeTab === 'levels'
+              ? levelSchema
+              : z.object({});
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm<AdminFormData>({
+    resolver: zodResolver(schema as any),
+    defaultValues: formData,
+  });
+
+  useEffect(() => {
+    reset(formData);
+  }, [formData, reset]);
+
+  const submitForm = async (data: AdminFormData) => {
+    setFormData(data);
+    await onSubmit(data);
+  };
+
   return (
-    <form onSubmit={onSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit(submitForm)} className="space-y-4">
       {activeTab === 'schools' && (
-        <input
-          type="text"
-          placeholder="School name"
-          value={formData.name || ''}
-          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1782C5]"
-          required
-        />
+        <div>
+          <input
+            type="text"
+            placeholder="School name"
+            {...register('name')}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1782C5]"
+          />
+          {errors.name && <p className="mt-1 text-sm text-red-600">{String(errors.name.message)}</p>}
+        </div>
       )}
 
       {activeTab === 'departments' && (
         <>
           <select
-            value={formData.school_id || ''}
-            onChange={(e) => setFormData({ ...formData, school_id: e.target.value })}
+            {...register('school_id')}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1782C5]"
-            required
           >
             <option value="">Select School</option>
             {schools.map((s) => (
@@ -53,24 +113,24 @@ export function AdminForm({
               </option>
             ))}
           </select>
-          <input
-            type="text"
-            placeholder="Department name"
-            value={formData.name || ''}
-            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1782C5]"
-            required
-          />
+          <div>
+            <input
+              type="text"
+              placeholder="Department name"
+              {...register('name')}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1782C5]"
+            />
+            {errors.name && <p className="mt-1 text-sm text-red-600">{String(errors.name.message)}</p>}
+          </div>
+          {errors.school_id && <p className="mt-1 text-sm text-red-600">{String(errors.school_id.message)}</p>}
         </>
       )}
 
       {activeTab === 'programs' && (
         <>
           <select
-            value={formData.department_id || ''}
-            onChange={(e) => setFormData({ ...formData, department_id: e.target.value })}
+            {...register('department_id')}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1782C5]"
-            required
           >
             <option value="">Select Department</option>
             {departments.map((d) => (
@@ -79,24 +139,24 @@ export function AdminForm({
               </option>
             ))}
           </select>
-          <input
-            type="text"
-            placeholder="Program name"
-            value={formData.name || ''}
-            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1782C5]"
-            required
-          />
+          <div>
+            <input
+              type="text"
+              placeholder="Program name"
+              {...register('name')}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1782C5]"
+            />
+            {errors.name && <p className="mt-1 text-sm text-red-600">{String(errors.name.message)}</p>}
+          </div>
+          {errors.department_id && <p className="mt-1 text-sm text-red-600">{String(errors.department_id.message)}</p>}
         </>
       )}
 
       {activeTab === 'courses' && (
         <>
           <select
-            value={formData.program_id || ''}
-            onChange={(e) => setFormData({ ...formData, program_id: e.target.value })}
+            {...register('program_id')}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1782C5]"
-            required
           >
             <option value="">Select Program</option>
             {programs.map((p) => (
@@ -105,43 +165,48 @@ export function AdminForm({
               </option>
             ))}
           </select>
-          <input
-            type="text"
-            placeholder="Course code"
-            value={formData.code || ''}
-            onChange={(e) => setFormData({ ...formData, code: e.target.value })}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1782C5]"
-            required
-          />
-          <input
-            type="text"
-            placeholder="Course name"
-            value={formData.name || ''}
-            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1782C5]"
-            required
-          />
+          <div>
+            <input
+              type="text"
+              placeholder="Course code"
+              {...register('code')}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1782C5]"
+            />
+            {errors.code && <p className="mt-1 text-sm text-red-600">{String(errors.code.message)}</p>}
+          </div>
+          <div>
+            <input
+              type="text"
+              placeholder="Course name"
+              {...register('name')}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1782C5]"
+            />
+            {errors.name && <p className="mt-1 text-sm text-red-600">{String(errors.name.message)}</p>}
+          </div>
+          {errors.program_id && <p className="mt-1 text-sm text-red-600">{String(errors.program_id.message)}</p>}
         </>
       )}
 
       {activeTab === 'levels' && (
         <>
-          <input
-            type="number"
-            placeholder="Level number"
-            value={formData.level_number || ''}
-            onChange={(e) => setFormData({ ...formData, level_number: e.target.value })}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1782C5]"
-            required
-          />
-          <input
-            type="text"
-            placeholder="Description"
-            value={formData.description || ''}
-            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1782C5]"
-            required
-          />
+          <div>
+            <input
+              type="number"
+              placeholder="Level number"
+              {...register('level_number')}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1782C5]"
+            />
+            {errors.level_number && <p className="mt-1 text-sm text-red-600">{String(errors.level_number.message)}</p>}
+          </div>
+          <div>
+            <input
+              type="text"
+              placeholder="Description"
+              {...register('description')}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1782C5]"
+            />
+            {errors.description && <p className="mt-1 text-sm text-red-600">{String(errors.description.message)}</p>}
+          </div>
         </>
       )}
 
