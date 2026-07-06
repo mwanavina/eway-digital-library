@@ -114,7 +114,7 @@ export default function AdminPage() {
       const result = await fetchAllDocuments();
       setDocuments(result.data || []);
     } catch (error) {
-      console.error('[v0] Error loading documents:', error);
+      console.error('Error loading documents:', error);
     }
   }
 
