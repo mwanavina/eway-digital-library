@@ -1,9 +1,10 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
+import { asc, desc, eq } from 'drizzle-orm';
 import { z } from 'zod';
 import { db } from "@/lib/db";
-import { schools, departments, programs, courses, levels } from "@/lib/db/schema";
+import { schools, departments, programs, courses, levels, documents } from "@/lib/db/schema";
 
 type NewSchool = typeof schools.$inferInsert;
 
@@ -269,7 +270,13 @@ export async function deleteLevel(id: number) {
 // FETCH ALL
 export async function fetchAllSchools() {
   try {
-    return { success: true, data: [{ id: 1, name: 'School of Science' }] };
+    const rows = await db.select({
+      id: schools.id,
+      name: schools.name,
+      createdAt: schools.createdAt,
+    }).from(schools).orderBy(asc(schools.name));
+
+    return { success: true, data: rows };
   } catch (error) {
     console.error('Error fetching schools:', error);
     return { success: false, error: 'Failed to fetch schools' };
@@ -278,7 +285,17 @@ export async function fetchAllSchools() {
 
 export async function fetchAllDepartments() {
   try {
-    return { success: true, data: [{ id: 1, school_id: 1, name: 'Mathematics' }] };
+    const rows = await db.select({
+      id: departments.id,
+      name: departments.name,
+      schoolId: departments.schoolId,
+      school_name: schools.name,
+      createdAt: departments.createdAt,
+    }).from(departments)
+      .leftJoin(schools, eq(departments.schoolId, schools.id))
+      .orderBy(asc(departments.name));
+
+    return { success: true, data: rows };
   } catch (error) {
     console.error('Error fetching departments:', error);
     return { success: false, error: 'Failed to fetch departments' };
@@ -287,7 +304,19 @@ export async function fetchAllDepartments() {
 
 export async function fetchAllPrograms() {
   try {
-    return { success: true, data: [{ id: 1, department_id: 1, name: 'BSc Mathematics' }] };
+    const rows = await db.select({
+      id: programs.id,
+      name: programs.name,
+      departmentId: programs.departmentId,
+      department_name: departments.name,
+      school_name: schools.name,
+      createdAt: programs.createdAt,
+    }).from(programs)
+      .leftJoin(departments, eq(programs.departmentId, departments.id))
+      .leftJoin(schools, eq(departments.schoolId, schools.id))
+      .orderBy(asc(programs.name));
+
+    return { success: true, data: rows };
   } catch (error) {
     console.error('Error fetching programs:', error);
     return { success: false, error: 'Failed to fetch programs' };
@@ -296,7 +325,18 @@ export async function fetchAllPrograms() {
 
 export async function fetchAllCourses() {
   try {
-    return { success: true, data: [{ id: 1, program_id: 1, code: 'MATH101', name: 'Calculus I' }] };
+    const rows = await db.select({
+      id: courses.id,
+      code: courses.code,
+      name: courses.name,
+      programId: courses.programId,
+      program_name: programs.name,
+      createdAt: courses.createdAt,
+    }).from(courses)
+      .leftJoin(programs, eq(courses.programId, programs.id))
+      .orderBy(asc(courses.name));
+
+    return { success: true, data: rows };
   } catch (error) {
     console.error('Error fetching courses:', error);
     return { success: false, error: 'Failed to fetch courses' };
@@ -305,7 +345,14 @@ export async function fetchAllCourses() {
 
 export async function fetchAllLevels() {
   try {
-    return { success: true, data: [{ id: 1, name: 'Level 100' }] };
+    const rows = await db.select({
+      id: levels.id,
+      level_number: levels.levelNumber,
+      description: levels.description,
+      createdAt: levels.createdAt,
+    }).from(levels).orderBy(asc(levels.levelNumber));
+
+    return { success: true, data: rows };
   } catch (error) {
     console.error('Error fetching levels:', error);
     return { success: false, error: 'Failed to fetch levels' };
@@ -314,7 +361,28 @@ export async function fetchAllLevels() {
 
 export async function fetchAllDocuments() {
   try {
-    return { success: true, data: [{ id: 1, title: 'Sample Document' }] };
+    const rows = await db.select({
+      id: documents.id,
+      title: documents.title,
+      course_code: courses.code,
+      course_name: courses.name,
+      program_name: programs.name,
+      department_name: departments.name,
+      school_name: schools.name,
+      year: documents.year,
+      semester: documents.semester,
+      exam_type: documents.examType,
+      upload_status: documents.uploadStatus,
+      thumbnail_url: documents.thumbnailUrl,
+      created_at: documents.createdAt,
+    }).from(documents)
+      .leftJoin(courses, eq(documents.courseId, courses.id))
+      .leftJoin(programs, eq(courses.programId, programs.id))
+      .leftJoin(departments, eq(programs.departmentId, departments.id))
+      .leftJoin(schools, eq(departments.schoolId, schools.id))
+      .orderBy(desc(documents.createdAt));
+
+    return { success: true, data: rows };
   } catch (error) {
     console.error('Error fetching documents:', error);
     return { success: false, error: 'Failed to fetch documents' };
@@ -323,7 +391,16 @@ export async function fetchAllDocuments() {
 
 export async function fetchAllResourceTypes() {
   try {
-    return { success: true, data: [{ id: 1, name: 'Past Papers' }] };
+    return {
+      success: true,
+      data: [
+        { id: 1, name: 'Past Papers' },
+        { id: 2, name: 'Journals' },
+        { id: 3, name: 'Dissertations' },
+        { id: 4, name: 'Course Outlines' },
+        { id: 5, name: 'Research Papers' },
+      ],
+    };
   } catch (error) {
     console.error('Error fetching resource types:', error);
     return { success: false, error: 'Failed to fetch resource types' };
