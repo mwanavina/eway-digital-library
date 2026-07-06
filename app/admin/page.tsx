@@ -54,6 +54,15 @@ export default function AdminPage() {
   const [formData, setFormData] = useState<AdminFormData>({});
   const [loading, setLoading] = useState(false);
 
+  const user = session?.user;
+
+  useEffect(() => {
+    if (!user) return;
+
+    void loadAllData();
+    void loadDocuments();
+  }, [user]);
+
   if (isPending) {
     return (
       // spinnner
@@ -72,7 +81,6 @@ export default function AdminPage() {
     );
   }
 
-  const user = session?.user;
   if (!user) {
     return (
       <div className="flex h-screen items-center justify-center">
