@@ -65,7 +65,13 @@ export async function createSchool(input: string | { name: string }) {
 
 export async function updateSchool(id: number, name: string) {
   try {
-    return { success: true, data: { id, name } };
+    const [updatedSchool] = await db.update(schools)
+      .set({ name })
+      .where(eq(schools.id, id))
+      .returning({ id: schools.id, name: schools.name, createdAt: schools.createdAt });
+
+    revalidatePath('/admin');
+    return { success: true, data: updatedSchool };
   } catch (error) {
     console.error('Error updating school:', error);
     return { success: false, error: 'Failed to update school' };
@@ -74,6 +80,8 @@ export async function updateSchool(id: number, name: string) {
 
 export async function deleteSchool(id: number) {
   try {
+    await db.delete(schools).where(eq(schools.id, id));
+    revalidatePath('/admin');
     return { success: true };
   } catch (error) {
     console.error('Error deleting school:', error);
@@ -109,9 +117,15 @@ export async function createDepartment(input: string | { name: string; schoolId:
   }
 }
 
-export async function updateDepartment(id: number, name: string) {
+export async function updateDepartment(id: number, name: string, schoolId: number) {
   try {
-    return { success: true, data: { id, name } };
+    const [updatedDepartment] = await db.update(departments)
+      .set({ name, schoolId })
+      .where(eq(departments.id, id))
+      .returning({ id: departments.id, name: departments.name, schoolId: departments.schoolId, createdAt: departments.createdAt });
+
+    revalidatePath('/admin');
+    return { success: true, data: updatedDepartment };
   } catch (error) {
     console.error('Error updating department:', error);
     return { success: false, error: 'Failed to update department' };
@@ -120,6 +134,8 @@ export async function updateDepartment(id: number, name: string) {
 
 export async function deleteDepartment(id: number) {
   try {
+    await db.delete(departments).where(eq(departments.id, id));
+    revalidatePath('/admin');
     return { success: true };
   } catch (error) {
     console.error('Error deleting department:', error);
@@ -155,9 +171,15 @@ export async function createProgram(input: string | { name: string; departmentId
   }
 }
 
-export async function updateProgram(id: number, name: string) {
+export async function updateProgram(id: number, name: string, departmentId: number) {
   try {
-    return { success: true, data: { id, name } };
+    const [updatedProgram] = await db.update(programs)
+      .set({ name, departmentId })
+      .where(eq(programs.id, id))
+      .returning({ id: programs.id, name: programs.name, departmentId: programs.departmentId, createdAt: programs.createdAt });
+
+    revalidatePath('/admin');
+    return { success: true, data: updatedProgram };
   } catch (error) {
     console.error('Error updating program:', error);
     return { success: false, error: 'Failed to update program' };
@@ -166,6 +188,8 @@ export async function updateProgram(id: number, name: string) {
 
 export async function deleteProgram(id: number) {
   try {
+    await db.delete(programs).where(eq(programs.id, id));
+    revalidatePath('/admin');
     return { success: true };
   } catch (error) {
     console.error('Error deleting program:', error);
@@ -203,9 +227,15 @@ export async function createCourse(input: string | { code: string; name: string;
   }
 }
 
-export async function updateCourse(id: number, code: string, name: string) {
+export async function updateCourse(id: number, code: string, name: string, programId: number) {
   try {
-    return { success: true, data: { id, code, name } };
+    const [updatedCourse] = await db.update(courses)
+      .set({ code, name, programId })
+      .where(eq(courses.id, id))
+      .returning({ id: courses.id, code: courses.code, name: courses.name, programId: courses.programId, createdAt: courses.createdAt });
+
+    revalidatePath('/admin');
+    return { success: true, data: updatedCourse };
   } catch (error) {
     console.error('Error updating course:', error);
     return { success: false, error: 'Failed to update course' };
@@ -214,6 +244,8 @@ export async function updateCourse(id: number, code: string, name: string) {
 
 export async function deleteCourse(id: number) {
   try {
+    await db.delete(courses).where(eq(courses.id, id));
+    revalidatePath('/admin');
     return { success: true };
   } catch (error) {
     console.error('Error deleting course:', error);
@@ -249,9 +281,15 @@ export async function createLevel(input: number | { levelNumber: number; descrip
   }
 }
 
-export async function updateLevel(id: number, name: string) {
+export async function updateLevel(id: number, levelNumber: number, description: string) {
   try {
-    return { success: true, data: { id, name } };
+    const [updatedLevel] = await db.update(levels)
+      .set({ levelNumber, description })
+      .where(eq(levels.id, id))
+      .returning({ id: levels.id, levelNumber: levels.levelNumber, description: levels.description, createdAt: levels.createdAt });
+
+    revalidatePath('/admin');
+    return { success: true, data: updatedLevel };
   } catch (error) {
     console.error('Error updating level:', error);
     return { success: false, error: 'Failed to update level' };
@@ -260,6 +298,8 @@ export async function updateLevel(id: number, name: string) {
 
 export async function deleteLevel(id: number) {
   try {
+    await db.delete(levels).where(eq(levels.id, id));
+    revalidatePath('/admin');
     return { success: true };
   } catch (error) {
     console.error('Error deleting level:', error);

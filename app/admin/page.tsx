@@ -5,14 +5,19 @@ import { useRouter } from 'next/navigation';
 import {
   createSchool,
   deleteSchool,
+  updateSchool,
   createDepartment,
   deleteDepartment,
+  updateDepartment,
   createProgram,
   deleteProgram,
+  updateProgram,
   createCourse,
   deleteCourse,
+  updateCourse,
   createLevel,
   deleteLevel,
+  updateLevel,
   fetchAllSchools,
   fetchAllDepartments,
   fetchAllPrograms,
@@ -132,25 +137,45 @@ export default function AdminPage() {
     setLoading(true);
 
     try {
-      switch (activeTab) {
-        case 'schools':
-          await createSchool({ name: data.name ?? '' });
-          break;
-        case 'departments':
-          await createDepartment({ name: data.name ?? '', schoolId: Number.parseInt(data.school_id ?? '0', 10) });
-          break;
-        case 'programs':
-          await createProgram({ name: data.name ?? '', departmentId: Number.parseInt(data.department_id ?? '0', 10) });
-          break;
-        case 'courses':
-          await createCourse({ code: data.code ?? '', name: data.name ?? '', programId: Number.parseInt(data.program_id ?? '0', 10) });
-          break;
-        case 'levels':
-          await createLevel({ levelNumber: Number.parseInt(data.level_number ?? '0', 10), description: data.description ?? '' });
-          break;
+      if (editingItem) {
+        switch (activeTab) {
+          case 'schools':
+            await updateSchool(editingItem.id, data.name ?? '');
+            break;
+          case 'departments':
+            await updateDepartment(editingItem.id, data.name ?? '', Number.parseInt(data.school_id ?? '0', 10));
+            break;
+          case 'programs':
+            await updateProgram(editingItem.id, data.name ?? '', Number.parseInt(data.department_id ?? '0', 10));
+            break;
+          case 'courses':
+            await updateCourse(editingItem.id, data.code ?? '', data.name ?? '', Number.parseInt(data.program_id ?? '0', 10));
+            break;
+          case 'levels':
+            await updateLevel(editingItem.id, Number.parseInt(data.level_number ?? '0', 10), data.description ?? '');
+            break;
+        }
+      } else {
+        switch (activeTab) {
+          case 'schools':
+            await createSchool({ name: data.name ?? '' });
+            break;
+          case 'departments':
+            await createDepartment({ name: data.name ?? '', schoolId: Number.parseInt(data.school_id ?? '0', 10) });
+            break;
+          case 'programs':
+            await createProgram({ name: data.name ?? '', departmentId: Number.parseInt(data.department_id ?? '0', 10) });
+            break;
+          case 'courses':
+            await createCourse({ code: data.code ?? '', name: data.name ?? '', programId: Number.parseInt(data.program_id ?? '0', 10) });
+            break;
+          case 'levels':
+            await createLevel({ levelNumber: Number.parseInt(data.level_number ?? '0', 10), description: data.description ?? '' });
+            break;
+        }
       }
 
-      await loadAllData();
+      await Promise.all([loadAllData(), loadDocuments()]);
       setIsModalOpen(false);
       setFormData({});
       setEditingItem(null);
@@ -184,7 +209,7 @@ export default function AdminPage() {
           break;
       }
 
-      await loadAllData();
+      await Promise.all([loadAllData(), loadDocuments()]);
       setConfirmDelete(null);
     } catch (error) {
       console.error('[v0] Error:', error);
@@ -201,7 +226,17 @@ export default function AdminPage() {
 
   function openEditModal(item: AdminItem) {
     setEditingItem(item);
-    setFormData(item);
+    setFormData(
+      activeTab === 'departments'
+        ? { name: item.name, school_id: item.schoolId?.toString() ?? item.school_id?.toString() ?? '' }
+        : activeTab === 'programs'
+          ? { name: item.name, department_id: item.departmentId?.toString() ?? item.department_id?.toString() ?? '' }
+          : activeTab === 'courses'
+            ? { code: item.code, name: item.name, program_id: item.programId?.toString() ?? item.program_id?.toString() ?? '' }
+            : activeTab === 'levels'
+              ? { level_number: item.levelNumber?.toString() ?? item.level_number?.toString() ?? '', description: item.description ?? '' }
+              : { name: item.name }
+    );
     setIsModalOpen(true);
   }
 
