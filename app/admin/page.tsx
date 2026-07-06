@@ -83,30 +83,6 @@ export default function AdminPage() {
     );
   }
 
-  // useEffect(() => {
-  //   let isActive = true;
-
-  //   async function verifyAccess() {
-  //     try {
-  //       const response = await fetch('/api/admin', { cache: 'no-store' });
-  //       if (!isActive) return;
-
-  //       if (!response.ok) {
-  //         router.replace('/dashboard');
-  //       }
-  //     } catch {
-  //       if (isActive) router.replace('/dashboard');
-  //     }
-  //   }
-
-  //   void verifyAccess();
-  //   void loadAllData();
-
-  //   return () => {
-  //     isActive = false;
-  //   };
-  // }, [router]);
-
   async function loadAllData() {
     const [schoolsRes, depsRes, progsRes, coursesRes, levelsRes, resourceTypesRes] = await Promise.all([
       fetchAllSchools(),
