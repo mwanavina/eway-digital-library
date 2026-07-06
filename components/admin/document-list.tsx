@@ -19,6 +19,12 @@ export function AdminDocumentList({ documents, onDelete }: AdminDocumentListProp
   const safePage = Math.min(currentPage, totalPages);
   const startIndex = (safePage - 1) * pageSize;
   const paginatedDocuments = documents.slice(startIndex, startIndex + pageSize);
+  const visiblePages = Array.from({ length: totalPages }, (_, index) => index + 1).filter((page) => {
+    if (totalPages <= 7) return true;
+    if (page === 1 || page === totalPages) return true;
+    if (page >= safePage - 1 && page <= safePage + 1) return true;
+    return false;
+  });
 
   const goToPage = (page: number) => {
     if (page < 1 || page > totalPages) return;
@@ -152,11 +158,11 @@ export function AdminDocumentList({ documents, onDelete }: AdminDocumentListProp
       </div>
 
       {totalPages > 1 && (
-        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border pt-4">
+        <div className="flex flex-col gap-3 border-t border-border pt-4 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-sm text-muted-foreground">
             Showing {startIndex + 1}-{Math.min(startIndex + pageSize, documents.length)} of {documents.length} documents
           </p>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <button
               onClick={() => goToPage(safePage - 1)}
               disabled={safePage === 1}
@@ -164,15 +170,20 @@ export function AdminDocumentList({ documents, onDelete }: AdminDocumentListProp
             >
               Previous
             </button>
-            {Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => (
-              <button
-                key={page}
-                onClick={() => goToPage(page)}
-                className={`rounded-lg px-3 py-2 text-sm ${page === safePage ? 'bg-[#1782C5] text-white' : 'border border-border'}`}
-              >
-                {page}
-              </button>
-            ))}
+            {visiblePages.map((page, index) => {
+              const showEllipsisBefore = index > 0 && page !== visiblePages[index - 1] + 1;
+              return (
+                <div key={page} className="flex items-center gap-2">
+                  {showEllipsisBefore && <span className="px-1 text-sm text-muted-foreground">...</span>}
+                  <button
+                    onClick={() => goToPage(page)}
+                    className={`rounded-lg px-3 py-2 text-sm ${page === safePage ? 'bg-[#1782C5] text-white' : 'border border-border'}`}
+                  >
+                    {page}
+                  </button>
+                </div>
+              );
+            })}
             <button
               onClick={() => goToPage(safePage + 1)}
               disabled={safePage === totalPages}
