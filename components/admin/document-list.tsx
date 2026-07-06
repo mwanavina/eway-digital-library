@@ -12,6 +12,18 @@ interface AdminDocumentListProps {
 export function AdminDocumentList({ documents, onDelete }: AdminDocumentListProps) {
   const [deleting, setDeleting] = useState<number | null>(null);
   const [error, setError] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 6;
+
+  const totalPages = Math.max(1, Math.ceil(documents.length / pageSize));
+  const safePage = Math.min(currentPage, totalPages);
+  const startIndex = (safePage - 1) * pageSize;
+  const paginatedDocuments = documents.slice(startIndex, startIndex + pageSize);
+
+  const goToPage = (page: number) => {
+    if (page < 1 || page > totalPages) return;
+    setCurrentPage(page);
+  };
 
   const handleDelete = async (docId: number) => {
     if (!confirm('Are you sure you want to delete this document?')) return;
@@ -86,7 +98,7 @@ export function AdminDocumentList({ documents, onDelete }: AdminDocumentListProp
             </tr>
           </thead>
           <tbody>
-            {documents.map((doc) => (
+            {paginatedDocuments.map((doc) => (
               <tr key={doc.id} className="border-b border-border hover:bg-muted">
                 <td className="py-3 px-4">
                   <div className="flex items-center gap-3">
@@ -138,6 +150,39 @@ export function AdminDocumentList({ documents, onDelete }: AdminDocumentListProp
           </tbody>
         </table>
       </div>
+
+      {totalPages > 1 && (
+        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border pt-4">
+          <p className="text-sm text-muted-foreground">
+            Showing {startIndex + 1}-{Math.min(startIndex + pageSize, documents.length)} of {documents.length} documents
+          </p>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => goToPage(safePage - 1)}
+              disabled={safePage === 1}
+              className="rounded-lg border border-border px-3 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              Previous
+            </button>
+            {Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => (
+              <button
+                key={page}
+                onClick={() => goToPage(page)}
+                className={`rounded-lg px-3 py-2 text-sm ${page === safePage ? 'bg-[#1782C5] text-white' : 'border border-border'}`}
+              >
+                {page}
+              </button>
+            ))}
+            <button
+              onClick={() => goToPage(safePage + 1)}
+              disabled={safePage === totalPages}
+              className="rounded-lg border border-border px-3 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              Next
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
