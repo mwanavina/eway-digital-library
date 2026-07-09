@@ -19,6 +19,7 @@ interface CreateDocumentInput {
 
 /**
  * Create a new document with PDF processing via API
+ * we need to improve this
  */
 export async function createDocument(input: CreateDocumentInput): Promise<any> {
   try {
