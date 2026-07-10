@@ -68,7 +68,7 @@ export async function getAllDocuments(): Promise<any> {
       },
     ];
   } catch (error) {
-    console.error('[v0] Error fetching documents:', error);
+    console.error('Error fetching documents:', error);
     throw error;
   }
 }
@@ -81,7 +81,7 @@ export async function deleteDocument(documentId: number): Promise<any> {
     console.log('[v0] Document deleted:', documentId);
     return { success: true };
   } catch (error) {
-    console.error('[v0] Error deleting document:', error);
+    console.error('Error deleting document:', error);
     throw error;
   }
 }
