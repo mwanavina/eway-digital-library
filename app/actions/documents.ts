@@ -44,7 +44,7 @@ export async function createDocument(input: CreateDocumentInput): Promise<any> {
       document: mockDocument,
     };
   } catch (error) {
-    console.error('[v0] Error creating document:', error);
+    console.error('Error creating document:', error);
     throw error;
   }
 }
@@ -78,7 +78,7 @@ export async function getAllDocuments(): Promise<any> {
  */
 export async function deleteDocument(documentId: number): Promise<any> {
   try {
-    console.log('[v0] Document deleted:', documentId);
+    console.log('Document deleted:', documentId);
     return { success: true };
   } catch (error) {
     console.error('Error deleting document:', error);
@@ -96,7 +96,7 @@ export async function updateDocumentStatus(
   try {
     return { id: documentId, upload_status: status };
   } catch (error) {
-    console.error('[v0] Error updating document status:', error);
+    console.error('Error updating document status:', error);
     throw error;
   }
 }
