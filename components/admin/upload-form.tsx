@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Upload, AlertCircle, Loader2 } from 'lucide-react';
-import { UploadButton } from '@uploadthing/react';
+import { UploadButton } from "@/utils/uploadthing";
 import { OurFileRouter } from '@/lib/uploadthing';
 import { createDocument } from '@/app/actions/documents';
 
@@ -285,13 +285,16 @@ export function AdminUploadForm({
       <div className="space-y-2">
         <label className="block text-sm font-medium text-foreground">Upload PDF</label>
         <div className="border-2 border-dashed border-border rounded-lg p-8">
-          <UploadButton<OurFileRouter, "documentPdf">
-            endpoint="documentPdf"
-            input={undefined as never}
-            onClientUploadComplete={handleUploadComplete}
-            onUploadError={(error: Error) => {
-              setError(`Upload error: ${error.message}`);
+          <UploadButton
+            endpoint="pdfUploader"
+            onClientUploadComplete={(res) => {
+              console.log("Files:", res);
+              alert("Upload complete");
             }}
+            onUploadError={(error: Error) => {
+          // Do something with the error.
+          alert(`ERROR! ${error.message}`);
+        }}
             disabled={!selectedCourse || isUploading}
           />
         </div>
