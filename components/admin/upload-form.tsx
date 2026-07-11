@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Upload, AlertCircle, Loader2 } from 'lucide-react';
-import { UploadButton } from "@/utils/uploadthing";
+import { UploadButton, UploadDropzone } from "@/utils/uploadthing";
 import { OurFileRouter } from '@/lib/uploadthing';
 import { createDocument } from '@/app/actions/documents';
 
@@ -298,9 +298,6 @@ export function AdminUploadForm({
             disabled={!selectedCourse || isUploading}
           />
         </div>
-        <p className="text-xs text-muted-foreground">
-          Maximum file size: 100MB. Select a course first before uploading.
-        </p>
       </div>
     </div>
   );
