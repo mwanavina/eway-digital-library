@@ -8,13 +8,13 @@ const auth = (req: Request) => ({ id: "User1" }); // Fake auth function
 // FileRouter for your app, can contain multiple FileRoutes
 export const ourFileRouter = {
   // Define as many FileRoutes as you like, each with a unique routeSlug
-  imageUploader: f({
-    image: {
+  pdfUploader: f({
+    pdf: {
       /**
        * For full list of options and defaults, see the File Route API reference
        * @see https://docs.uploadthing.com/file-routes#route-config
        */
-      maxFileSize: "4MB",
+      maxFileSize: "32MB",
       maxFileCount: 1,
     },
   })
@@ -36,7 +36,7 @@ export const ourFileRouter = {
       console.log("file url", file.ufsUrl);
 
       // !!! Whatever is returned here is sent to the clientside `onClientUploadComplete` callback
-      return { uploadedBy: metadata.userId };
+      return { uploadedBy: metadata.userId, fileUrl: file.ufsUrl, fileName: file.name, fileSize: file.size, fileType: file.type };
     }),
 } satisfies FileRouter;
 
