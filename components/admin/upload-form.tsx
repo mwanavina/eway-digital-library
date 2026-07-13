@@ -295,7 +295,7 @@ export function AdminUploadForm({
           // Do something with the error.
           alert(`ERROR! ${error.message}`);
         }}
-            disabled={!selectedCourse || isUploading}
+            // disabled={!selectedCourse || isUploading}
           />
         </div>
       </div>
