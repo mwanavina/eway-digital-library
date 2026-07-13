@@ -1,4 +1,5 @@
 import { createRequire } from 'node:module';
+import { pathToFileURL } from 'node:url';
 import sharp from 'sharp';
 import { getDocument, GlobalWorkerOptions } from 'pdfjs-dist/legacy/build/pdf.mjs';
 import { UTApi } from 'uploadthing/server';
@@ -7,7 +8,8 @@ const require = createRequire(import.meta.url);
 
 function ensurePdfWorker() {
   if (!GlobalWorkerOptions.workerSrc) {
-    GlobalWorkerOptions.workerSrc = require.resolve('pdfjs-dist/build/pdf.worker.mjs');
+    const workerPath = require.resolve('pdfjs-dist/build/pdf.worker.mjs');
+    GlobalWorkerOptions.workerSrc = pathToFileURL(workerPath).href;
   }
 }
 
@@ -29,7 +31,10 @@ export async function generatePdfThumbnailUrl(pdfUrl: string, originalName: stri
     }
 
     const pdfBytes = new Uint8Array(await response.arrayBuffer());
-    const loadingTask = getDocument({ data: pdfBytes });
+    const loadingTask = getDocument({
+      data: pdfBytes,
+      useWorkerFetch: false,
+    });
     const pdf = await loadingTask.promise;
     const page = await pdf.getPage(1);
 
