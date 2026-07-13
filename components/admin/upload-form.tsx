@@ -1,9 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Upload, AlertCircle, Loader2 } from 'lucide-react';
+import { useState } from 'react';
+import { Upload, AlertCircle } from 'lucide-react';
 import { UploadButton, UploadDropzone } from "@/utils/uploadthing";
-import { OurFileRouter } from '@/lib/uploadthing';
 import { createDocument } from '@/app/actions/documents';
 
 interface UploadFormProps {
