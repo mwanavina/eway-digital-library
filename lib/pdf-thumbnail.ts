@@ -1,5 +1,4 @@
 import { createRequire } from 'node:module';
-import { createCanvas } from 'canvas';
 import sharp from 'sharp';
 import { getDocument, GlobalWorkerOptions } from 'pdfjs-dist/legacy/build/pdf.mjs';
 import { UTApi } from 'uploadthing/server';
@@ -35,22 +34,35 @@ export async function generatePdfThumbnailUrl(pdfUrl: string, originalName: stri
     const page = await pdf.getPage(1);
 
     const viewport = page.getViewport({ scale: 2 });
-    const canvas = createCanvas(Math.ceil(viewport.width), Math.ceil(viewport.height));
-    const context = canvas.getContext('2d');
 
-    if (!context) {
-      throw new Error('Failed to create canvas context');
+    let canvas: any = null;
+
+    try {
+      const { createCanvas } = await import('canvas');
+      canvas = createCanvas(Math.ceil(viewport.width), Math.ceil(viewport.height));
+      const context = canvas.getContext('2d');
+
+      if (!context) {
+        throw new Error('Failed to create canvas context');
+      }
+
+      const renderCanvas = canvas as unknown as HTMLCanvasElement;
+
+      await page.render({
+        canvas: renderCanvas,
+        canvasContext: context as unknown as CanvasRenderingContext2D,
+        viewport,
+      }).promise;
+    } catch (canvasError) {
+      console.warn('Canvas-based PDF thumbnail generation is unavailable, skipping thumbnail generation.', canvasError);
+      return null;
+    } finally {
+      await page.cleanup();
     }
 
-    const renderCanvas = canvas as unknown as HTMLCanvasElement;
-
-    await page.render({
-      canvas: renderCanvas,
-      canvasContext: context as unknown as CanvasRenderingContext2D,
-      viewport,
-    }).promise;
-
-    await page.cleanup();
+    if (!canvas) {
+      return null;
+    }
 
     const pngBuffer = await sharp(Buffer.from(canvas.toDataURL('image/png').split(',')[1], 'base64'))
       .resize(640, 900, { fit: 'cover', withoutEnlargement: true })
