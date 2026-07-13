@@ -1,7 +1,5 @@
 'use server';
 
-import { generatePdfThumbnailUrl } from '@/lib/pdf-thumbnail';
-
 // Mock database for demonstration
 
 interface CreateDocumentInput {
@@ -29,9 +27,7 @@ export async function createDocument(input: CreateDocumentInput): Promise<any> {
   try {
     console.log('[v0] Creating document:', input.title);
 
-    const thumbnailUrl = input.thumbnailUrl ?? (input.fileUrl
-      ? await generatePdfThumbnailUrl(input.fileUrl, input.fileName ?? input.title)
-      : null);
+    const thumbnailUrl = input.thumbnailUrl ?? null;
 
     const mockDocument = {
       id: Math.floor(Math.random() * 10000),
