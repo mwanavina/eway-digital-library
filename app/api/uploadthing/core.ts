@@ -1,6 +1,5 @@
 import { createUploadthing, type FileRouter } from "uploadthing/next";
 import { UploadThingError } from "uploadthing/server";
-import { generatePdfThumbnailUrl } from "@/lib/pdf-thumbnail";
 
 const f = createUploadthing();
 
@@ -21,15 +20,12 @@ export const ourFileRouter = {
     })
     .onUploadComplete(async ({ metadata, file }) => {
       console.log("PDF uploaded for userId:", metadata.userId);
-      const thumbnailUrl = await generatePdfThumbnailUrl(file.ufsUrl, file.name);
-
       return {
         uploadedBy: metadata.userId,
         fileUrl: file.ufsUrl,
         fileName: file.name,
         fileSize: file.size,
         fileType: file.type,
-        thumbnailUrl,
       };
     }),
 
