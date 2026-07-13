@@ -2,8 +2,12 @@
 
 import { useState } from 'react';
 import { Upload, AlertCircle } from 'lucide-react';
-import { UploadButton } from "@/utils/uploadthing";
+import { UploadButton,UploadDropzone } from "@/utils/uploadthing";
 import { createDocument } from '@/app/actions/documents';
+import { createPdfThumbnail } from '@/app/actions/thumbnail';
+import { genUploader } from 'uploadthing/client';
+
+const { uploadFiles } = genUploader();
 
 interface UploadFormProps {
   schools: any[];
@@ -295,10 +299,47 @@ export function AdminUploadForm({
       <div className="space-y-2">
         <label className="block text-sm font-medium text-foreground">Upload PDF</label>
         <div className="border-2 border-dashed border-border rounded-lg p-8">
-          <UploadButton
+          <UploadDropzone
             endpoint="pdfUploader"
-            onClientUploadComplete={(res) => {
-              void handleUploadComplete(res);
+            onClientUploadComplete={async (res) => {
+              const uploadedPdf = res?.[0];
+              if (!uploadedPdf) return;
+
+              const pdfUrl = uploadedPdf.serverData?.fileUrl ?? uploadedPdf.url ?? uploadedPdf.ufsUrl;
+              if (!pdfUrl) {
+                setError('PDF upload completed but no file URL was returned');
+                return;
+              }
+
+              const thumbnailUrl = await createPdfThumbnail(pdfUrl, uploadedPdf.name ?? 'document');
+              if (!thumbnailUrl) {
+                await handleUploadComplete({
+                  0: {
+                    ...uploadedPdf,
+                    serverData: {
+                      ...(uploadedPdf.serverData ?? {}),
+                      fileUrl: pdfUrl,
+                    },
+                  },
+                });
+                return;
+              }
+
+              const imageUploadResult = await uploadFiles('imageUploader', {
+                files: [new File([await fetch(thumbnailUrl).then((res) => res.arrayBuffer())], 'thumbnail.png', { type: 'image/png' })],
+              });
+              const imageUrl = imageUploadResult?.[0]?.serverData?.fileUrl ?? imageUploadResult?.[0]?.url ?? imageUploadResult?.[0]?.ufsUrl ?? thumbnailUrl;
+
+              await handleUploadComplete({
+                0: {
+                  ...uploadedPdf,
+                  serverData: {
+                    ...(uploadedPdf.serverData ?? {}),
+                    fileUrl: pdfUrl,
+                    thumbnailUrl: imageUrl,
+                  },
+                },
+              });
             }}
             onUploadError={(error: Error) => {
               setError(`Upload failed: ${error.message}`);
