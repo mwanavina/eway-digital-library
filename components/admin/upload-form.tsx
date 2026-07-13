@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Upload, AlertCircle } from 'lucide-react';
-import { UploadButton, UploadDropzone } from "@/utils/uploadthing";
+import { UploadButton } from "@/utils/uploadthing";
 import { createDocument } from '@/app/actions/documents';
 
 interface UploadFormProps {
@@ -55,8 +55,16 @@ export function AdminUploadForm({
       return;
     }
 
-    const file = res[0];
-    
+    const uploadedFile = res[0];
+    const fileUrl = uploadedFile?.serverData?.fileUrl ?? uploadedFile?.url ?? uploadedFile?.ufsUrl;
+    const thumbnailUrl = uploadedFile?.serverData?.thumbnailUrl ?? null;
+    const fileKey = uploadedFile?.serverData?.fileKey ?? uploadedFile?.key;
+
+    if (!fileUrl) {
+      setError('Upload completed but no file URL was returned');
+      return;
+    }
+
     if (!selectedCourse) {
       setError('Please select a course before uploading');
       return;
@@ -82,13 +90,15 @@ export function AdminUploadForm({
         year: parseInt(year),
         semester: parseInt(semester),
         examType,
-        fileKey: file.key,
-        fileUrl: file.url,
+        fileKey: fileKey ?? `${Date.now()}`,
+        fileUrl: fileUrl,
+        fileName: uploadedFile?.name ?? uploadedFile?.fileName,
+        thumbnailUrl,
       });
 
       if (result.success) {
-        setSuccess(`Document uploaded successfully! Processing thumbnail...`);
-        // Reset form
+        setSuccess(`Document uploaded successfully${result.thumbnailUrl ? ' and thumbnail generated' : ''}.`);
+
         setSelectedSchool('');
         setSelectedDepartment('');
         setSelectedProgram('');
@@ -97,11 +107,12 @@ export function AdminUploadForm({
         setYear(new Date().getFullYear().toString());
         setSemester('1');
         setExamType('Mid-semester');
-        
-        // Notify parent component
+
         setTimeout(() => {
           onSuccess?.();
         }, 1000);
+      } else {
+        setError(result.error ?? 'Failed to create document');
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create document');
@@ -284,17 +295,15 @@ export function AdminUploadForm({
       <div className="space-y-2">
         <label className="block text-sm font-medium text-foreground">Upload PDF</label>
         <div className="border-2 border-dashed border-border rounded-lg p-8">
-          <UploadDropzone
+          <UploadButton
             endpoint="pdfUploader"
             onClientUploadComplete={(res) => {
-              console.log("Files:", res);
-              alert("Upload complete");
+              void handleUploadComplete(res);
             }}
             onUploadError={(error: Error) => {
-          // Do something with the error.
-          alert(`ERROR! ${error.message}`);
-        }}
-            // disabled={!selectedCourse || isUploading}
+              setError(`Upload failed: ${error.message}`);
+            }}
+            disabled={!selectedCourse || isUploading}
           />
         </div>
       </div>
