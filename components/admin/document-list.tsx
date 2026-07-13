@@ -1,8 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { Trash2, AlertCircle, CheckCircle2, Clock, XCircle } from 'lucide-react';
+import { Trash2, Eye, AlertCircle, CheckCircle2, Clock, XCircle } from 'lucide-react';
 import { deleteDocument } from '@/app/actions/documents';
+import { PDFModal } from '@/components/pdf-modal';
 
 interface AdminDocumentListProps {
   documents: any[];
@@ -12,6 +13,7 @@ interface AdminDocumentListProps {
 export function AdminDocumentList({ documents, onDelete }: AdminDocumentListProps) {
   const [deleting, setDeleting] = useState<number | null>(null);
   const [error, setError] = useState('');
+  const [previewDocument, setPreviewDocument] = useState<{ id: number; title: string; pdfUrl: string } | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 6;
 
@@ -141,7 +143,16 @@ export function AdminDocumentList({ documents, onDelete }: AdminDocumentListProp
                 <td className="py-3 px-4 text-muted-foreground text-xs">
                   {new Date(doc.created_at).toLocaleDateString()}
                 </td>
-                <td className="py-3 px-4 text-center">
+                <td className="py-3 px-4 text-center flex items-center justify-center gap-2">
+                  {doc.file_url && (
+                    <button
+                      onClick={() => setPreviewDocument({ id: doc.id, title: doc.title, pdfUrl: doc.file_url })}
+                      className="inline-flex items-center justify-center p-2 hover:bg-muted rounded-lg transition-colors"
+                      title="Preview PDF"
+                    >
+                      <Eye size={16} className="text-slate-600" />
+                    </button>
+                  )}
                   <button
                     onClick={() => handleDelete(doc.id)}
                     disabled={deleting === doc.id}
@@ -194,6 +205,15 @@ export function AdminDocumentList({ documents, onDelete }: AdminDocumentListProp
           </div>
         </div>
       )}
+
+      <PDFModal
+        isOpen={Boolean(previewDocument)}
+        onClose={() => setPreviewDocument(null)}
+        title={previewDocument?.title ?? ''}
+        pdfUrl={previewDocument?.pdfUrl ?? ''}
+        documentId={previewDocument?.id ?? 0}
+        onDownload={async () => Promise.resolve()}
+      />
     </div>
   );
 }

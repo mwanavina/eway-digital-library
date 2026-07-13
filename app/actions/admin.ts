@@ -414,6 +414,7 @@ export async function fetchAllDocuments() {
       exam_type: documents.examType,
       upload_status: documents.uploadStatus,
       thumbnail_url: documents.thumbnailUrl,
+      file_url: documents.filePath,
       created_at: documents.createdAt,
     }).from(documents)
       .leftJoin(courses, eq(documents.courseId, courses.id))
