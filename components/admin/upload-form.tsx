@@ -284,7 +284,7 @@ export function AdminUploadForm({
       <div className="space-y-2">
         <label className="block text-sm font-medium text-foreground">Upload PDF</label>
         <div className="border-2 border-dashed border-border rounded-lg p-8">
-          <UploadButton
+          <UploadDropzone
             endpoint="pdfUploader"
             onClientUploadComplete={(res) => {
               console.log("Files:", res);
