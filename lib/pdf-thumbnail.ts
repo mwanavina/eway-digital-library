@@ -28,8 +28,8 @@ export async function generatePdfThumbnailUrl(pdfUrl: string, originalName: stri
       throw new Error(`Failed to download PDF: ${response.status}`);
     }
 
-    const pdfBuffer = Buffer.from(await response.arrayBuffer());
-    const loadingTask = getDocument({ data: pdfBuffer });
+    const pdfBytes = new Uint8Array(await response.arrayBuffer());
+    const loadingTask = getDocument({ data: pdfBytes });
     const pdf = await loadingTask.promise;
     const page = await pdf.getPage(1);
 
