@@ -38,19 +38,29 @@ export function AdminUploadForm({
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
+  const getValue = (item: any, keys: string[]) => {
+    for (const key of keys) {
+      const value = item?.[key];
+      if (value !== undefined && value !== null && value !== '') {
+        return value;
+      }
+    }
+    return null;
+  };
+
   // Filter departments based on school
   const filteredDepartments = selectedSchool
-    ? departments.filter((d) => d.school_id === parseInt(selectedSchool))
+    ? departments.filter((d) => Number(getValue(d, ['school_id', 'schoolId'])) === Number(selectedSchool))
     : [];
 
   // Filter programs based on department
   const filteredPrograms = selectedDepartment
-    ? programs.filter((p) => p.department_id === parseInt(selectedDepartment))
+    ? programs.filter((p) => Number(getValue(p, ['department_id', 'departmentId'])) === Number(selectedDepartment))
     : [];
 
   // Filter courses based on program
   const filteredCourses = selectedProgram
-    ? courses.filter((c) => c.program_id === parseInt(selectedProgram))
+    ? courses.filter((c) => Number(getValue(c, ['program_id', 'programId'])) === Number(selectedProgram))
     : [];
 
   const handleUploadComplete = async (res: any) => {
