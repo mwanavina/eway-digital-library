@@ -2,12 +2,16 @@
 
 import { useState } from 'react';
 import { Upload, AlertCircle } from 'lucide-react';
-import { UploadButton,UploadDropzone } from "@/utils/uploadthing";
+import { UploadButton, UploadDropzone } from "@/utils/uploadthing";
 import { createDocument } from '@/app/actions/documents';
-import { createPdfThumbnail } from '@/app/actions/thumbnail';
 import { genUploader } from 'uploadthing/client';
+import * as pdfjsLib from 'pdfjs-dist';
 
 const { uploadFiles } = genUploader();
+
+if (typeof window !== 'undefined') {
+  pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.mjs';
+}
 
 interface UploadFormProps {
   schools: any[];
@@ -62,6 +66,31 @@ export function AdminUploadForm({
   const filteredCourses = selectedProgram
     ? courses.filter((c) => Number(getValue(c, ['program_id', 'programId'])) === Number(selectedProgram))
     : [];
+
+  const generatePdfThumbnailBlob = async (pdfUrl: string) => {
+    try {
+      const pdf = await pdfjsLib.getDocument({ url: pdfUrl }).promise;
+      const page = await pdf.getPage(1);
+      const scale = 1.5;
+      const viewport = page.getViewport({ scale });
+
+      const canvas = document.createElement('canvas');
+      const context = canvas.getContext('2d');
+      if (!context) throw new Error('Failed to get canvas context');
+
+      canvas.width = viewport.width;
+      canvas.height = viewport.height;
+
+      await page.render({ canvas, canvasContext: context, viewport }).promise;
+
+      return await new Promise<Blob | null>((resolve) => {
+        canvas.toBlob((blob) => resolve(blob), 'image/png');
+      });
+    } catch (error) {
+      console.error('Failed to generate PDF thumbnail in browser:', error);
+      return null;
+    }
+  };
 
   const handleUploadComplete = async (res: any) => {
     if (!res || !res[0]) {
@@ -321,24 +350,41 @@ export function AdminUploadForm({
                 return;
               }
 
-              const thumbnailUrl = await createPdfThumbnail(pdfUrl, uploadedPdf.name ?? 'document');
-              if (!thumbnailUrl) {
-                await handleUploadComplete({
-                  0: {
-                    ...uploadedPdf,
-                    serverData: {
-                      ...(uploadedPdf.serverData ?? {}),
-                      fileUrl: pdfUrl,
-                    },
-                  },
-                });
-                return;
-              }
+              const generatePdfThumbnailBlob = async (pdfUrl: string) => {
+                try {
+                  const pdf = await pdfjsLib.getDocument({ url: pdfUrl }).promise;
+                  const page = await pdf.getPage(1);
+                  const scale = 1.5;
+                  const viewport = page.getViewport({ scale });
 
-              const imageUploadResult = await uploadFiles('imageUploader', {
-                files: [new File([await fetch(thumbnailUrl).then((res) => res.arrayBuffer())], 'thumbnail.png', { type: 'image/png' })],
-              });
-              const imageUrl = imageUploadResult?.[0]?.serverData?.fileUrl ?? imageUploadResult?.[0]?.url ?? imageUploadResult?.[0]?.ufsUrl ?? thumbnailUrl;
+                  const canvas = document.createElement('canvas');
+                  const context = canvas.getContext('2d');
+                  if (!context) throw new Error('Failed to get canvas context');
+
+                  canvas.width = viewport.width;
+                  canvas.height = viewport.height;
+
+                  await page.render({ canvas, canvasContext: context, viewport }).promise;
+
+                  return await new Promise<Blob | null>((resolve) => {
+                    canvas.toBlob((blob) => resolve(blob), 'image/png');
+                  });
+                } catch (error) {
+                  console.error('Failed to generate PDF thumbnail in browser:', error);
+                  return null;
+                }
+              };
+
+              const thumbnailBlob = await generatePdfThumbnailBlob(pdfUrl);
+              let thumbnailUrl: string | null = null;
+
+              if (thumbnailBlob) {
+                const thumbnailFile = new File([thumbnailBlob], 'thumbnail.png', { type: 'image/png' });
+                const imageUploadResult = await uploadFiles('imageUploader', {
+                  files: [thumbnailFile],
+                });
+                thumbnailUrl = imageUploadResult?.[0]?.serverData?.fileUrl ?? imageUploadResult?.[0]?.url ?? imageUploadResult?.[0]?.ufsUrl ?? null;
+              }
 
               await handleUploadComplete({
                 0: {
@@ -346,7 +392,7 @@ export function AdminUploadForm({
                   serverData: {
                     ...(uploadedPdf.serverData ?? {}),
                     fileUrl: pdfUrl,
-                    thumbnailUrl: imageUrl,
+                    thumbnailUrl,
                   },
                 },
               });
