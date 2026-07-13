@@ -1,5 +1,7 @@
 'use server';
 
+import { generatePdfThumbnailUrl } from '@/lib/pdf-thumbnail';
+
 // Mock database for demonstration
 
 interface CreateDocumentInput {
@@ -10,6 +12,8 @@ interface CreateDocumentInput {
   examType: string;
   fileKey: string;
   fileUrl: string;
+  fileName?: string;
+  thumbnailUrl?: string;
   levelId?: number;
   resourceTypeId?: number;
   author?: string | null;
@@ -25,12 +29,18 @@ export async function createDocument(input: CreateDocumentInput): Promise<any> {
   try {
     console.log('[v0] Creating document:', input.title);
 
+    const thumbnailUrl = input.thumbnailUrl ?? (input.fileUrl
+      ? await generatePdfThumbnailUrl(input.fileUrl, input.fileName ?? input.title)
+      : null);
+
     const mockDocument = {
       id: Math.floor(Math.random() * 10000),
       title: input.title,
       course_id: input.courseId,
-        level_id: input.levelId || null,
+      level_id: input.levelId || null,
       file_key: input.fileKey,
+      file_url: input.fileUrl,
+      thumbnail_url: thumbnailUrl,
       upload_status: 'completed',
       resource_type_id: input.resourceTypeId || 1,
       author: input.author || null,
@@ -42,6 +52,7 @@ export async function createDocument(input: CreateDocumentInput): Promise<any> {
     return {
       success: true,
       document: mockDocument,
+      thumbnailUrl,
     };
   } catch (error) {
     console.error('Error creating document:', error);
