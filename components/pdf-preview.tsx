@@ -2,12 +2,16 @@
 
 import { useState, useEffect } from 'react';
 import { Download, X, FileText } from 'lucide-react';
-import * as pdfjsLib from 'pdfjs-dist';
 
-// Set up PDF.js worker with path from public folder
-if (typeof window !== 'undefined') {
+const loadPdfJs = async () => {
+  if (typeof window === 'undefined') {
+    throw new Error('PDF.js can only run in the browser');
+  }
+
+  const pdfjsLib = await import('pdfjs-dist');
   pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.mjs';
-}
+  return pdfjsLib;
+};
 
 interface PDFPreviewProps {
   pdfUrl: string;
@@ -30,6 +34,7 @@ export function PDFPreview({ pdfUrl, fileName, onDownload, isOpen, onClose }: PD
         setLoading(true);
         setError('');
         
+        const pdfjsLib = await loadPdfJs();
         const pdf = await pdfjsLib.getDocument({ url: pdfUrl }).promise;
         const page = await pdf.getPage(1);
         
@@ -141,6 +146,7 @@ export function PDFThumbnail({ pdfUrl, fileName, onPreview }: PDFThumbnailProps)
   useEffect(() => {
     const loadThumbnail = async () => {
       try {
+        const pdfjsLib = await loadPdfJs();
         const pdf = await pdfjsLib.getDocument({ url: pdfUrl }).promise;
         const page = await pdf.getPage(1);
         
