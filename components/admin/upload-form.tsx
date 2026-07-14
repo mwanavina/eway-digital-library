@@ -5,13 +5,18 @@ import { Upload, AlertCircle } from 'lucide-react';
 import { UploadButton, UploadDropzone } from "@/utils/uploadthing";
 import { createDocument } from '@/app/actions/documents';
 import { genUploader } from 'uploadthing/client';
-import * as pdfjsLib from 'pdfjs-dist';
 
 const { uploadFiles } = genUploader();
 
-if (typeof window !== 'undefined') {
+const loadPdfJs = async () => {
+  if (typeof window === 'undefined') {
+    throw new Error('PDF.js can only run in the browser');
+  }
+
+  const pdfjsLib = await import('pdfjs-dist');
   pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.mjs';
-}
+  return pdfjsLib;
+};
 
 interface PendingUpload {
   fileUrl: string;
@@ -78,6 +83,7 @@ export function AdminUploadForm({
 
   const generatePdfThumbnailBlob = async (pdfUrl: string) => {
     try {
+      const pdfjsLib = await loadPdfJs();
       const pdf = await pdfjsLib.getDocument({ url: pdfUrl }).promise;
       const page = await pdf.getPage(1);
       const scale = 1.5;
@@ -398,6 +404,7 @@ export function AdminUploadForm({
 
               const generatePdfThumbnailBlob = async (pdfUrl: string) => {
                 try {
+                  const pdfjsLib = await loadPdfJs();
                   const pdf = await pdfjsLib.getDocument({ url: pdfUrl }).promise;
                   const page = await pdf.getPage(1);
                   const scale = 1.5;
