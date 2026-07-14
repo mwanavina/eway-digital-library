@@ -1,6 +1,8 @@
 'use server';
 
-// Mock database for demonstration
+import { revalidatePath } from 'next/cache';
+import { db } from '@/lib/db';
+import { documents } from '@/lib/db/schema';
 
 interface CreateDocumentInput {
   title: string;
@@ -19,40 +21,48 @@ interface CreateDocumentInput {
   abstract?: string | null;
 }
 
-/**
- * Create a new document with PDF processing via API
- * we need to improve this
- */
 export async function createDocument(input: CreateDocumentInput): Promise<any> {
   try {
     console.log('[v0] Creating document:', input.title);
 
-    const thumbnailUrl = input.thumbnailUrl ?? null;
-
-    const mockDocument = {
-      id: Math.floor(Math.random() * 10000),
+    const [createdDocument] = await db.insert(documents).values({
       title: input.title,
-      course_id: input.courseId,
-      level_id: input.levelId || null,
-      file_key: input.fileKey,
-      file_url: input.fileUrl,
-      thumbnail_url: thumbnailUrl,
-      upload_status: 'completed',
-      resource_type_id: input.resourceTypeId || 1,
-      author: input.author || null,
-      publication_date: input.publicationDate || null,
-      abstract: input.abstract || null,
-      created_at: new Date().toISOString(),
-    };
+      courseId: input.courseId,
+      levelId: input.levelId ?? null,
+      year: input.year,
+      semester: input.semester,
+      examType: input.examType,
+      filePath: input.fileUrl,
+      fileKey: input.fileKey,
+      thumbnailUrl: input.thumbnailUrl ?? null,
+      uploadStatus: 'completed',
+      uploadedBy: null,
+      uploadedAt: new Date(),
+    }).returning({
+      id: documents.id,
+      title: documents.title,
+      courseId: documents.courseId,
+      levelId: documents.levelId,
+      year: documents.year,
+      semester: documents.semester,
+      examType: documents.examType,
+      filePath: documents.filePath,
+      fileKey: documents.fileKey,
+      thumbnailUrl: documents.thumbnailUrl,
+      uploadStatus: documents.uploadStatus,
+      createdAt: documents.createdAt,
+    });
+
+    revalidatePath('/admin');
 
     return {
       success: true,
-      document: mockDocument,
-      thumbnailUrl,
+      document: createdDocument,
+      thumbnailUrl: createdDocument.thumbnailUrl,
     };
   } catch (error) {
     console.error('Error creating document:', error);
-    throw error;
+    return { success: false, error: 'Failed to save document' };
   }
 }
 
