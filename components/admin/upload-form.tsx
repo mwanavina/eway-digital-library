@@ -13,6 +13,13 @@ if (typeof window !== 'undefined') {
   pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.mjs';
 }
 
+interface PendingUpload {
+  fileUrl: string;
+  fileKey: string;
+  fileName: string;
+  thumbnailUrl: string | null;
+}
+
 interface UploadFormProps {
   schools: any[];
   departments: any[];
@@ -39,6 +46,8 @@ export function AdminUploadForm({
   const [semester, setSemester] = useState('1');
   const [examType, setExamType] = useState('Mid-semester');
   const [isUploading, setIsUploading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [pendingUpload, setPendingUpload] = useState<PendingUpload | null>(null);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
@@ -100,25 +109,62 @@ export function AdminUploadForm({
 
     const uploadedFile = res[0];
     const fileUrl = uploadedFile?.serverData?.fileUrl ?? uploadedFile?.url ?? uploadedFile?.ufsUrl;
-    const thumbnailUrl = uploadedFile?.serverData?.thumbnailUrl ?? null;
     const fileKey = uploadedFile?.serverData?.fileKey ?? uploadedFile?.key;
+    const fileName = uploadedFile?.name ?? uploadedFile?.fileName ?? 'document.pdf';
 
     if (!fileUrl) {
-      setError('Upload completed but no file URL was returned');
-      return;
-    }
-
-    if (!selectedCourse) {
-      setError('Please select a course before uploading');
-      return;
-    }
-
-    if (!selectedLevel) {
-      setError('Please select a level before uploading');
+      setError('PDF upload completed but no file URL was returned');
       return;
     }
 
     setIsUploading(true);
+    setError('');
+    setSuccess('');
+
+    try {
+      const thumbnailBlob = await generatePdfThumbnailBlob(fileUrl);
+      let thumbnailUrl: string | null = null;
+
+      if (thumbnailBlob) {
+        const thumbnailFile = new File([thumbnailBlob], 'thumbnail.png', { type: 'image/png' });
+        const imageUploadResult = await uploadFiles('imageUploader', {
+          files: [thumbnailFile],
+        });
+        thumbnailUrl = imageUploadResult?.[0]?.serverData?.fileUrl ?? imageUploadResult?.[0]?.url ?? imageUploadResult?.[0]?.ufsUrl ?? null;
+      }
+
+      setPendingUpload({
+        fileUrl,
+        fileKey,
+        fileName,
+        thumbnailUrl,
+      });
+      setSuccess('PDF uploaded and thumbnail generated. Review below, then click Save to persist to the database.');
+    } catch (err) {
+      console.error(err);
+      setError(err instanceof Error ? err.message : 'Failed to generate thumbnail');
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleSaveDocument = async () => {
+    if (!pendingUpload) {
+      setError('Please upload a PDF before saving.');
+      return;
+    }
+
+    if (!selectedCourse) {
+      setError('Please select a course before saving');
+      return;
+    }
+
+    if (!selectedLevel) {
+      setError('Please select a level before saving');
+      return;
+    }
+
+    setIsSaving(true);
     setError('');
     setSuccess('');
 
@@ -133,15 +179,15 @@ export function AdminUploadForm({
         year: parseInt(year),
         semester: parseInt(semester),
         examType,
-        fileKey: fileKey ?? `${Date.now()}`,
-        fileUrl: fileUrl,
-        fileName: uploadedFile?.name ?? uploadedFile?.fileName,
-        thumbnailUrl,
+        fileKey: pendingUpload.fileKey,
+        fileUrl: pendingUpload.fileUrl,
+        fileName: pendingUpload.fileName,
+        thumbnailUrl: pendingUpload.thumbnailUrl ?? undefined,
       });
 
       if (result.success) {
-        setSuccess(`Document uploaded successfully${result.thumbnailUrl ? ' and thumbnail generated' : ''}.`);
-
+        setSuccess('Document saved successfully.');
+        setPendingUpload(null);
         setSelectedSchool('');
         setSelectedDepartment('');
         setSelectedProgram('');
@@ -155,12 +201,12 @@ export function AdminUploadForm({
           onSuccess?.();
         }, 1000);
       } else {
-        setError(result.error ?? 'Failed to create document');
+        setError(result.error ?? 'Failed to save document');
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to create document');
+      setError(err instanceof Error ? err.message : 'Failed to save document');
     } finally {
-      setIsUploading(false);
+      setIsSaving(false);
     }
   };
 
@@ -400,10 +446,59 @@ export function AdminUploadForm({
             onUploadError={(error: Error) => {
               setError(`Upload failed: ${error.message}`);
             }}
-            disabled={!selectedCourse || isUploading}
+            disabled={!selectedCourse || isUploading || Boolean(pendingUpload)}
           />
         </div>
       </div>
+
+      {pendingUpload && (
+        <div className="space-y-4 p-4 bg-slate-50 border border-border rounded-lg">
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <h3 className="text-lg font-semibold text-foreground">Preview</h3>
+              <p className="text-sm text-muted-foreground">Review the uploaded PDF and thumbnail before saving.</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setPendingUpload(null)}
+              className="rounded-lg px-3 py-2 border border-border text-sm hover:bg-muted"
+            >
+              Reset upload
+            </button>
+          </div>
+
+          <div className="grid gap-4 lg:grid-cols-[1.5fr_1fr]">
+            <div className="border border-border rounded-lg overflow-hidden h-[360px]">
+              <iframe
+                src={`${pendingUpload.fileUrl}#toolbar=0&navpanes=0&scrollbar=1`}
+                className="w-full h-full"
+                title={pendingUpload.fileName}
+              />
+            </div>
+            <div className="space-y-4">
+              <div>
+                <p className="text-sm font-medium text-foreground">Thumbnail</p>
+                <div className="mt-2 rounded-lg border border-border bg-white h-64 overflow-hidden flex items-center justify-center">
+                  {pendingUpload.thumbnailUrl ? (
+                    <img src={pendingUpload.thumbnailUrl} alt="PDF thumbnail" className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="text-sm text-muted-foreground">Thumbnail generation failed or is unavailable.</div>
+                  )}
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={handleSaveDocument}
+                disabled={isSaving}
+                className="w-full rounded-lg bg-[#1782C5] px-4 py-3 text-white font-semibold hover:bg-[#1464a0] disabled:opacity-50"
+              >
+                {isSaving ? 'Saving…' : 'Save document to database'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
