@@ -54,10 +54,10 @@ export function PDFModal({ isOpen, onClose, title, pdfUrl, documentId, onDownloa
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col">
+      <div className="bg-white rounded-lg shadow-2xl w-full max-w-[95vw] max-h-[95vh] flex flex-col overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-[#1782C5] to-[#1F2557]">
-          <div className="flex-1">
+          <div className="flex-1 min-w-0">
             <h2 className="text-xl font-bold text-white truncate">{title}</h2>
             <p className="text-sm text-gray-100 mt-1">PDF Preview</p>
           </div>
@@ -71,18 +71,18 @@ export function PDFModal({ isOpen, onClose, title, pdfUrl, documentId, onDownloa
         </div>
 
         {/* PDF Container */}
-        <div className="flex-1 overflow-auto bg-gray-900 flex items-center justify-center">
-          <div className="w-full h-full flex items-center justify-center">
+        <div className="flex-1 overflow-hidden bg-gray-900 p-4">
+          <div className="w-full h-full rounded-lg overflow-hidden border border-slate-700 bg-white shadow-sm">
             <iframe
               src={`${pdfUrl}#toolbar=1&navpanes=0&scrollbar=1`}
-              className="w-full h-full border-0"
+              className="w-full h-full min-h-[70vh] border-0"
               title={title}
             />
           </div>
         </div>
 
         {/* Footer */}
-        <div className="p-6 border-t border-gray-200 bg-gray-50 flex items-center justify-between">
+        <div className="p-6 border-t border-gray-200 bg-gray-50 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-sm text-gray-600">
             Click the download button below to save this PDF to your device
           </p>
