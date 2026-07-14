@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { X, Download, Loader2 } from 'lucide-react';
+import { X } from 'lucide-react';
 
 interface PDFModalProps {
   isOpen: boolean;
@@ -54,28 +54,28 @@ export function PDFModal({ isOpen, onClose, title, pdfUrl, documentId, onDownloa
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg shadow-2xl w-full max-w-[95vw] max-h-[95vh] flex flex-col overflow-hidden">
+      <div className="bg-white rounded-lg shadow-2xl w-full max-w-[95vw] max-h-[98vh] flex flex-col overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200 bg-gradient-to-r from-[#1782C5] to-[#1F2557]">
+        <div className="flex items-center justify-between px-4 border-b border-gray-200 bg-gradient-to-r from-[#1782C5] to-[#1F2557]">
           <div className="flex-1 min-w-0">
-            <h2 className="text-lg font-semibold text-white truncate">{title}</h2>
-            <p className="text-xs text-gray-100 mt-1">PDF Preview</p>
+            <h2 className="text-base font-semibold text-white truncate">{title}</h2>
+            {/* <p className="text-[11px] text-gray-100 mt-1">PDF Preview</p> */}
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-white hover:bg-opacity-20 rounded-lg transition-colors"
+            className="p-1.5 hover:bg-white hover:bg-opacity-20 rounded-lg transition-colors"
             aria-label="Close modal"
           >
-            <X size={20} className="text-white" />
+            <X size={18} className="text-white" />
           </button>
         </div>
 
         {/* PDF Container */}
-        <div className="flex-1 overflow-hidden bg-gray-900 p-4">
+        <div className="flex-1 overflow-hidden bg-gray-900 p-3">
           <div className="w-full h-full rounded-lg overflow-hidden border border-slate-700 bg-white shadow-sm">
             <iframe
               src={`${pdfUrl}#toolbar=1&navpanes=0&scrollbar=1`}
-              className="w-full h-full min-h-[70vh] border-0"
+              className="w-full h-full min-h-[80vh] border-0"
               title={title}
             />
           </div>
