@@ -81,8 +81,6 @@ export function PDFModal({ isOpen, onClose, title, pdfUrl, documentId, onDownloa
           </div>
         </div>
 
-        {/* Footer */}
-        <div className="p-4 border-t border-gray-200 bg-gray-50" />
       </div>
     </div>
   );
