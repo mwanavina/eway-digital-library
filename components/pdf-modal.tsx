@@ -56,7 +56,7 @@ export function PDFModal({ isOpen, onClose, title, pdfUrl, documentId, onDownloa
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-lg shadow-2xl w-full max-w-[95vw] max-h-[98vh] flex flex-col overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between px-4 border-b border-gray-200 bg-gradient-to-r from-[#1782C5] to-[#1F2557]">
+        <div className="flex items-center justify-between px-4 border-b border-gray-200 bg-linear-to-r from-[#1782C5] to-[#1F2557]">
           <div className="flex-1 min-w-0">
             <h2 className="text-base font-semibold text-white truncate">{title}</h2>
             {/* <p className="text-[11px] text-gray-100 mt-1">PDF Preview</p> */}
