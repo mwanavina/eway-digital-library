@@ -199,7 +199,7 @@ export function PDFThumbnail({ pdfUrl, fileName, onPreview }: PDFThumbnailProps)
           className="w-full h-full object-cover group-hover:scale-105 transition-transform"
         />
       ) : (
-        <div className="w-full h-full bg-gradient-to-br from-[#1782C5] to-[#1F2557] flex flex-col items-center justify-center text-white">
+        <div className="w-full h-full bg-linear-to-br from-[#1782C5] to-[#1F2557] flex flex-col items-center justify-center text-white">
           <FileText size={32} className="mb-2 opacity-80" />
           <span className="text-xs font-medium">PDF Document</span>
         </div>
