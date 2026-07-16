@@ -475,7 +475,7 @@ export function AdminUploadForm({
           </div>
 
           <div className="grid gap-4 lg:grid-cols-[1.5fr_1fr]">
-            <div className="border border-border rounded-lg overflow-hidden h-[360px]">
+            <div className="border border-border rounded-lg overflow-hidden h-90">
               <iframe
                 src={`${pendingUpload.fileUrl}#toolbar=0&navpanes=0&scrollbar=1`}
                 className="w-full h-full"
