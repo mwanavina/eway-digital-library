@@ -54,13 +54,13 @@ export function PDFModal({ isOpen, onClose, title, pdfUrl, documentId, onDownloa
 
   return (
     <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center overflow-hidden">
-      <div className="bg-white rounded-none shadow-2xl w-full h-screen max-w-full overflow-hidden flex flex-col">
+      <div className="bg-white rounded-none sm:rounded-3xl shadow-2xl w-full h-full max-w-full max-h-screen overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="flex flex-col gap-3 px-4 py-3 border-b border-gray-200 bg-gradient-to-r from-[#1782C5] to-[#1F2557] sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-3 px-4 py-3 border-b border-gray-200 bg-linear-to-r from-[#1782C5] to-[#1F2557] sm:flex-row sm:items-center sm:justify-between">
           <div className="flex-1 min-w-0">
             <h2 className="text-base font-semibold text-white truncate">{title}</h2>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <a
               href={pdfUrl}
               target="_blank"
@@ -81,7 +81,7 @@ export function PDFModal({ isOpen, onClose, title, pdfUrl, documentId, onDownloa
         </div>
 
         {/* PDF Container */}
-        <div className="flex-1 overflow-hidden bg-gray-900">
+        <div className="flex-1 min-h-0 overflow-hidden bg-gray-900">
           <div className="h-full w-full overflow-hidden bg-white">
             <iframe
               src={`${pdfUrl}#toolbar=1&navpanes=0&scrollbar=1`}
