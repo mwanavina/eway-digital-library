@@ -1,7 +1,16 @@
 'use client';
 
-import { useState } from 'react';
-import { ExternalLink, X } from 'lucide-react';
+import { useState, Suspense, useEffect } from 'react';
+import { X, Download, ChevronLeft, ChevronRight, Loader } from 'lucide-react';
+import * as pdfjsLib from 'pdfjs-dist';
+import { pdfjs, Document, Page } from 'react-pdf';
+import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
+import 'react-pdf/dist/esm/Page/TextLayer.css';
+
+// Set up the worker
+if (typeof window !== 'undefined' && !pdfjsLib.GlobalWorkerOptions.workerSrc) {
+  pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+}
 
 interface PDFModalProps {
   isOpen: boolean;
@@ -13,25 +22,24 @@ interface PDFModalProps {
 }
 
 export function PDFModal({ isOpen, onClose, title, pdfUrl, documentId, onDownload }: PDFModalProps) {
+  const [numPages, setNumPages] = useState<number>(0);
+  const [pageNumber, setPageNumber] = useState<number>(1);
   const [isDownloading, setIsDownloading] = useState(false);
+  const [scale, setScale] = useState(1);
 
   const handleDownloadPDF = async () => {
     setIsDownloading(true);
     try {
-      // Track the download via callback
       if (onDownload) {
         await onDownload(documentId);
       }
 
-      // Fetch the PDF as a blob
       const response = await fetch(pdfUrl);
       if (!response.ok) {
         throw new Error('Failed to download PDF');
       }
 
       const blob = await response.blob();
-
-      // Create a blob URL and trigger download
       const blobUrl = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = blobUrl;
@@ -40,8 +48,6 @@ export function PDFModal({ isOpen, onClose, title, pdfUrl, documentId, onDownloa
       link.click();
       document.body.removeChild(link);
       window.URL.revokeObjectURL(blobUrl);
-
-      console.log('[v0] PDF downloaded:', title);
     } catch (error) {
       console.error('[v0] Error downloading PDF:', error);
       alert('Failed to download PDF. Please try again.');
@@ -50,45 +56,122 @@ export function PDFModal({ isOpen, onClose, title, pdfUrl, documentId, onDownloa
     }
   };
 
+  const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
+    setNumPages(numPages);
+    setPageNumber(1);
+  };
+
+  const goToPreviousPage = () => {
+    setPageNumber(Math.max(pageNumber - 1, 1));
+  };
+
+  const goToNextPage = () => {
+    setPageNumber(Math.min(pageNumber + 1, numPages));
+  };
+
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center overflow-hidden">
-      <div className="bg-white rounded-none sm:rounded-3xl shadow-2xl w-full h-full max-w-full max-h-screen overflow-hidden flex flex-col">
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-2 sm:p-4">
+      <div className="bg-white rounded-lg shadow-2xl w-full max-w-[95vw] sm:max-w-4xl max-h-[98vh] flex flex-col overflow-hidden">
         {/* Header */}
-        <div className="flex flex-col gap-3 px-4 py-3 border-b border-gray-200 bg-linear-to-r from-[#1782C5] to-[#1F2557] sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 px-3 sm:px-6 py-3 sm:py-4 border-b border-gray-200 bg-gradient-to-r from-[#1782C5] to-[#1F2557]">
           <div className="flex-1 min-w-0">
-            <h2 className="text-base font-semibold text-white truncate">{title}</h2>
+            <h2 className="text-sm sm:text-base font-semibold text-white truncate">{title}</h2>
           </div>
-          <div className="flex flex-wrap items-center gap-2">
-            <a
-              href={pdfUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-2 text-sm font-medium text-slate-900 hover:bg-slate-100 transition-colors"
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleDownloadPDF}
+              disabled={isDownloading}
+              className="flex items-center gap-1 px-2 sm:px-3 py-1.5 sm:py-2 bg-[#EDD899] text-[#1F2557] rounded hover:bg-opacity-90 transition-colors disabled:opacity-50 text-xs sm:text-sm font-medium"
+              title="Download PDF"
             >
-              <ExternalLink size={16} />
-              Open
-            </a>
+              <Download size={16} className="sm:w-5 sm:h-5" />
+              <span className="hidden sm:inline">Download</span>
+            </button>
             <button
               onClick={onClose}
-              className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20 transition-colors"
+              className="p-1.5 hover:bg-white hover:bg-opacity-20 rounded-lg transition-colors"
               aria-label="Close modal"
             >
-              <X size={18} />
+              <X size={18} className="text-white" />
             </button>
           </div>
         </div>
 
-        {/* PDF Container */}
-        <div className="flex-1 min-h-0 overflow-hidden bg-gray-900">
-          <div className="h-full w-full overflow-hidden bg-white">
-            <iframe
-              src={`${pdfUrl}#toolbar=1&navpanes=0&scrollbar=1`}
-              className="h-full w-full border-0"
-              title={title}
-            />
+        {/* PDF Viewer Container */}
+        <div className="flex-1 overflow-hidden bg-gray-900 flex flex-col">
+          {/* PDF Content */}
+          <div className="flex-1 overflow-auto flex items-center justify-center bg-gray-900 p-2 sm:p-4">
+            <Suspense
+              fallback={
+                <div className="flex flex-col items-center justify-center gap-3">
+                  <Loader className="w-8 h-8 animate-spin text-white" />
+                  <p className="text-white text-sm">Loading PDF...</p>
+                </div>
+              }
+            >
+              <Document
+                file={pdfUrl}
+                onLoadSuccess={onDocumentLoadSuccess}
+                loading={
+                  <div className="flex flex-col items-center justify-center gap-3">
+                    <Loader className="w-8 h-8 animate-spin text-white" />
+                    <p className="text-white text-sm">Loading PDF...</p>
+                  </div>
+                }
+                error={
+                  <div className="text-center text-red-400 p-4">
+                    <p className="mb-4">Failed to load PDF</p>
+                    <a
+                      href={pdfUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-400 underline hover:text-blue-300"
+                    >
+                      Open in new tab
+                    </a>
+                  </div>
+                }
+              >
+                <div className="w-full flex justify-center">
+                  <Page
+                    pageNumber={pageNumber}
+                    renderTextLayer
+                    renderAnnotationLayer
+                    className="bg-white shadow-lg"
+                  />
+                </div>
+              </Document>
+            </Suspense>
           </div>
+
+          {/* Navigation Footer */}
+          {numPages > 0 && (
+            <div className="bg-gray-800 border-t border-gray-700 px-3 sm:px-6 py-3 sm:py-4 flex flex-wrap items-center justify-between gap-2 sm:gap-4">
+              <button
+                onClick={goToPreviousPage}
+                disabled={pageNumber <= 1}
+                className="flex items-center gap-1 px-2 sm:px-3 py-1.5 sm:py-2 bg-gray-700 text-white rounded hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-xs sm:text-sm"
+              >
+                <ChevronLeft size={18} />
+                <span className="hidden sm:inline">Previous</span>
+              </button>
+
+              <div className="text-white text-xs sm:text-sm font-medium">
+                Page <span className="font-bold">{pageNumber}</span> of <span className="font-bold">{numPages}</span>
+              </div>
+
+              <button
+                onClick={goToNextPage}
+                disabled={pageNumber >= numPages}
+                className="flex items-center gap-1 px-2 sm:px-3 py-1.5 sm:py-2 bg-gray-700 text-white rounded hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-xs sm:text-sm"
+              >
+                <span className="hidden sm:inline">Next</span>
+                <ChevronRight size={18} />
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>
