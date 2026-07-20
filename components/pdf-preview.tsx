@@ -38,7 +38,8 @@ export function PDFPreview({ pdfUrl, fileName, onDownload, isOpen, onClose }: PD
         const pdf = await pdfjsLib.getDocument({ url: pdfUrl }).promise;
         const page = await pdf.getPage(1);
         
-        const scale = 1.5;
+        const screenScale = Math.min(1.5, Math.max(0.7, window.innerWidth / 640));
+        const scale = screenScale;
         const viewport = page.getViewport({ scale });
         
         const canvas = document.createElement('canvas');
@@ -69,35 +70,36 @@ export function PDFPreview({ pdfUrl, fileName, onDownload, isOpen, onClose }: PD
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
+      <div className="relative w-full max-w-3xl max-h-[95vh] overflow-hidden rounded-3xl bg-white shadow-2xl flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-[#1782C5]">
-          <div className="flex-1">
+        <div className="flex items-center justify-between gap-3 px-4 py-3 border-b border-gray-200 bg-[#1782C5]">
+          <div className="min-w-0 flex-1">
             <h3 className="font-semibold text-white truncate">{fileName}</h3>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <a
               href={pdfUrl}
               target="_blank"
               rel="noopener noreferrer"
               onClick={onDownload}
-              className="flex items-center gap-2 px-3 py-2 bg-[#EDD899] text-[#1F2557] rounded-lg hover:bg-opacity-90 transition-colors font-medium"
+              className="flex items-center gap-2 px-3 py-2 bg-[#EDD899] text-[#1F2557] rounded-full hover:bg-opacity-90 transition-colors text-sm font-medium"
             >
               <Download size={18} />
-              <span className="text-sm">Download</span>
+              <span>Open PDF</span>
             </a>
             <button
               onClick={onClose}
-              className="p-2 hover:bg-white hover:bg-opacity-20 rounded transition-colors"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20 transition-colors"
+              aria-label="Close preview"
             >
-              <X size={20} className="text-white" />
+              <X size={20} />
             </button>
           </div>
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto bg-gray-100 flex items-center justify-center">
+        <div className="flex-1 overflow-auto bg-gray-100 p-4 flex items-center justify-center min-h-72">
           {loading && (
             <div className="text-center">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#1782C5] mx-auto mb-4"></div>
@@ -106,16 +108,16 @@ export function PDFPreview({ pdfUrl, fileName, onDownload, isOpen, onClose }: PD
           )}
           
           {error && (
-            <div className="text-center text-red-600">
+            <div className="text-center text-red-600 max-w-lg">
               <p className="mb-4">{error}</p>
               <a
                 href={pdfUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={onDownload}
-                className="text-[#1782C5] hover:underline font-medium"
+                className="inline-flex items-center justify-center px-4 py-2 rounded-full bg-[#1782C5] text-white hover:bg-[#1465a3] transition-colors font-medium"
               >
-                Open PDF in new tab
+                Open PDF in browser
               </a>
             </div>
           )}
@@ -124,7 +126,7 @@ export function PDFPreview({ pdfUrl, fileName, onDownload, isOpen, onClose }: PD
             <img
               src={thumbnail}
               alt="PDF first page"
-              className="max-w-full max-h-full object-contain"
+              className="max-w-full max-h-[80vh] object-contain rounded-xl border border-gray-200 shadow-sm"
             />
           )}
         </div>
@@ -150,7 +152,8 @@ export function PDFThumbnail({ pdfUrl, fileName, onPreview }: PDFThumbnailProps)
         const pdf = await pdfjsLib.getDocument({ url: pdfUrl }).promise;
         const page = await pdf.getPage(1);
         
-        const scale = 1.2;
+        const screenScale = Math.min(1.2, Math.max(0.7, window.innerWidth / 680));
+        const scale = screenScale;
         const viewport = page.getViewport({ scale });
         
         const canvas = document.createElement('canvas');
