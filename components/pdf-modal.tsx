@@ -53,8 +53,8 @@ export function PDFModal({ isOpen, onClose, title, pdfUrl, documentId, onDownloa
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
-      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-[95vw] max-h-[95vh] flex flex-col overflow-hidden">
+    <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center overflow-hidden">
+      <div className="bg-white rounded-none shadow-2xl w-full h-screen max-w-full overflow-hidden flex flex-col">
         {/* Header */}
         <div className="flex flex-col gap-3 px-4 py-3 border-b border-gray-200 bg-gradient-to-r from-[#1782C5] to-[#1F2557] sm:flex-row sm:items-center sm:justify-between">
           <div className="flex-1 min-w-0">
@@ -81,11 +81,11 @@ export function PDFModal({ isOpen, onClose, title, pdfUrl, documentId, onDownloa
         </div>
 
         {/* PDF Container */}
-        <div className="flex-1 overflow-hidden bg-gray-900 p-2 sm:p-3">
-          <div className="w-full h-full rounded-3xl overflow-hidden border border-slate-700 bg-white shadow-sm">
+        <div className="flex-1 overflow-hidden bg-gray-900">
+          <div className="h-full w-full overflow-hidden bg-white">
             <iframe
               src={`${pdfUrl}#toolbar=1&navpanes=0&scrollbar=1`}
-              className="w-full h-full min-h-[60vh] border-0"
+              className="h-full w-full border-0"
               title={title}
             />
           </div>
