@@ -81,16 +81,14 @@ export function PDFModal({ isOpen, onClose, title, pdfUrl, documentId, onDownloa
           </div>
         </div>
 
-        {/* PDF Viewer Container - Full Screen with Scroll Support */}
-        <div className="flex-1 overflow-auto bg-gray-100 flex items-center justify-center">
-          <div className="w-full h-full flex items-center justify-center min-h-screen md:min-h-full">
-            <embed
-              src={pdfUrl}
-              type="application/pdf"
-              className="w-full h-full"
-              title={title}
-            />
-          </div>
+        {/* PDF Viewer Container - Full Screen with Vertical Scroll */}
+        <div className="flex-1 overflow-y-auto overflow-x-hidden bg-gray-100">
+          <embed
+            src={pdfUrl}
+            type="application/pdf"
+            className="w-full h-auto"
+            title={title}
+          />
         </div>
       </div>
     </>
