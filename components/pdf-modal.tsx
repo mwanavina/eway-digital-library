@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { X } from 'lucide-react';
+import { ExternalLink, X } from 'lucide-react';
 
 interface PDFModalProps {
   isOpen: boolean;
@@ -53,34 +53,43 @@ export function PDFModal({ isOpen, onClose, title, pdfUrl, documentId, onDownloa
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg shadow-2xl w-full max-w-[95vw] max-h-[98vh] flex flex-col overflow-hidden">
+    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
+      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-[95vw] max-h-[95vh] flex flex-col overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between px-4 border-b border-gray-200 bg-linear-to-r from-[#1782C5] to-[#1F2557]">
+        <div className="flex flex-col gap-3 px-4 py-3 border-b border-gray-200 bg-gradient-to-r from-[#1782C5] to-[#1F2557] sm:flex-row sm:items-center sm:justify-between">
           <div className="flex-1 min-w-0">
             <h2 className="text-base font-semibold text-white truncate">{title}</h2>
-            {/* <p className="text-[11px] text-gray-100 mt-1">PDF Preview</p> */}
           </div>
-          <button
-            onClick={onClose}
-            className="p-1.5 hover:bg-white hover:bg-opacity-20 rounded-lg transition-colors"
-            aria-label="Close modal"
-          >
-            <X size={18} className="text-white" />
-          </button>
+          <div className="flex items-center gap-2">
+            <a
+              href={pdfUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-2 text-sm font-medium text-slate-900 hover:bg-slate-100 transition-colors"
+            >
+              <ExternalLink size={16} />
+              Open
+            </a>
+            <button
+              onClick={onClose}
+              className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20 transition-colors"
+              aria-label="Close modal"
+            >
+              <X size={18} />
+            </button>
+          </div>
         </div>
 
         {/* PDF Container */}
-        <div className="flex-1 overflow-hidden bg-gray-900 p-3">
-          <div className="w-full h-full rounded-lg overflow-hidden border border-slate-700 bg-white shadow-sm">
+        <div className="flex-1 overflow-hidden bg-gray-900 p-2 sm:p-3">
+          <div className="w-full h-full rounded-3xl overflow-hidden border border-slate-700 bg-white shadow-sm">
             <iframe
               src={`${pdfUrl}#toolbar=1&navpanes=0&scrollbar=1`}
-              className="w-full h-full min-h-[80vh] border-0"
+              className="w-full h-full min-h-[60vh] border-0"
               title={title}
             />
           </div>
         </div>
-
       </div>
     </div>
   );
