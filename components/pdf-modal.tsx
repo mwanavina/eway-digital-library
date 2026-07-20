@@ -1,10 +1,16 @@
 'use client';
 
-import { useState, Suspense } from 'react';
+import { useState, Suspense, useEffect } from 'react';
 import { X, Download, ChevronLeft, ChevronRight, Loader } from 'lucide-react';
-import { Document, Page } from 'react-pdf';
+import * as pdfjsLib from 'pdfjs-dist';
+import { pdfjs, Document, Page } from 'react-pdf';
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
+
+// Set up the worker
+if (typeof window !== 'undefined' && !pdfjsLib.GlobalWorkerOptions.workerSrc) {
+  pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+}
 
 interface PDFModalProps {
   isOpen: boolean;
@@ -115,27 +121,27 @@ export function PDFModal({ isOpen, onClose, title, pdfUrl, documentId, onDownloa
                   </div>
                 }
                 error={
-                  <div className="text-center text-red-400">
+                  <div className="text-center text-red-400 p-4">
                     <p className="mb-4">Failed to load PDF</p>
                     <a
                       href={pdfUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-white underline hover:no-underline"
+                      className="text-blue-400 underline hover:text-blue-300"
                     >
                       Open in new tab
                     </a>
                   </div>
                 }
               >
-                <Page
-                  pageNumber={pageNumber}
-                  scale={scale}
-                  renderTextLayer
-                  renderAnnotationLayer
-                  className="bg-white"
-                  width={Math.min(600, window.innerWidth - 40)}
-                />
+                <div className="w-full flex justify-center">
+                  <Page
+                    pageNumber={pageNumber}
+                    renderTextLayer
+                    renderAnnotationLayer
+                    className="bg-white shadow-lg"
+                  />
+                </div>
               </Document>
             </Suspense>
           </div>
