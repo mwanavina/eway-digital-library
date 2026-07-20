@@ -47,14 +47,21 @@ export function PDFModal({ isOpen, onClose, title, pdfUrl, documentId, onDownloa
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-2 sm:p-4">
-      <div className="bg-white rounded-lg shadow-2xl w-full max-w-[95vw] sm:max-w-4xl max-h-[98vh] flex flex-col overflow-hidden">
+    <>
+      {/* Overlay */}
+      <div 
+        className="fixed inset-0 bg-black bg-opacity-50 z-40"
+        onClick={onClose}
+      />
+      
+      {/* Full Screen PDF Modal */}
+      <div className="fixed inset-0 z-50 flex flex-col bg-white">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 px-3 sm:px-6 py-3 sm:py-4 border-b border-gray-200 bg-gradient-to-r from-[#1782C5] to-[#1F2557]">
+        <div className="flex items-center justify-between gap-3 px-3 sm:px-6 py-3 sm:py-4 border-b border-gray-200 bg-gradient-to-r from-[#1782C5] to-[#1F2557] flex-shrink-0">
           <div className="flex-1 min-w-0">
             <h2 className="text-sm sm:text-base font-semibold text-white truncate">{title}</h2>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-shrink-0">
             <button
               onClick={handleDownloadPDF}
               disabled={isDownloading}
@@ -74,16 +81,16 @@ export function PDFModal({ isOpen, onClose, title, pdfUrl, documentId, onDownloa
           </div>
         </div>
 
-        {/* PDF Viewer Container - Using Native Browser PDF Viewer */}
-        <div className="flex-1 overflow-hidden bg-gray-900">
+        {/* PDF Viewer Container - Full Screen with Vertical Scroll */}
+        <div className="flex-1 overflow-y-auto overflow-x-hidden bg-gray-100">
           <embed
             src={pdfUrl}
             type="application/pdf"
-            className="w-full h-full"
+            className="w-full h-auto"
             title={title}
           />
         </div>
       </div>
-    </div>
+    </>
   );
 }
