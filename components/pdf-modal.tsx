@@ -1,16 +1,7 @@
 'use client';
 
-import { useState, Suspense, useEffect } from 'react';
-import { X, Download, ChevronLeft, ChevronRight, Loader } from 'lucide-react';
-import * as pdfjsLib from 'pdfjs-dist';
-import { pdfjs, Document, Page } from 'react-pdf';
-import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
-import 'react-pdf/dist/esm/Page/TextLayer.css';
-
-// Set up the worker
-if (typeof window !== 'undefined' && !pdfjsLib.GlobalWorkerOptions.workerSrc) {
-  pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
-}
+import { useState } from 'react';
+import { X, Download } from 'lucide-react';
 
 interface PDFModalProps {
   isOpen: boolean;
@@ -22,10 +13,7 @@ interface PDFModalProps {
 }
 
 export function PDFModal({ isOpen, onClose, title, pdfUrl, documentId, onDownload }: PDFModalProps) {
-  const [numPages, setNumPages] = useState<number>(0);
-  const [pageNumber, setPageNumber] = useState<number>(1);
   const [isDownloading, setIsDownloading] = useState(false);
-  const [scale, setScale] = useState(1);
 
   const handleDownloadPDF = async () => {
     setIsDownloading(true);
@@ -54,19 +42,6 @@ export function PDFModal({ isOpen, onClose, title, pdfUrl, documentId, onDownloa
     } finally {
       setIsDownloading(false);
     }
-  };
-
-  const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
-    setNumPages(numPages);
-    setPageNumber(1);
-  };
-
-  const goToPreviousPage = () => {
-    setPageNumber(Math.max(pageNumber - 1, 1));
-  };
-
-  const goToNextPage = () => {
-    setPageNumber(Math.min(pageNumber + 1, numPages));
   };
 
   if (!isOpen) return null;
@@ -99,79 +74,14 @@ export function PDFModal({ isOpen, onClose, title, pdfUrl, documentId, onDownloa
           </div>
         </div>
 
-        {/* PDF Viewer Container */}
-        <div className="flex-1 overflow-hidden bg-gray-900 flex flex-col">
-          {/* PDF Content */}
-          <div className="flex-1 overflow-auto flex items-center justify-center bg-gray-900 p-2 sm:p-4">
-            <Suspense
-              fallback={
-                <div className="flex flex-col items-center justify-center gap-3">
-                  <Loader className="w-8 h-8 animate-spin text-white" />
-                  <p className="text-white text-sm">Loading PDF...</p>
-                </div>
-              }
-            >
-              <Document
-                file={pdfUrl}
-                onLoadSuccess={onDocumentLoadSuccess}
-                loading={
-                  <div className="flex flex-col items-center justify-center gap-3">
-                    <Loader className="w-8 h-8 animate-spin text-white" />
-                    <p className="text-white text-sm">Loading PDF...</p>
-                  </div>
-                }
-                error={
-                  <div className="text-center text-red-400 p-4">
-                    <p className="mb-4">Failed to load PDF</p>
-                    <a
-                      href={pdfUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-400 underline hover:text-blue-300"
-                    >
-                      Open in new tab
-                    </a>
-                  </div>
-                }
-              >
-                <div className="w-full flex justify-center">
-                  <Page
-                    pageNumber={pageNumber}
-                    renderTextLayer
-                    renderAnnotationLayer
-                    className="bg-white shadow-lg"
-                  />
-                </div>
-              </Document>
-            </Suspense>
-          </div>
-
-          {/* Navigation Footer */}
-          {numPages > 0 && (
-            <div className="bg-gray-800 border-t border-gray-700 px-3 sm:px-6 py-3 sm:py-4 flex flex-wrap items-center justify-between gap-2 sm:gap-4">
-              <button
-                onClick={goToPreviousPage}
-                disabled={pageNumber <= 1}
-                className="flex items-center gap-1 px-2 sm:px-3 py-1.5 sm:py-2 bg-gray-700 text-white rounded hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-xs sm:text-sm"
-              >
-                <ChevronLeft size={18} />
-                <span className="hidden sm:inline">Previous</span>
-              </button>
-
-              <div className="text-white text-xs sm:text-sm font-medium">
-                Page <span className="font-bold">{pageNumber}</span> of <span className="font-bold">{numPages}</span>
-              </div>
-
-              <button
-                onClick={goToNextPage}
-                disabled={pageNumber >= numPages}
-                className="flex items-center gap-1 px-2 sm:px-3 py-1.5 sm:py-2 bg-gray-700 text-white rounded hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-xs sm:text-sm"
-              >
-                <span className="hidden sm:inline">Next</span>
-                <ChevronRight size={18} />
-              </button>
-            </div>
-          )}
+        {/* PDF Viewer Container - Using Native Browser PDF Viewer */}
+        <div className="flex-1 overflow-hidden bg-gray-900">
+          <embed
+            src={pdfUrl}
+            type="application/pdf"
+            className="w-full h-full"
+            title={title}
+          />
         </div>
       </div>
     </div>
