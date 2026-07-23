@@ -13,6 +13,7 @@ interface AdminContentProps {
   programs: AdminItem[];
   courses: AdminItem[];
   levels: AdminItem[];
+  resources: AdminItem[];
   documents: AdminItem[];
   loading: boolean;
   onCreateClick: () => void;
@@ -28,6 +29,7 @@ export function AdminContent({
   programs,
   courses,
   levels,
+  resources,
   documents,
   loading,
   onCreateClick,
@@ -38,7 +40,7 @@ export function AdminContent({
   const activeSectionTitles: Record<Tab, { title: string; subtitle: string; actionLabel: string }> = {
     upload: {
       title: 'Upload documents',
-      subtitle: 'Add new papers, journals, and other academic resources to the library.',
+      subtitle: 'Add past papers, course outlines, syllabi, and other academic resources to the library.',
       actionLabel: 'Upload documents',
     },
     documents: {
@@ -100,6 +102,7 @@ export function AdminContent({
               programs={programs}
               courses={courses}
               levels={levels}
+              resourceTypes={resources}
               onSuccess={onUploadSuccess}
             />
           </div>
