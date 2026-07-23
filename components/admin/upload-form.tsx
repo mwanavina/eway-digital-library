@@ -31,6 +31,7 @@ interface UploadFormProps {
   programs: any[];
   courses: any[];
   levels: any[];
+  resourceTypes?: any[];
   onSuccess?: () => void;
 }
 
@@ -40,6 +41,7 @@ export function AdminUploadForm({
   programs,
   courses,
   levels,
+  resourceTypes = [],
   onSuccess,
 }: UploadFormProps) {
   const [selectedSchool, setSelectedSchool] = useState('');
@@ -47,6 +49,7 @@ export function AdminUploadForm({
   const [selectedProgram, setSelectedProgram] = useState('');
   const [selectedCourse, setSelectedCourse] = useState('');
   const [selectedLevel, setSelectedLevel] = useState('');
+  const [selectedResourceType, setSelectedResourceType] = useState('');
   const [year, setYear] = useState(new Date().getFullYear().toString());
   const [semester, setSemester] = useState('1');
   const [examType, setExamType] = useState('Mid-semester');
@@ -170,6 +173,16 @@ export function AdminUploadForm({
       return;
     }
 
+    if (!selectedResourceType) {
+      setError('Please select a resource type before saving');
+      return;
+    }
+
+    if (Number(selectedResourceType) === 1 && !examType.trim()) {
+      setError('Please select an exam type for past papers');
+      return;
+    }
+
     setIsSaving(true);
     setError('');
     setSuccess('');
@@ -179,12 +192,13 @@ export function AdminUploadForm({
       const selectedLevelName = levels.find((l) => l.id === parseInt(selectedLevel))?.name;
 
       const result = await createDocument({
-        title: `${selectedCourseName ?? 'Document'} - ${selectedLevelName ?? ''} ${year} Sem${semester} ${examType}`.trim(),
+        title: `${selectedCourseName ?? 'Document'} - ${selectedLevelName ?? ''} ${year} Sem${semester}${selectedResourceType === '1' ? ` ${examType}` : ''}`.trim(),
         courseId: parseInt(selectedCourse),
         levelId: parseInt(selectedLevel),
+        resourceTypeId: parseInt(selectedResourceType),
         year: parseInt(year),
         semester: parseInt(semester),
-        examType,
+        examType: selectedResourceType === '1' ? examType : undefined,
         fileKey: pendingUpload.fileKey,
         fileUrl: pendingUpload.fileUrl,
         fileName: pendingUpload.fileName,
@@ -199,6 +213,7 @@ export function AdminUploadForm({
         setSelectedProgram('');
         setSelectedCourse('');
         setSelectedLevel('');
+        setSelectedResourceType('');
         setYear(new Date().getFullYear().toString());
         setSemester('1');
         setExamType('Mid-semester');
@@ -236,6 +251,30 @@ export function AdminUploadForm({
 
       {/* Form Fields */}
       <div className="grid md:grid-cols-2 gap-4">
+        {/* Resource Type Selection */}
+        <div className="space-y-2">
+          <label className="block text-sm font-medium text-foreground">Resource Type</label>
+          <select
+            value={selectedResourceType}
+            onChange={(e) => {
+              setSelectedResourceType(e.target.value);
+              if (e.target.value !== '1') {
+                setExamType('');
+              } else {
+                setExamType('Mid-semester');
+              }
+            }}
+            className="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-[#1782C5] focus:border-transparent"
+          >
+            <option value="">Select a resource type...</option>
+            {resourceTypes.map((resourceType) => (
+              <option key={resourceType.id} value={resourceType.id}>
+                {resourceType.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
         {/* School Selection */}
         <div className="space-y-2">
           <label className="block text-sm font-medium text-foreground">School</label>
@@ -366,25 +405,26 @@ export function AdminUploadForm({
         </div>
       </div>
 
-      {/* Exam Type Selection */}
-      <div className="space-y-2">
-        <label className="block text-sm font-medium text-foreground">Exam Type</label>
-        <div className="flex flex-wrap gap-4">
-          {['Mid-semester', 'End-semester', 'Supplementary', 'Deferred'].map((type) => (
-            <label key={type} className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="radio"
-                name="examType"
-                value={type}
-                checked={examType === type}
-                onChange={(e) => setExamType(e.target.value)}
-                className="w-4 h-4"
-              />
-              <span className="text-sm text-foreground">{type}</span>
-            </label>
-          ))}
+      {selectedResourceType === '1' && (
+        <div className="space-y-2">
+          <label className="block text-sm font-medium text-foreground">Exam Type</label>
+          <div className="flex flex-wrap gap-4">
+            {['Mid-semester', 'End-semester', 'Supplementary', 'Deferred'].map((type) => (
+              <label key={type} className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="radio"
+                  name="examType"
+                  value={type}
+                  checked={examType === type}
+                  onChange={(e) => setExamType(e.target.value)}
+                  className="w-4 h-4"
+                />
+                <span className="text-sm text-foreground">{type}</span>
+              </label>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* PDF Upload */}
       <div className="space-y-2">
