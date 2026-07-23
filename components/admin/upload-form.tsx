@@ -13,7 +13,7 @@ const loadPdfJs = async () => {
     throw new Error('PDF.js can only run in the browser');
   }
 
-  const pdfjsLib = await import('pdfjs-dist');
+  const pdfjsLib = await import('pdfjs-dist/legacy/build/pdf.mjs');
   pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.mjs';
   return pdfjsLib;
 };
