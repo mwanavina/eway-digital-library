@@ -7,9 +7,9 @@ import { documents } from '@/lib/db/schema';
 interface CreateDocumentInput {
   title: string;
   courseId: number;
-  year: number;
-  semester: number;
-  examType: string;
+  year?: number;
+  semester?: number;
+  examType?: string;
   fileKey: string;
   fileUrl: string;
   fileName?: string;
@@ -29,9 +29,10 @@ export async function createDocument(input: CreateDocumentInput): Promise<any> {
       title: input.title,
       courseId: input.courseId,
       levelId: input.levelId ?? null,
-      year: input.year,
-      semester: input.semester,
-      examType: input.examType,
+      resourceTypeId: input.resourceTypeId ?? null,
+      year: input.year ?? null,
+      semester: input.semester ?? null,
+      examType: input.examType?.trim() || null,
       filePath: input.fileUrl,
       fileKey: input.fileKey,
       thumbnailUrl: input.thumbnailUrl ?? null,
@@ -43,6 +44,7 @@ export async function createDocument(input: CreateDocumentInput): Promise<any> {
       title: documents.title,
       courseId: documents.courseId,
       levelId: documents.levelId,
+      resourceTypeId: documents.resourceTypeId,
       year: documents.year,
       semester: documents.semester,
       examType: documents.examType,
