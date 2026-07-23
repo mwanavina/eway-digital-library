@@ -32,7 +32,7 @@ export function PDFModal({ isOpen, onClose, title, pdfUrl, documentId, onDownloa
   const [pageNumber, setPageNumber] = useState(1);
   const [pageCount, setPageCount] = useState(0);
   const [scale, setScale] = useState(1.2);
-  const [viewMode, setViewMode] = useState<'continuous' | 'page'>('continuous');
+  const [viewMode] = useState<'continuous' | 'page'>('continuous');
 
   const renderPageToCanvas = async (
     doc: any,
@@ -258,27 +258,10 @@ export function PDFModal({ isOpen, onClose, title, pdfUrl, documentId, onDownloa
           </div>
 
           <div className="flex items-center gap-2 rounded-full bg-slate-100 p-1">
-            <button
-              onClick={() => setViewMode('continuous')}
-              className={`flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold transition sm:text-sm ${
-                viewMode === 'continuous'
-                  ? 'bg-[#1782C5] text-white'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
+            <div className="flex items-center gap-1 rounded-full bg-[#1782C5] px-3 py-1 text-xs font-semibold text-white sm:text-sm">
               <BookOpen size={16} />
               Continuous
-            </button>
-            <button
-              onClick={() => setViewMode('page')}
-              className={`rounded-full px-3 py-1 text-xs font-semibold transition sm:text-sm ${
-                viewMode === 'page'
-                  ? 'bg-[#1F2557] text-white'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              Page View
-            </button>
+            </div>
           </div>
 
           <div className="flex items-center gap-2">
@@ -333,22 +316,7 @@ export function PDFModal({ isOpen, onClose, title, pdfUrl, documentId, onDownloa
             </div>
           )}
 
-          {!isLoading && !error && pdfDoc && viewMode === 'page' && (
-            <div className="flex min-h-full justify-center">
-              <div className="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
-                <div className="mb-2 text-xs font-semibold text-slate-500 sm:text-sm">
-                  Page {pageNumber} of {pageCount}
-                </div>
-                <canvas
-                  ref={canvasRef}
-                  className="mx-auto max-w-full rounded-xl bg-white"
-                  aria-label="PDF page canvas"
-                />
-              </div>
-            </div>
-          )}
-
-          {!isLoading && !error && pdfDoc && viewMode === 'continuous' && (
+          {!isLoading && !error && pdfDoc && (
             <div className="space-y-4">
               {pageList.map((pageIndex) => (
                 <div
