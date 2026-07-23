@@ -32,6 +32,7 @@ export function PDFModal({ isOpen, onClose, title, pdfUrl, documentId, onDownloa
   const [pageNumber, setPageNumber] = useState(1);
   const [pageCount, setPageCount] = useState(0);
   const [scale, setScale] = useState(1.2);
+  const [defaultScale, setDefaultScale] = useState(1.2);
   const [viewMode] = useState<'continuous' | 'page'>('continuous');
 
   const renderPageToCanvas = async (
@@ -79,15 +80,20 @@ export function PDFModal({ isOpen, onClose, title, pdfUrl, documentId, onDownloa
         setIsLoading(true);
         setError('');
         setPageNumber(1);
-        setScale(1.2);
 
         const pdfjsLib = await loadPdfJs();
         const doc = await pdfjsLib.getDocument({ url: pdfUrl }).promise;
+        const firstPage = await doc.getPage(1);
+        const firstViewport = firstPage.getViewport({ scale: 1 });
+        const fitScale = Math.min(1.6, Math.max(0.8, (window.innerWidth - 96) / firstViewport.width));
+        const normalizedScale = Number(fitScale.toFixed(2));
 
         if (isCancelled) {
           return;
         }
 
+        setScale(normalizedScale);
+        setDefaultScale(normalizedScale);
         setPdfDoc(doc);
         setPageCount(doc.numPages || 0);
       } catch (err) {
@@ -253,7 +259,7 @@ export function PDFModal({ isOpen, onClose, title, pdfUrl, documentId, onDownloa
             </button>
             <button
               onClick={() => {
-                setScale(1.2);
+                setScale(defaultScale);
                 setPageNumber(1);
               }}
               className="rounded-lg border border-slate-300 bg-white p-2 text-slate-700 transition hover:bg-slate-50"
