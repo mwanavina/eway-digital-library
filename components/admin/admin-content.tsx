@@ -73,6 +73,11 @@ export function AdminContent({
       subtitle: 'Define the student progression levels used across the platform.',
       actionLabel: 'Add level',
     },
+    'resource-types': {
+      title: 'Resource Types',
+      subtitle: 'Manage the document categories used across the library.',
+      actionLabel: 'Add resource type',
+    },
   };
 
   const activeMeta = activeSectionTitles[activeTab];
@@ -118,7 +123,7 @@ export function AdminContent({
           </div>
         )}
 
-        {(activeTab === 'schools' || activeTab === 'departments' || activeTab === 'programs' || activeTab === 'courses' || activeTab === 'levels') && (
+        {(activeTab === 'schools' || activeTab === 'departments' || activeTab === 'programs' || activeTab === 'courses' || activeTab === 'levels' || activeTab === 'resource-types') && (
           <div className="space-y-6">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
@@ -154,6 +159,11 @@ export function AdminContent({
                       { key: 'name', label: 'Course' },
                       { key: 'program_name', label: 'Program' },
                     ]
+                  : activeTab === 'resource-types'
+                  ? [
+                      { key: 'name', label: 'Name' },
+                      { key: 'description', label: 'Description' },
+                    ]
                   : [{ key: 'level_number', label: 'Level' }, { key: 'description', label: 'Description' }]
               }
               data={
@@ -165,6 +175,8 @@ export function AdminContent({
                   ? programs
                   : activeTab === 'courses'
                   ? courses
+                  : activeTab === 'resource-types'
+                  ? resources
                   : levels
               }
               onEdit={onEdit}
