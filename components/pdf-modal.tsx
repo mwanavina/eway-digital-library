@@ -260,7 +260,6 @@ export function PDFModal({ isOpen, onClose, title, pdfUrl, documentId, onDownloa
           <div className="flex items-center gap-2 rounded-full bg-slate-100 p-1">
             <div className="flex items-center gap-1 rounded-full bg-[#1782C5] px-3 py-1 text-xs font-semibold text-white sm:text-sm">
               <BookOpen size={16} />
-              Continuous
             </div>
           </div>
 
