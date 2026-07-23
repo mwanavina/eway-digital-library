@@ -18,6 +18,9 @@ import {
   createLevel,
   deleteLevel,
   updateLevel,
+  createResourceType,
+  deleteResourceType,
+  updateResourceType,
   fetchAllSchools,
   fetchAllDepartments,
   fetchAllPrograms,
@@ -154,6 +157,9 @@ export default function AdminPage() {
           case 'levels':
             await updateLevel(editingItem.id, Number.parseInt(data.level_number ?? '0', 10), data.description ?? '');
             break;
+          case 'resource-types':
+            await updateResourceType(editingItem.id, data.name ?? '', data.description ?? '');
+            break;
         }
       } else {
         switch (activeTab) {
@@ -171,6 +177,9 @@ export default function AdminPage() {
             break;
           case 'levels':
             await createLevel({ levelNumber: Number.parseInt(data.level_number ?? '0', 10), description: data.description ?? '' });
+            break;
+          case 'resource-types':
+            await createResourceType({ name: data.name ?? '', description: data.description ?? '' });
             break;
         }
       }
@@ -207,6 +216,9 @@ export default function AdminPage() {
         case 'levels':
           await deleteLevel(confirmDelete.id);
           break;
+        case 'resource-types':
+          await deleteResourceType(confirmDelete.id);
+          break;
       }
 
       await Promise.all([loadAllData(), loadDocuments()]);
@@ -235,6 +247,8 @@ export default function AdminPage() {
             ? { code: item.code, name: item.name, program_id: item.programId?.toString() ?? item.program_id?.toString() ?? '' }
             : activeTab === 'levels'
               ? { level_number: item.levelNumber?.toString() ?? item.level_number?.toString() ?? '', description: item.description ?? '' }
+            : activeTab === 'resource-types'
+              ? { name: item.name ?? '', description: item.description ?? '' }
               : { name: item.name }
     );
     setIsModalOpen(true);
@@ -248,6 +262,7 @@ export default function AdminPage() {
     { id: 'programs', label: 'Programs' },
     { id: 'courses', label: 'Courses' },
     { id: 'levels', label: 'Levels' },
+    { id: 'resource-types', label: 'Resource Types' },
   ];
 
   return (
