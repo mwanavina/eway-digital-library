@@ -43,6 +43,11 @@ const levelSchema = z.object({
   description: z.string().trim().min(2, 'Description is required').max(200),
 });
 
+const resourceTypeSchema = z.object({
+  name: z.string().trim().min(2, 'Resource type name is required').max(100),
+  description: z.string().trim().min(2, 'Description is required').max(200),
+});
+
 export function AdminForm({
   activeTab,
   formData,
@@ -65,7 +70,9 @@ export function AdminForm({
             ? courseSchema
             : activeTab === 'levels'
               ? levelSchema
-              : z.object({});
+              : activeTab === 'resource-types'
+                ? resourceTypeSchema
+                : z.object({});
 
   const {
     register,
@@ -197,6 +204,29 @@ export function AdminForm({
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1782C5]"
             />
             {errors.level_number && <p className="mt-1 text-sm text-red-600">{String(errors.level_number.message)}</p>}
+          </div>
+          <div>
+            <input
+              type="text"
+              placeholder="Description"
+              {...register('description')}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1782C5]"
+            />
+            {errors.description && <p className="mt-1 text-sm text-red-600">{String(errors.description.message)}</p>}
+          </div>
+        </>
+      )}
+
+      {activeTab === 'resource-types' && (
+        <>
+          <div>
+            <input
+              type="text"
+              placeholder="Resource type name"
+              {...register('name')}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1782C5]"
+            />
+            {errors.name && <p className="mt-1 text-sm text-red-600">{String(errors.name.message)}</p>}
           </div>
           <div>
             <input
