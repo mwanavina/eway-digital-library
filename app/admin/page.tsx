@@ -282,6 +282,7 @@ export default function AdminPage() {
             programs={programs}
             courses={courses}
             levels={levels}
+            resources={resourceTypes}
             documents={documents}
             loading={loading}
             onCreateClick={openCreateModal}
