@@ -231,35 +231,8 @@ export function PDFModal({ isOpen, onClose, title, pdfUrl, documentId, onDownloa
 
         <div className="flex items-center justify-between gap-2 border-b border-slate-200 bg-white px-3 py-2 sm:px-6">
           <div className="flex items-center gap-2">
-            {viewMode === 'page' ? (
-              <>
-                <button
-                  onClick={() => setPageNumber((current) => Math.max(1, current - 1))}
-                  disabled={!canGoPrev}
-                  className="rounded-lg border border-slate-300 bg-white p-2 text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
-                  aria-label="Previous page"
-                >
-                  <ChevronLeft size={18} />
-                </button>
-                <button
-                  onClick={() => setPageNumber((current) => Math.min(pageCount, current + 1))}
-                  disabled={!canGoNext}
-                  className="rounded-lg border border-slate-300 bg-white p-2 text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
-                  aria-label="Next page"
-                >
-                  <ChevronRight size={18} />
-                </button>
-              </>
-            ) : (
-              <div className="rounded-lg bg-slate-100 px-3 py-2 text-xs font-semibold text-slate-700 sm:text-sm">
-                Continuous scroll
-              </div>
-            )}
-          </div>
-
-          <div className="flex items-center gap-2 rounded-full bg-slate-100 p-1">
-            <div className="flex items-center gap-1 rounded-full bg-[#1782C5] px-3 py-1 text-xs font-semibold text-white sm:text-sm">
-              <BookOpen size={16} />
+            <div className="flex items-center gap-1 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-white sm:text-sm">
+              <BookOpen size={16} className="text-[#1782C5]" />
             </div>
           </div>
 
