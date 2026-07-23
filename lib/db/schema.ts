@@ -131,6 +131,14 @@ export const levels = pgTable("levels", {
   createdAt: timestamp("created_at", { withTimezone: false }).defaultNow().notNull(),
 });
 
+export const resourceTypes = pgTable("resource_types", {
+  id: serial("id").primaryKey(),
+  name: varchar("name", { length: 255 }).notNull().unique(),
+  slug: varchar("slug", { length: 100 }).notNull().unique(),
+  description: text("description"),
+  createdAt: timestamp("created_at", { withTimezone: false }).defaultNow().notNull(),
+});
+
 export const documents = pgTable("documents", {
   id: serial("id").primaryKey(),
   title: varchar("title", { length: 255 }).notNull(),
@@ -138,6 +146,7 @@ export const documents = pgTable("documents", {
     .notNull()
     .references(() => courses.id, { onDelete: "cascade" }),
   levelId: integer("level_id").references(() => levels.id, { onDelete: "set null" }),
+  resourceTypeId: integer("resource_type_id").references(() => resourceTypes.id, { onDelete: "set null" }),
   year: integer("year"),
   semester: integer("semester"),
   examType: varchar("exam_type", { length: 100 }),
@@ -270,6 +279,10 @@ export const levelsRelations = relations(levels, ({ many }) => ({
   documents: many(documents),
 }));
 
+export const resourceTypesRelations = relations(resourceTypes, ({ many }) => ({
+  documents: many(documents),
+}));
+
 export const documentsRelations = relations(documents, ({ one, many }) => ({
   course: one(courses, {
     fields: [documents.courseId],
@@ -278,6 +291,10 @@ export const documentsRelations = relations(documents, ({ one, many }) => ({
   level: one(levels, {
     fields: [documents.levelId],
     references: [levels.id],
+  }),
+  resourceType: one(resourceTypes, {
+    fields: [documents.resourceTypeId],
+    references: [resourceTypes.id],
   }),
   uploader: one(user, {
     fields: [documents.uploadedBy],
