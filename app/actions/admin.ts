@@ -38,6 +38,11 @@ const levelSchema = z.object({
   description: z.string().trim().min(2, 'Description must be at least 2 characters').max(200),
 });
 
+const resourceTypeSchema = z.object({
+  name: z.string().trim().min(2, 'Resource type name must be at least 2 characters').max(100),
+  description: z.string().trim().min(2, 'Description must be at least 2 characters').max(200),
+});
+
 // Mock admin actions for demonstration - would connect to database in production
 
 export async function createSchool(input: string | { name: string }) {
@@ -304,6 +309,71 @@ export async function deleteLevel(id: number) {
   } catch (error) {
     console.error('Error deleting level:', error);
     return { success: false, error: 'Failed to delete level' };
+  }
+}
+
+export async function createResourceType(input: string | { name: string; description?: string }) {
+  const parsed = typeof input === 'string' ? { name: input, description: '' } : input;
+  const result = resourceTypeSchema.safeParse(parsed);
+
+  if (!result.success) {
+    return { success: false, error: result.error.issues[0]?.message ?? 'Invalid resource type data' };
+  }
+
+  const slug = result.data.name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '');
+
+  try {
+    const [createdResourceType] = await db.insert(resourceTypes).values({
+      name: result.data.name,
+      slug,
+      description: result.data.description,
+    }).returning({
+      id: resourceTypes.id,
+      name: resourceTypes.name,
+      slug: resourceTypes.slug,
+      description: resourceTypes.description,
+      createdAt: resourceTypes.createdAt,
+    });
+
+    revalidatePath('/admin');
+    return { success: true, data: createdResourceType };
+  } catch (error) {
+    console.error('Error creating resource type:', error);
+    return { success: false, error: 'Failed to create resource type' };
+  }
+}
+
+export async function updateResourceType(id: number, name: string, description: string) {
+  const slug = name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '');
+
+  try {
+    const [updatedResourceType] = await db.update(resourceTypes)
+      .set({ name, slug, description })
+      .where(eq(resourceTypes.id, id))
+      .returning({ id: resourceTypes.id, name: resourceTypes.name, slug: resourceTypes.slug, description: resourceTypes.description, createdAt: resourceTypes.createdAt });
+
+    revalidatePath('/admin');
+    return { success: true, data: updatedResourceType };
+  } catch (error) {
+    console.error('Error updating resource type:', error);
+    return { success: false, error: 'Failed to update resource type' };
+  }
+}
+
+export async function deleteResourceType(id: number) {
+  try {
+    await db.delete(resourceTypes).where(eq(resourceTypes.id, id));
+    revalidatePath('/admin');
+    return { success: true };
+  } catch (error) {
+    console.error('Error deleting resource type:', error);
+    return { success: false, error: 'Failed to delete resource type' };
   }
 }
 
