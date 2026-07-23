@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { asc, desc, eq } from 'drizzle-orm';
 import { z } from 'zod';
 import { db } from "@/lib/db";
-import { schools, departments, programs, courses, levels, documents } from "@/lib/db/schema";
+import { schools, departments, programs, courses, levels, documents, resourceTypes } from "@/lib/db/schema";
 
 type NewSchool = typeof schools.$inferInsert;
 
@@ -432,16 +432,25 @@ export async function fetchAllDocuments() {
 
 export async function fetchAllResourceTypes() {
   try {
-    return {
-      success: true,
-      data: [
-        { id: 1, name: 'Past Papers' },
-        { id: 2, name: 'Journals' },
-        { id: 3, name: 'Dissertations' },
-        { id: 4, name: 'Course Outlines' },
-        { id: 5, name: 'Research Papers' },
-      ],
-    };
+    const rows = await db.select({
+      id: resourceTypes.id,
+      name: resourceTypes.name,
+      slug: resourceTypes.slug,
+      description: resourceTypes.description,
+      createdAt: resourceTypes.createdAt,
+    }).from(resourceTypes).orderBy(asc(resourceTypes.name));
+
+    if (rows.length === 0) {
+      const fallbackTypes = [
+        { id: 1, name: 'Past Papers', slug: 'past-papers', description: 'Past examination papers' },
+        { id: 2, name: 'Course Outlines', slug: 'course-outlines', description: 'Course outlines and study guides' },
+        { id: 3, name: 'Syllabi', slug: 'syllabi', description: 'Syllabus and academic plans' },
+      ];
+
+      return { success: true, data: fallbackTypes };
+    }
+
+    return { success: true, data: rows };
   } catch (error) {
     console.error('Error fetching resource types:', error);
     return { success: false, error: 'Failed to fetch resource types' };
