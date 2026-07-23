@@ -175,7 +175,7 @@ export function PDFModal({ isOpen, onClose, title, pdfUrl, documentId, onDownloa
       <div className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm" onClick={onClose} />
 
       <div className="fixed inset-0 z-50 flex flex-col bg-slate-100">
-        <div className="flex items-center justify-between gap-3 border-b border-slate-200 bg-gradient-to-r from-[#1782C5] to-[#1F2557] px-3 py-3 text-white sm:px-6">
+        <div className="flex items-center justify-between gap-3 border-b border-slate-200 bg-linear-to-r from-[#1782C5] to-[#1F2557] px-3 py-3 text-white sm:px-6">
           <div className="min-w-0 flex-1">
             <h2 className="truncate text-sm font-semibold sm:text-base">{title}</h2>
           </div>
