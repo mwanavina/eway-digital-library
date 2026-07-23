@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { ChevronLeft, ChevronRight, Download, ExternalLink, RotateCcw, X, ZoomIn, ZoomOut } from 'lucide-react';
+import { BookOpen, ChevronLeft, ChevronRight, Download, ExternalLink, RotateCcw, X, ZoomIn, ZoomOut } from 'lucide-react';
 
 interface PDFModalProps {
   isOpen: boolean;
@@ -24,6 +24,7 @@ const loadPdfJs = async () => {
 
 export function PDFModal({ isOpen, onClose, title, pdfUrl, documentId, onDownload }: PDFModalProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const pageCanvasRefs = useRef<Record<number, HTMLCanvasElement | null>>({});
   const [isDownloading, setIsDownloading] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string>('');
@@ -31,15 +32,20 @@ export function PDFModal({ isOpen, onClose, title, pdfUrl, documentId, onDownloa
   const [pageNumber, setPageNumber] = useState(1);
   const [pageCount, setPageCount] = useState(0);
   const [scale, setScale] = useState(1.2);
+  const [viewMode, setViewMode] = useState<'continuous' | 'page'>('continuous');
 
-  const renderPage = async (doc: any, currentPage: number, currentScale: number) => {
-    if (!canvasRef.current) {
+  const renderPageToCanvas = async (
+    doc: any,
+    pageIndex: number,
+    currentScale: number,
+    canvas: HTMLCanvasElement | null,
+  ) => {
+    if (!canvas) {
       return;
     }
 
-    const page = await doc.getPage(currentPage);
+    const page = await doc.getPage(pageIndex);
     const viewport = page.getViewport({ scale: currentScale });
-    const canvas = canvasRef.current;
     const context = canvas.getContext('2d');
 
     if (!context) {
@@ -104,7 +110,7 @@ export function PDFModal({ isOpen, onClose, title, pdfUrl, documentId, onDownloa
   }, [isOpen, pdfUrl]);
 
   useEffect(() => {
-    if (!pdfDoc || !canvasRef.current || !isOpen) {
+    if (!pdfDoc || !isOpen) {
       return;
     }
 
@@ -113,7 +119,19 @@ export function PDFModal({ isOpen, onClose, title, pdfUrl, documentId, onDownloa
     const renderCurrentPage = async () => {
       try {
         setError('');
-        await renderPage(pdfDoc, pageNumber, scale);
+
+        if (viewMode === 'continuous') {
+          const pagePromises = Array.from({ length: pageCount }, (_, index) => {
+            const pageIndex = index + 1;
+            const canvas = pageCanvasRefs.current[pageIndex];
+            return renderPageToCanvas(pdfDoc, pageIndex, scale, canvas);
+          });
+
+          await Promise.all(pagePromises);
+        } else {
+          await renderPageToCanvas(pdfDoc, pageNumber, scale, canvasRef.current);
+        }
+
         if (isCancelled) {
           return;
         }
@@ -130,7 +148,7 @@ export function PDFModal({ isOpen, onClose, title, pdfUrl, documentId, onDownloa
     return () => {
       isCancelled = true;
     };
-  }, [pdfDoc, pageNumber, scale, isOpen]);
+  }, [pdfDoc, pageNumber, pageCount, scale, viewMode, isOpen]);
 
   const handleDownloadPDF = async () => {
     setIsDownloading(true);
@@ -167,6 +185,7 @@ export function PDFModal({ isOpen, onClose, title, pdfUrl, documentId, onDownloa
 
   const canGoPrev = pageNumber > 1;
   const canGoNext = pageNumber < pageCount;
+  const pageList = Array.from({ length: pageCount }, (_, index) => index + 1);
 
   if (!isOpen) return null;
 
@@ -212,26 +231,54 @@ export function PDFModal({ isOpen, onClose, title, pdfUrl, documentId, onDownloa
 
         <div className="flex items-center justify-between gap-2 border-b border-slate-200 bg-white px-3 py-2 sm:px-6">
           <div className="flex items-center gap-2">
-            <button
-              onClick={() => setPageNumber((current) => Math.max(1, current - 1))}
-              disabled={!canGoPrev}
-              className="rounded-lg border border-slate-300 bg-white p-2 text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
-              aria-label="Previous page"
-            >
-              <ChevronLeft size={18} />
-            </button>
-            <button
-              onClick={() => setPageNumber((current) => Math.min(pageCount, current + 1))}
-              disabled={!canGoNext}
-              className="rounded-lg border border-slate-300 bg-white p-2 text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
-              aria-label="Next page"
-            >
-              <ChevronRight size={18} />
-            </button>
+            {viewMode === 'page' ? (
+              <>
+                <button
+                  onClick={() => setPageNumber((current) => Math.max(1, current - 1))}
+                  disabled={!canGoPrev}
+                  className="rounded-lg border border-slate-300 bg-white p-2 text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+                  aria-label="Previous page"
+                >
+                  <ChevronLeft size={18} />
+                </button>
+                <button
+                  onClick={() => setPageNumber((current) => Math.min(pageCount, current + 1))}
+                  disabled={!canGoNext}
+                  className="rounded-lg border border-slate-300 bg-white p-2 text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+                  aria-label="Next page"
+                >
+                  <ChevronRight size={18} />
+                </button>
+              </>
+            ) : (
+              <div className="rounded-lg bg-slate-100 px-3 py-2 text-xs font-semibold text-slate-700 sm:text-sm">
+                Continuous scroll
+              </div>
+            )}
           </div>
 
-          <div className="text-xs font-medium text-slate-600 sm:text-sm">
-            Page {pageNumber} {pageCount ? `of ${pageCount}` : ''}
+          <div className="flex items-center gap-2 rounded-full bg-slate-100 p-1">
+            <button
+              onClick={() => setViewMode('continuous')}
+              className={`flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold transition sm:text-sm ${
+                viewMode === 'continuous'
+                  ? 'bg-[#1782C5] text-white'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <BookOpen size={16} />
+              Continuous
+            </button>
+            <button
+              onClick={() => setViewMode('page')}
+              className={`rounded-full px-3 py-1 text-xs font-semibold transition sm:text-sm ${
+                viewMode === 'page'
+                  ? 'bg-[#1F2557] text-white'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              Page View
+            </button>
           </div>
 
           <div className="flex items-center gap-2">
@@ -286,15 +333,40 @@ export function PDFModal({ isOpen, onClose, title, pdfUrl, documentId, onDownloa
             </div>
           )}
 
-          {!isLoading && !error && pdfDoc && (
+          {!isLoading && !error && pdfDoc && viewMode === 'page' && (
             <div className="flex min-h-full justify-center">
               <div className="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
+                <div className="mb-2 text-xs font-semibold text-slate-500 sm:text-sm">
+                  Page {pageNumber} of {pageCount}
+                </div>
                 <canvas
                   ref={canvasRef}
                   className="mx-auto max-w-full rounded-xl bg-white"
                   aria-label="PDF page canvas"
                 />
               </div>
+            </div>
+          )}
+
+          {!isLoading && !error && pdfDoc && viewMode === 'continuous' && (
+            <div className="space-y-4">
+              {pageList.map((pageIndex) => (
+                <div
+                  key={pageIndex}
+                  className="mx-auto max-w-3xl rounded-2xl border border-slate-200 bg-white p-3 shadow-sm"
+                >
+                  <div className="mb-2 text-xs font-semibold text-slate-500 sm:text-sm">
+                    Page {pageIndex} of {pageCount}
+                  </div>
+                  <canvas
+                    ref={(element) => {
+                      pageCanvasRefs.current[pageIndex] = element;
+                    }}
+                    className="mx-auto max-w-full rounded-xl bg-white"
+                    aria-label={`PDF page ${pageIndex}`}
+                  />
+                </div>
+              ))}
             </div>
           )}
         </div>
