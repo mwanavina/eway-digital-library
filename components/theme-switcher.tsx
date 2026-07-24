@@ -26,8 +26,8 @@ export function ThemeSwitcher() {
   return (
     <Popover>
       <PopoverTrigger>
-        <button
-          className="inline-flex items-center justify-center p-2 rounded-lg bg-white bg-opacity-20 hover:bg-opacity-30 transition-colors dark:bg-slate-800 dark:hover:bg-slate-700"
+        <span
+          className="inline-flex items-center justify-center p-2 rounded-lg bg-white bg-opacity-20 hover:bg-opacity-30 transition-colors dark:bg-slate-800 dark:hover:bg-slate-700 cursor-pointer"
           aria-label="Select theme"
           title="Select theme"
         >
@@ -36,7 +36,7 @@ export function ThemeSwitcher() {
           ) : (
             <Sun size={20} className="text-yellow-300 dark:text-slate-700" />
           )}
-        </button>
+        </span>
       </PopoverTrigger>
 
       <PopoverContent className="w-36 p-2" align="end">
