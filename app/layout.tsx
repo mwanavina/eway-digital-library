@@ -8,6 +8,7 @@ import { connection } from 'next/server'
 import { NextSSRPlugin } from "@uploadthing/react/next-ssr-plugin";
 import { extractRouterConfig } from "uploadthing/server";
 import { ourFileRouter } from "@/app/api/uploadthing/core";
+import { Toaster } from '@/components/ui/sonner';
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-mono" });
@@ -45,6 +46,7 @@ export default function RootLayout({
         </Suspense>
         <ThemeProvider>
           {children}
+          <Toaster richColors closeButton position="top-right" />
         </ThemeProvider>
         <Analytics />
       </body>
