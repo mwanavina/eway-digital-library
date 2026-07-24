@@ -15,8 +15,8 @@ export function ShareModal({ isOpen, onClose, title, resourceId }: ShareModalPro
 
   if (!isOpen) return null;
 
-  const shareUrl = typeof window !== 'undefined' 
-    ? `${window.location.origin}/?resource=${resourceId}&title=${encodeURIComponent(title)}`
+  const shareUrl = typeof window !== 'undefined'
+    ? `${window.location.origin}/document/${resourceId}`
     : '';
 
   const shareText = `Check out this resource: "${title}"`;
