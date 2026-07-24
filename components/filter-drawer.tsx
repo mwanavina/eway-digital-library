@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
 
 type ResourceType = 'all' | 'past-papers' | 'journals' | 'dissertations' | 'course-outlines' | 'research-papers';
@@ -28,6 +28,13 @@ interface FilterDrawerProps {
   activeResourceType: ResourceType;
 }
 
+interface FilterDrawerInternalProps extends FilterDrawerProps {
+  levels?: any[];
+  years?: number[];
+  semesters?: number[];
+  examTypes?: string[];
+}
+
 type ExpandedSection = 'school' | 'department' | 'program' | 'course' | 'year' | 'semester' | 'examType';
 
 export interface FilterState {
@@ -49,6 +56,31 @@ export function FilterDrawer({
   courses,
   activeResourceType,
 }: FilterDrawerProps) {
+  const [levels, setLevels] = useState<any[]>([]);
+  const [years, setYears] = useState<number[]>([]);
+  const [semesters, setSemesters] = useState<number[]>([]);
+  const [examTypes, setExamTypes] = useState<string[]>([]);
+  useEffect(() => {
+    const loadFilterMeta = async () => {
+      try {
+        const response = await fetch('/api/filters');
+        const data = await response.json();
+        if (data.success) {
+          setLevels(data.levels || data.data?.levels || []);
+          setYears(data.years || data.data?.years || []);
+          setSemesters(data.semesters || data.data?.semesters || []);
+          setExamTypes(data.examTypes || data.data?.examTypes || []);
+        }
+      } catch (error) {
+        console.error('[v0] Error loading filter metadata:', error);
+      }
+    };
+
+    if (isOpen) {
+      void loadFilterMeta();
+    }
+  }, [isOpen]);
+
   const [expandedSections, setExpandedSections] = useState<Record<ExpandedSection, boolean>>({
     school: true,
     department: false,
@@ -215,7 +247,17 @@ export function FilterDrawer({
                   >
                     Any
                   </button>
-                  {[2024, 2023, 2022, 2021].map((year) => (
+                  <button
+                    onClick={() => onFilterChange('year', '')}
+                    className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
+                      !currentFilters.year
+                        ? 'bg-blue-500 text-white'
+                        : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
+                    }`}
+                  >
+                    Any
+                  </button>
+                  {years.map((year) => (
                     <button
                       key={year}
                       onClick={() => onFilterChange('year', year.toString())}
@@ -245,17 +287,27 @@ export function FilterDrawer({
               </button>
               {expandedSections.semester && (
                 <div className="px-4 pb-3 space-y-2 bg-gray-50 flex flex-wrap gap-2">
-                  {['Sem 1', 'Sem 2'].map((sem, idx) => (
+                  <button
+                    onClick={() => onFilterChange('semester', '')}
+                    className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
+                      !currentFilters.semester
+                        ? 'bg-blue-500 text-white'
+                        : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
+                    }`}
+                  >
+                    Any
+                  </button>
+                  {semesters.map((semester) => (
                     <button
-                      key={idx}
-                      onClick={() => onFilterChange('semester', (idx + 1).toString())}
+                      key={semester}
+                      onClick={() => onFilterChange('semester', semester.toString())}
                       className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
-                        currentFilters.semester === (idx + 1).toString()
+                        currentFilters.semester === semester.toString()
                           ? 'bg-blue-500 text-white'
                           : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
                       }`}
                     >
-                      {sem}
+                      Semester {semester}
                     </button>
                   ))}
                 </div>
@@ -275,7 +327,17 @@ export function FilterDrawer({
               </button>
               {expandedSections.examType && (
                 <div className="px-4 pb-3 space-y-2 bg-gray-50 flex flex-wrap gap-2">
-                  {['Midterm', 'Final', 'Quiz'].map((type) => (
+                  <button
+                    onClick={() => onFilterChange('examType', '')}
+                    className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
+                      !currentFilters.examType
+                        ? 'bg-blue-500 text-white'
+                        : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
+                    }`}
+                  >
+                    Any
+                  </button>
+                  {examTypes.map((type) => (
                     <button
                       key={type}
                       onClick={() => onFilterChange('examType', type)}
