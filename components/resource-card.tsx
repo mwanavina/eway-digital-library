@@ -174,39 +174,6 @@ export function ResourceCard({
             <p className="text-gray-600 dark:text-gray-400 line-clamp-1">{courseName}</p>
           </div>
 
-          {/* Metadata Grid */}
-          <div className="grid grid-cols-2 gap-2 mb-4 text-xs text-gray-700 dark:text-gray-300">
-            <div className="bg-white bg-opacity-60 rounded p-2">
-              <p className="text-gray-600 font-medium">School</p>
-              <p className="text-gray-900 font-semibold line-clamp-1">{schoolName}</p>
-            </div>
-            <div className="bg-white bg-opacity-60 rounded p-2">
-              <p className="text-gray-600 font-medium">Department</p>
-              <p className="text-gray-900 font-semibold line-clamp-1">{departmentName}</p>
-            </div>
-          </div>
-
-          {/* Type-Specific Info */}
-          {resourceType === 'Past Papers' && year && (
-            <div className="bg-white bg-opacity-60 rounded p-2 mb-4 text-xs">
-              <p className="text-gray-600 font-medium">Exam Details</p>
-              <p className="text-gray-900 font-semibold">{year} Sem {semester} - {examType}</p>
-            </div>
-          )}
-
-          {['Journals', 'Research Papers'].includes(resourceType) && author && (
-            <div className="bg-white bg-opacity-60 rounded p-2 mb-4 text-xs">
-              <p className="text-gray-600 font-medium">Author</p>
-              <p className="text-gray-900 font-semibold line-clamp-1">{author}</p>
-            </div>
-          )}
-
-          {resourceType === 'Dissertations' && author && (
-            <div className="bg-white bg-opacity-60 rounded p-2 mb-4 text-xs">
-              <p className="text-gray-600 font-medium">Author</p>
-              <p className="text-gray-900 font-semibold line-clamp-1">{author}</p>
-            </div>
-          )}
         </div>
 
         {/* Action Buttons */}
