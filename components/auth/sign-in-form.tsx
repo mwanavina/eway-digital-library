@@ -42,44 +42,51 @@ export function SignInForm() {
     setError(null);
     setLoading(true);
 
-    const formData = new FormData();
+    try {
+      const formData = new FormData();
 
-    formData.append("email", values.email);
-    formData.append("password", values.password);
+      formData.append("email", values.email);
+      formData.append("password", values.password);
 
-    const result = await signIn(formData);
+      const result = await signIn(formData);
 
-    setLoading(false);
+      if (!result.success) {
+        const message = result.error ?? "Unable to sign in.";
 
-    if (!result.success) {
-      const message = result.error;
+        if (message.toLowerCase().includes("verify")) {
+          router.push(
+            `/check-email?email=${encodeURIComponent(values.email)}`
+          );
+          return;
+        }
 
-      if (message.toLowerCase().includes("verify")) {
-        router.push(
-          `/check-email?email=${encodeURIComponent(values.email)}`
-        );
+        setError(message);
         return;
       }
 
+      const profileResponse = await fetch("/api/onboarding");
+
+      if (profileResponse.ok) {
+        const data = await profileResponse.json().catch(() => null);
+
+        router.push(
+          data?.profile?.onboardingCompleted
+            ? "/"
+            : "/onboarding"
+        );
+      } else {
+        router.push("/onboarding");
+      }
+
+      router.refresh();
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "An unexpected error occurred while signing in.";
+
       setError(message);
-      return;
+    } finally {
+      setLoading(false);
     }
-
-    const profileResponse = await fetch("/api/onboarding");
-
-    if (profileResponse.ok) {
-      const data = await profileResponse.json();
-
-      router.push(
-        data.profile?.onboardingCompleted
-          ? "/"
-          : "/onboarding"
-      );
-    } else {
-      router.push("/onboarding");
-    }
-
-    router.refresh();
   }
 
   return (
