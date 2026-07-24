@@ -39,8 +39,8 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className="bg-background">
-      <body className={`${geist.variable} ${geistMono.variable} font-sans antialiased bg-background text-foreground`}>
+    <html lang="en" className="bg-background" suppressHydrationWarning>
+      <body className={`${geist.variable} ${geistMono.variable} font-sans antialiased bg-background text-foreground`} suppressHydrationWarning>
         <Suspense>
           <UTSSR />
         </Suspense>
