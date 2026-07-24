@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Trash2, Eye, AlertCircle, CheckCircle2, Clock, XCircle } from 'lucide-react';
 import { deleteDocument } from '@/app/actions/documents';
 import { PDFModal } from '@/components/pdf-modal';
+import { toast } from 'sonner';
 
 interface AdminDocumentListProps {
   documents: any[];
@@ -42,9 +43,12 @@ export function AdminDocumentList({ documents, onDelete }: AdminDocumentListProp
     try {
       await deleteDocument(docId);
       setDeleting(null);
+      toast.success('Document deleted successfully.');
       onDelete?.();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to delete document');
+      const message = err instanceof Error ? err.message : 'Failed to delete document';
+      setError(message);
+      toast.error(message);
       setDeleting(null);
     }
   };
