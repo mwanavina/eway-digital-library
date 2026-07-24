@@ -430,7 +430,7 @@ export default function Home() {
                 <button
                   key={type.id}
                   onClick={() => handleResourceTypeChange(type.id as ResourceType)}
-                  className={`px-4 py-2 rounded-full text-xs font-semibold transition-all flex-shrink-0 whitespace-nowrap ${
+                  className={`px-4 py-2 rounded-full text-xs font-semibold transition-all shrink-0 whitespace-nowrap ${
                     activeResourceType === type.id
                       ? 'bg-[#1782C5] text-white'
                       : 'bg-gray-100 text-gray-700'

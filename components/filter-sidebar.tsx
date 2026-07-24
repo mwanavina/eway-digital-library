@@ -198,7 +198,7 @@ export function FilterSidebar({ onFiltersChange, onClearFilters, isOpen = true, 
         </button>
       </div>
 
-      <div className="hidden lg:block p-4 bg-[#EDD899] border-b border-gray-200 flex-shrink-0">
+      <div className="hidden lg:block p-4 bg-[#EDD899] border-b border-gray-200 shrink-0">
         <h2 className="font-bold text-gray-800">Filters</h2>
       </div>
 
@@ -273,7 +273,7 @@ export function FilterSidebar({ onFiltersChange, onClearFilters, isOpen = true, 
       </div>
 
       {/* Clear Filters Button */}
-      <div className="sticky bottom-0 p-4 bg-white border-t border-gray-200 flex-shrink-0">
+      <div className="sticky bottom-0 p-4 bg-white border-t border-gray-200 shrink-0">
         <button
           onClick={onClearFilters}
           className="w-full py-2 px-4 bg-[#1F2557] text-white rounded-lg hover:bg-opacity-90 transition-all font-medium"

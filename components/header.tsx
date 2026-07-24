@@ -64,7 +64,7 @@ export function Header({ onSearchChange, onMenuClick, onSearchClick, onFilterCli
     <header className="sticky top-0 z-40 bg-[#1782C5] dark:bg-slate-900 text-white shadow-md dark:shadow-slate-950">
       <div className="flex items-center justify-between h-16 px-4 md:px-6 gap-4">
         {/* Logo */}
-        <div className="flex items-center gap-2.5 flex-shrink-0">
+        <div className="flex items-center gap-2.5 shrink-0">
           <div className="flex items-center justify-center overflow-hidden rounded-full bg-white/95 p-0.5 shadow-none ring-0 md:p-0.5">
             <Image
               src="/eway-logo.png"
@@ -80,7 +80,7 @@ export function Header({ onSearchChange, onMenuClick, onSearchClick, onFilterCli
         </div>
 
         {/* Right Icons - Search, Filter, Settings, User */}
-        <div className="flex items-center gap-1 flex-shrink-0">
+        <div className="flex items-center gap-1 shrink-0">
           {/* Dashboard Button - Desktop Only */}
           <Link
             href="/dashboard"
