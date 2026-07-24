@@ -490,7 +490,7 @@ export default function Home() {
               </div>
             ) : documents.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6">
-                {documents.map((doc) => (
+                {documents.map((doc: Document) => (
                   <ResourceCard
                     key={doc.id}
                     id={doc.id}
