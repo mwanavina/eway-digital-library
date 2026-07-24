@@ -184,7 +184,7 @@ export function ResourceCard({
               <button
                 onClick={handleDownload}
                 disabled={isDownloading}
-                className="flex-shrink-0 flex items-center justify-center p-2 rounded-lg font-semibold text-white transition-all"
+                className="flex-1 flex items-center justify-center p-2 rounded-lg font-semibold text-white transition-all"
                 style={{
                   backgroundColor: typeColor,
                   opacity: isDownloading ? 0.7 : 1,
@@ -196,7 +196,7 @@ export function ResourceCard({
               </button>
               <button
                 onClick={() => setIsShareModalOpen(true)}
-                className="flex-shrink-0 flex items-center justify-center p-2 rounded-lg font-semibold transition-all border text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-slate-700"
+                className="flex-1 flex items-center justify-center p-2 rounded-lg font-semibold transition-all border text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-slate-700"
                 style={{ borderColor: typeColor }}
                 title="Share resource"
                 aria-label="Share resource"
