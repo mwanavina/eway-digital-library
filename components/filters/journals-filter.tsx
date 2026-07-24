@@ -73,29 +73,31 @@ export function JournalsFilter({
     <div className="border-b border-gray-200">
       <button
         onClick={() => toggleSection(section)}
-        className="w-full px-4 py-3 text-left font-medium text-gray-900 hover:bg-gray-50 flex justify-between items-center"
+        className="w-full px-4 py-3 text-left font-semibold text-gray-900 hover:bg-gray-50 flex justify-between items-center"
       >
-        <span>{title}</span>
+        <span className="uppercase tracking-wide text-[11px] sm:text-xs">{title}</span>
         <span className={`transition-transform ${expandedSections[section as keyof typeof expandedSections] ? 'rotate-180' : ''}`}>
           ▼
         </span>
       </button>
 
       {expandedSections[section as keyof typeof expandedSections] && (
-        <div className="px-4 pb-3 space-y-2 max-h-60 overflow-y-auto bg-gray-50">
-          {options.map((option) => (
-            <label key={option.id} className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="radio"
-                name={filterKey}
-                value={option.id}
-                checked={filters[filterKey as keyof typeof filters] == option.id}
-                onChange={(e) => onFilterChange(filterKey, e.target.value)}
-                className="w-4 h-4 cursor-pointer"
-              />
-              <span className="text-sm text-gray-900">{option.name || option.code}</span>
-            </label>
-          ))}
+        <div className="px-4 pb-3 bg-gray-50/70">
+          <div className="space-y-2 max-h-60 overflow-y-auto py-1">
+            {options.map((option) => (
+              <label key={String(option.id ?? option.name)} className="flex items-center gap-2 cursor-pointer rounded-lg px-2 py-1.5 hover:bg-white/70">
+                <input
+                  type="radio"
+                  name={filterKey}
+                  value={option.id ?? option.name}
+                  checked={filters[filterKey as keyof typeof filters] == (option.id ?? option.name)}
+                  onChange={(e) => onFilterChange(filterKey, e.target.value)}
+                  className="h-4 w-4 cursor-pointer accent-[#1782C5]"
+                />
+                <span className="text-sm text-gray-900">{option.name || option.code || option.label}</span>
+              </label>
+            ))}
+          </div>
         </div>
       )}
     </div>
