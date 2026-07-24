@@ -127,26 +127,26 @@ export function ResourceCard({
   // Mobile-optimized card with large icon display
   return (
     <>
-      <div className="rounded-lg overflow-hidden border border-gray-200 dark:border-slate-700 shadow-sm hover:shadow-md dark:hover:shadow-slate-950 transition-all dark:bg-slate-900">
+      <div className="rounded-xl overflow-hidden border border-gray-200/80 dark:border-slate-700 shadow-sm hover:shadow-md dark:hover:shadow-slate-950 transition-all dark:bg-slate-900">
         {/* Card Background */}
-        <div className="p-4 dark:bg-slate-800" style={{ backgroundColor: typeBackground }}>
+        <div className="p-3 dark:bg-slate-800" style={{ backgroundColor: typeBackground }}>
           {/* Type Badge and Download Count */}
-          <div className="flex items-start justify-between mb-3">
+          <div className="flex items-start justify-between mb-2">
             <span
-              className="px-2.5 py-1 text-xs font-semibold text-white rounded-full"
+              className="px-2 py-1 text-[11px] font-semibold text-white rounded-full"
               style={{ backgroundColor: typeColor }}
             >
               {resourceType}
             </span>
             {downloadCount !== undefined && (
-              <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
+              <span className="text-[11px] font-medium text-gray-600 dark:text-gray-400">
                 {downloadCount} <span className="text-gray-500 dark:text-gray-600">↓</span>
               </span>
             )}
           </div>
 
           {/* Thumbnail Image Container */}
-          <div className="mb-4 aspect-[4/3] bg-gradient-to-b from-gray-50 to-gray-100 dark:from-slate-700 dark:to-slate-800 rounded-lg overflow-hidden border border-gray-200 dark:border-slate-700 flex items-center justify-center">
+          <div className="mb-3 aspect-[5/3] bg-gradient-to-b from-gray-50 to-gray-100 dark:from-slate-700 dark:to-slate-800 rounded-lg overflow-hidden border border-gray-200/70 dark:border-slate-700 flex items-center justify-center">
             {thumbnailUrl ? (
               <img
                 src={thumbnailUrl}
@@ -158,18 +158,18 @@ export function ResourceCard({
                 className="w-full h-full flex items-center justify-center text-white"
                 style={{ backgroundColor: typeColor }}
               >
-                <FileText size={48} className="opacity-80" />
+                <FileText size={36} className="opacity-80" />
               </div>
             )}
           </div>
 
           {/* Title */}
-          <h3 className="font-bold text-gray-900 dark:text-white text-sm line-clamp-2 mb-3">
+          <h3 className="font-semibold text-gray-900 dark:text-white text-sm line-clamp-2 mb-2">
             {title}
           </h3>
 
           {/* Course Code and Info */}
-          <div className="text-center text-xs mb-4">
+          <div className="text-center text-[11px] mb-0">
             <p className="font-semibold text-gray-900 dark:text-white">{courseCode}</p>
             <p className="text-gray-600 dark:text-gray-400 line-clamp-1">{courseName}</p>
           </div>
@@ -177,14 +177,14 @@ export function ResourceCard({
         </div>
 
         {/* Action Buttons */}
-        <div className="p-4 bg-white dark:bg-slate-800 border-t border-gray-200 dark:border-slate-700">
-          <div className="flex md:flex-col gap-2 items-stretch">
+        <div className="px-3 py-2.5 bg-white dark:bg-slate-800 border-t border-gray-200 dark:border-slate-700">
+          <div className="flex md:flex-col gap-1.5 items-stretch">
             {/* Mobile Row Layout - Icons Only for Get and Share */}
             <div className="flex md:hidden gap-2 w-full">
               <button
                 onClick={handleDownload}
                 disabled={isDownloading}
-                className="flex-shrink-0 flex items-center justify-center p-2.5 rounded-lg font-semibold text-white transition-all"
+                className="flex-shrink-0 flex items-center justify-center p-2 rounded-lg font-semibold text-white transition-all"
                 style={{
                   backgroundColor: typeColor,
                   opacity: isDownloading ? 0.7 : 1,
@@ -196,7 +196,7 @@ export function ResourceCard({
               </button>
               <button
                 onClick={() => setIsShareModalOpen(true)}
-                className="flex-shrink-0 flex items-center justify-center p-2.5 rounded-lg font-semibold transition-all border-2 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-slate-700"
+                className="flex-shrink-0 flex items-center justify-center p-2 rounded-lg font-semibold transition-all border text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-slate-700"
                 style={{ borderColor: typeColor }}
                 title="Share resource"
                 aria-label="Share resource"
@@ -205,7 +205,7 @@ export function ResourceCard({
               </button>
               <Link
                 href={`/document/${id}`}
-                className="flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg font-semibold text-sm transition-all border-2 text-gray-900 dark:text-white dark:hover:bg-slate-700"
+                className="flex-1 flex items-center justify-center gap-2 py-2 px-2.5 rounded-lg font-semibold text-sm transition-all border text-gray-900 dark:text-white dark:hover:bg-slate-700"
                 style={{ borderColor: typeColor }}
               >
                 Details
@@ -218,7 +218,7 @@ export function ResourceCard({
               <button
                 onClick={handleDownload}
                 disabled={isDownloading}
-                className="flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg font-semibold text-sm transition-all text-white"
+                className="flex-1 flex items-center justify-center gap-2 py-2 px-2.5 rounded-lg font-semibold text-sm transition-all text-white"
                 style={{
                   backgroundColor: typeColor,
                   opacity: isDownloading ? 0.7 : 1,
@@ -229,7 +229,7 @@ export function ResourceCard({
               </button>
               <button
                 onClick={() => setIsShareModalOpen(true)}
-                className="flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg font-semibold text-sm transition-all border-2 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-slate-700"
+                className="flex-1 flex items-center justify-center gap-2 py-2 px-2.5 rounded-lg font-semibold text-sm transition-all border text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-slate-700"
                 style={{ borderColor: typeColor }}
                 aria-label="Share resource"
               >
@@ -238,7 +238,7 @@ export function ResourceCard({
               </button>
               <Link
                 href={`/document/${id}`}
-                className="flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg font-semibold text-sm transition-all border-2 text-gray-900 dark:text-white dark:hover:bg-slate-700"
+                className="flex-1 flex items-center justify-center gap-2 py-2 px-2.5 rounded-lg font-semibold text-sm transition-all border text-gray-900 dark:text-white dark:hover:bg-slate-700"
                 style={{ borderColor: typeColor }}
               >
                 Details
