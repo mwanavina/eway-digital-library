@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
 
 type SectionKey = 'school' | 'department' | 'program' | 'course' | 'year' | 'semester' | 'examType';
@@ -37,6 +37,9 @@ export function PastPapersFilter({
   isOpen,
   onClose,
 }: PastPapersFilterProps) {
+  const [years, setYears] = useState<number[]>([]);
+  const [semesters, setSemesters] = useState<number[]>([]);
+  const [examTypes, setExamTypes] = useState<string[]>([]);
   const [expandedSections, setExpandedSections] = useState<Record<SectionKey, boolean>>({
     school: true,
     department: false,
@@ -59,6 +62,24 @@ export function PastPapersFilter({
     ? courses.filter((c) => c.program_id === parseInt(filters.programId))
     : [];
 
+  useEffect(() => {
+    const loadMetadata = async () => {
+      try {
+        const response = await fetch('/api/filters');
+        const data = await response.json();
+        if (data.success) {
+          setYears(data.years || data.data?.years || []);
+          setSemesters(data.semesters || data.data?.semesters || []);
+          setExamTypes(data.examTypes || data.data?.examTypes || []);
+        }
+      } catch (error) {
+        console.error('[v0] Error loading filter metadata:', error);
+      }
+    };
+
+    void loadMetadata();
+  }, []);
+
   const toggleSection = (section: SectionKey) => {
     setExpandedSections((prev) => ({
       ...prev,
@@ -71,38 +92,66 @@ export function PastPapersFilter({
     section,
     options,
     filterKey,
+    variant = 'radio',
   }: {
     title: string;
     section: SectionKey;
     options: any[];
     filterKey: string;
+    variant?: 'radio' | 'pill';
   }) => (
     <div className="border-b border-gray-200">
       <button
         onClick={() => toggleSection(section)}
-        className="w-full px-4 py-3 text-left font-medium text-gray-900 hover:bg-gray-50 flex justify-between items-center"
+        className="w-full px-4 py-3 text-left font-semibold text-gray-900 hover:bg-gray-50 flex justify-between items-center"
       >
-        <span>{title}</span>
+        <span className="uppercase tracking-wide text-[11px] sm:text-xs">{title}</span>
         <span className={`transition-transform ${expandedSections[section as keyof typeof expandedSections] ? 'rotate-180' : ''}`}>
           ▼
         </span>
       </button>
 
       {expandedSections[section as keyof typeof expandedSections] && (
-        <div className="px-4 pb-3 space-y-2 max-h-60 overflow-y-auto bg-gray-50">
-          {options.map((option) => (
-            <label key={option.id} className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="radio"
-                name={filterKey}
-                value={option.id}
-                checked={filters[filterKey as keyof typeof filters] == option.id}
-                onChange={(e) => onFilterChange(filterKey, e.target.value)}
-                className="w-4 h-4 cursor-pointer"
-              />
-              <span className="text-sm text-gray-900">{option.name || option.code}</span>
-            </label>
-          ))}
+        <div className="px-4 pb-3 bg-gray-50/70">
+          {variant === 'pill' ? (
+            <div className="flex flex-wrap gap-2">
+              {options.map((option) => {
+                const optionValue = option.value ?? option.id ?? option.name;
+                const label = option.label ?? option.name ?? option.code ?? 'Option';
+                const isActive = filters[filterKey as keyof typeof filters] == optionValue;
+
+                return (
+                  <button
+                    key={String(optionValue)}
+                    onClick={() => onFilterChange(filterKey, String(optionValue))}
+                    className={`rounded-full border px-3 py-1.5 text-sm font-medium transition-colors ${
+                      isActive
+                        ? 'border-[#1782C5] bg-[#1782C5] text-white'
+                        : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-100'
+                    }`}
+                  >
+                    {label}
+                  </button>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="space-y-2 max-h-60 overflow-y-auto py-1">
+              {options.map((option) => (
+                <label key={String(option.id ?? option.name)} className="flex items-center gap-2 cursor-pointer rounded-lg px-2 py-1.5 hover:bg-white/70">
+                  <input
+                    type="radio"
+                    name={filterKey}
+                    value={option.id ?? option.name}
+                    checked={filters[filterKey as keyof typeof filters] == (option.id ?? option.name)}
+                    onChange={(e) => onFilterChange(filterKey, e.target.value)}
+                    className="h-4 w-4 cursor-pointer accent-[#1782C5]"
+                  />
+                  <span className="text-sm text-gray-900">{option.name || option.code || option.label}</span>
+                </label>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -150,33 +199,33 @@ export function PastPapersFilter({
           title="Year"
           section="year"
           options={[
-            { id: '2024', name: '2024' },
-            { id: '2023', name: '2023' },
-            { id: '2022', name: '2022' },
-            { id: '2021', name: '2021' },
-            { id: '2020', name: '2020' },
+            { value: '', label: 'Any' },
+            ...years.map((year) => ({ value: year.toString(), label: String(year) })),
           ]}
           filterKey="year"
+          variant="pill"
         />
-        
+
         <FilterSection
           title="Semester"
           section="semester"
           options={[
-            { id: '1', name: 'Semester 1' },
-            { id: '2', name: 'Semester 2' },
+            { value: '', label: 'Any' },
+            ...semesters.map((semester) => ({ value: semester.toString(), label: `Semester ${semester}` })),
           ]}
           filterKey="semester"
+          variant="pill"
         />
-        
+
         <FilterSection
           title="Exam Type"
           section="examType"
           options={[
-            { id: 'Mid-semester', name: 'Mid-semester' },
-            { id: 'End-semester', name: 'End-semester' },
+            { value: '', label: 'Any' },
+            ...examTypes.map((type) => ({ value: type, label: type })),
           ]}
           filterKey="examType"
+          variant="pill"
         />
       </div>
 
