@@ -115,41 +115,67 @@ export function FilterDrawer({
     section,
     options,
     filterKey,
+    variant = 'radio',
   }: {
     title: string;
     section: ExpandedSection;
     options: any[];
     filterKey: string;
+    variant?: 'radio' | 'pill';
   }) => (
     <div className="border-b border-gray-200">
       <button
         onClick={() => toggleSection(section)}
-        className="w-full px-4 py-3 text-left font-medium text-gray-900 hover:bg-gray-50 flex justify-between items-center"
+        className="w-full px-4 py-3 text-left font-semibold text-gray-900 hover:bg-gray-50 flex justify-between items-center"
       >
-        <span>{title}</span>
+        <span className="uppercase tracking-wide text-[11px] sm:text-xs">{title}</span>
         <span className={`transition-transform ${expandedSections[section as keyof typeof expandedSections] ? 'rotate-180' : ''}`}>
           ▼
         </span>
       </button>
 
       {expandedSections[section as keyof typeof expandedSections] && (
-        <div className="px-4 pb-3 space-y-2 max-h-60 overflow-y-auto bg-gray-50">
+        <div className="px-4 pb-3 bg-gray-50/70">
           {options.length === 0 ? (
-            <p className="text-sm text-gray-500">No options available</p>
+            <p className="text-sm text-gray-500 py-2">No options available</p>
+          ) : variant === 'pill' ? (
+            <div className="flex flex-wrap gap-2">
+              {options.map((option) => {
+                const optionValue = option.value ?? option.id ?? option.name;
+                const label = option.label ?? option.name ?? option.code ?? option.description ?? 'Option';
+                const isActive = currentFilters[filterKey as keyof typeof currentFilters] == optionValue;
+
+                return (
+                  <button
+                    key={String(optionValue)}
+                    onClick={() => onFilterChange(filterKey, String(optionValue))}
+                    className={`rounded-full border px-3 py-1.5 text-sm font-medium transition-colors ${
+                      isActive
+                        ? 'border-[#1782C5] bg-[#1782C5] text-white'
+                        : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-100'
+                    }`}
+                  >
+                    {label}
+                  </button>
+                );
+              })}
+            </div>
           ) : (
-            options.map((option) => (
-              <label key={option.id} className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="radio"
-                  name={filterKey}
-                  value={option.id}
-                  checked={currentFilters[filterKey as keyof typeof currentFilters] == option.id}
-                  onChange={(e) => onFilterChange(filterKey, e.target.value)}
-                  className="w-4 h-4 cursor-pointer"
-                />
-                <span className="text-sm text-gray-900">{option.name || option.code}</span>
-              </label>
-            ))
+            <div className="space-y-2 max-h-60 overflow-y-auto py-1">
+              {options.map((option) => (
+                <label key={String(option.id ?? option.name)} className="flex items-center gap-2 cursor-pointer rounded-lg px-2 py-1.5 hover:bg-white/70">
+                  <input
+                    type="radio"
+                    name={filterKey}
+                    value={option.id ?? option.name}
+                    checked={currentFilters[filterKey as keyof typeof currentFilters] == (option.id ?? option.name)}
+                    onChange={(e) => onFilterChange(filterKey, e.target.value)}
+                    className="h-4 w-4 cursor-pointer accent-[#1782C5]"
+                  />
+                  <span className="text-sm text-gray-900">{option.name || option.code || option.label}</span>
+                </label>
+              ))}
+            </div>
           )}
         </div>
       )}
@@ -194,11 +220,11 @@ export function FilterDrawer({
 
         {/* Filter Sections */}
         <div className="divide-y divide-gray-200 flex-1 overflow-y-auto min-h-0">
-          <FilterSection 
+          <FilterSection
             title={`School${schools.length > 0 ? ` (${schools.length})` : ''}`}
-            section="school" 
-            options={schools} 
-            filterKey="schoolId" 
+            section="school"
+            options={schools}
+            filterKey="schoolId"
           />
           {currentFilters.schoolId && (
             <FilterSection
@@ -227,132 +253,44 @@ export function FilterDrawer({
           
           {/* Year Filter */}
           {(activeResourceType === 'all' || activeResourceType === 'past-papers') && (
-            <div className="border-b border-gray-200">
-              <button
-                onClick={() => toggleSection('year')}
-                className="w-full px-4 py-3 text-left font-medium text-gray-900 hover:bg-gray-50 flex justify-between items-center"
-              >
-                <span>YEAR</span>
-                <span className={`transition-transform ${expandedSections.year ? 'rotate-180' : ''}`}>▼</span>
-              </button>
-              {expandedSections.year && (
-                <div className="px-4 pb-3 space-y-2 bg-gray-50 flex flex-wrap gap-2">
-                  <button
-                    onClick={() => onFilterChange('year', '')}
-                    className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
-                      !currentFilters.year
-                        ? 'bg-blue-500 text-white'
-                        : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
-                    }`}
-                  >
-                    Any
-                  </button>
-                  <button
-                    onClick={() => onFilterChange('year', '')}
-                    className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
-                      !currentFilters.year
-                        ? 'bg-blue-500 text-white'
-                        : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
-                    }`}
-                  >
-                    Any
-                  </button>
-                  {years.map((year) => (
-                    <button
-                      key={year}
-                      onClick={() => onFilterChange('year', year.toString())}
-                      className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
-                        currentFilters.year === year.toString()
-                          ? 'bg-blue-500 text-white'
-                          : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
-                      }`}
-                    >
-                      {year}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
+            <FilterSection
+              title="Year"
+              section="year"
+              options={[
+                { value: '', label: 'Any' },
+                ...years.map((year) => ({ value: year.toString(), label: String(year) })),
+              ]}
+              filterKey="year"
+              variant="pill"
+            />
           )}
 
           {/* Semester Filter */}
           {(activeResourceType === 'all' || activeResourceType === 'past-papers') && (
-            <div className="border-b border-gray-200">
-              <button
-                onClick={() => toggleSection('semester')}
-                className="w-full px-4 py-3 text-left font-medium text-gray-900 hover:bg-gray-50 flex justify-between items-center"
-              >
-                <span>SEMESTER</span>
-                <span className={`transition-transform ${expandedSections.semester ? 'rotate-180' : ''}`}>▼</span>
-              </button>
-              {expandedSections.semester && (
-                <div className="px-4 pb-3 space-y-2 bg-gray-50 flex flex-wrap gap-2">
-                  <button
-                    onClick={() => onFilterChange('semester', '')}
-                    className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
-                      !currentFilters.semester
-                        ? 'bg-blue-500 text-white'
-                        : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
-                    }`}
-                  >
-                    Any
-                  </button>
-                  {semesters.map((semester) => (
-                    <button
-                      key={semester}
-                      onClick={() => onFilterChange('semester', semester.toString())}
-                      className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
-                        currentFilters.semester === semester.toString()
-                          ? 'bg-blue-500 text-white'
-                          : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
-                      }`}
-                    >
-                      Semester {semester}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
+            <FilterSection
+              title="Semester"
+              section="semester"
+              options={[
+                { value: '', label: 'Any' },
+                ...semesters.map((semester) => ({ value: semester.toString(), label: `Semester ${semester}` })),
+              ]}
+              filterKey="semester"
+              variant="pill"
+            />
           )}
 
           {/* Exam Type Filter */}
           {activeResourceType === 'past-papers' && (
-            <div className="border-b border-gray-200">
-              <button
-                onClick={() => toggleSection('examType')}
-                className="w-full px-4 py-3 text-left font-medium text-gray-900 hover:bg-gray-50 flex justify-between items-center"
-              >
-                <span>EXAM TYPE</span>
-                <span className={`transition-transform ${expandedSections.examType ? 'rotate-180' : ''}`}>▼</span>
-              </button>
-              {expandedSections.examType && (
-                <div className="px-4 pb-3 space-y-2 bg-gray-50 flex flex-wrap gap-2">
-                  <button
-                    onClick={() => onFilterChange('examType', '')}
-                    className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
-                      !currentFilters.examType
-                        ? 'bg-blue-500 text-white'
-                        : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
-                    }`}
-                  >
-                    Any
-                  </button>
-                  {examTypes.map((type) => (
-                    <button
-                      key={type}
-                      onClick={() => onFilterChange('examType', type)}
-                      className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
-                        currentFilters.examType === type
-                          ? 'bg-blue-500 text-white'
-                          : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
-                      }`}
-                    >
-                      {type}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
+            <FilterSection
+              title="Exam Type"
+              section="examType"
+              options={[
+                { value: '', label: 'Any' },
+                ...examTypes.map((type) => ({ value: type, label: type })),
+              ]}
+              filterKey="examType"
+              variant="pill"
+            />
           )}
         </div>
 
