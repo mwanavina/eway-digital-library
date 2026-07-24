@@ -69,6 +69,10 @@ export function AdminUploadForm({
     return null;
   };
 
+  const selectedResourceTypeDetails = resourceTypes.find((resourceType) => String(resourceType.id) === String(selectedResourceType));
+  const isPastPaperResource = selectedResourceTypeDetails?.name === 'Past Papers';
+  const yearOptions = Array.from({ length: 15 }, (_, index) => new Date().getFullYear() - index);
+
   // Filter departments based on school
   const filteredDepartments = selectedSchool
     ? departments.filter((d) => Number(getValue(d, ['school_id', 'schoolId'])) === Number(selectedSchool))
@@ -178,7 +182,7 @@ export function AdminUploadForm({
       return;
     }
 
-    if (Number(selectedResourceType) === 1 && !examType.trim()) {
+    if (isPastPaperResource && !examType.trim()) {
       setError('Please select an exam type for past papers');
       return;
     }
@@ -192,13 +196,13 @@ export function AdminUploadForm({
       const selectedLevelName = levels.find((l) => l.id === parseInt(selectedLevel))?.name;
 
       const result = await createDocument({
-        title: `${selectedCourseName ?? 'Document'} - ${selectedLevelName ?? ''} ${year} Sem${semester}${selectedResourceType === '1' ? ` ${examType}` : ''}`.trim(),
+        title: `${selectedCourseName ?? 'Document'} - ${selectedLevelName ?? ''} ${year} Sem${semester}${isPastPaperResource ? ` ${examType}` : ''}`.trim(),
         courseId: parseInt(selectedCourse),
         levelId: parseInt(selectedLevel),
         resourceTypeId: parseInt(selectedResourceType),
         year: parseInt(year),
         semester: parseInt(semester),
-        examType: selectedResourceType === '1' ? examType : undefined,
+        examType: isPastPaperResource ? examType : undefined,
         fileKey: pendingUpload.fileKey,
         fileUrl: pendingUpload.fileUrl,
         fileName: pendingUpload.fileName,
@@ -257,8 +261,11 @@ export function AdminUploadForm({
           <select
             value={selectedResourceType}
             onChange={(e) => {
-              setSelectedResourceType(e.target.value);
-              if (e.target.value !== '1') {
+              const nextResourceTypeId = e.target.value;
+              const nextResourceType = resourceTypes.find((resourceType) => String(resourceType.id) === String(nextResourceTypeId));
+
+              setSelectedResourceType(nextResourceTypeId);
+              if (nextResourceType?.name !== 'Past Papers') {
                 setExamType('');
               } else {
                 setExamType('Mid-semester');
@@ -366,7 +373,7 @@ export function AdminUploadForm({
             onChange={(e) => setYear(e.target.value)}
             className="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-[#1782C5] focus:border-transparent"
           >
-            {[2022, 2023, 2024, 2025, 2026].map((y) => (
+            {yearOptions.map((y) => (
               <option key={y} value={y}>
                 {y}
               </option>
@@ -385,7 +392,7 @@ export function AdminUploadForm({
             <option value="">Select a level...</option>
             {levels.map((level) => (
               <option key={level.id} value={level.id}>
-                {level.name}
+                Level {level.level_number}{level.description ? ` - ${level.description}` : ''}
               </option>
             ))}
           </select>
@@ -405,7 +412,7 @@ export function AdminUploadForm({
         </div>
       </div>
 
-      {selectedResourceType === '1' && (
+      {isPastPaperResource && (
         <div className="space-y-2">
           <label className="block text-sm font-medium text-foreground">Exam Type</label>
           <div className="flex flex-wrap gap-4">
