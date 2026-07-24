@@ -50,14 +50,21 @@ export function SignUpForm() {
     formData.append("password", values.password);
 
     startTransition(async () => {
-      const result = await signUp(formData);
+      try {
+        const result = await signUp(formData);
 
-      if (!result.success) {
-        setError(result.error ?? "Unable to create account.");
-        return;
+        if (!result.success) {
+          setError(result.error ?? "Unable to create account.");
+          return;
+        }
+
+        router.push(`/check-email?email=${encodeURIComponent(result.email)}`);
+      } catch (err) {
+        const message =
+          err instanceof Error ? err.message : "An unexpected error occurred while creating your account.";
+
+        setError(message);
       }
-
-      router.push(`/check-email?email=${encodeURIComponent(result.email)}`);
     });
   }
 
