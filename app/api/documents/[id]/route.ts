@@ -1,15 +1,18 @@
+import { getServerSession } from '@/lib/server/session';
+import { db } from '@/lib/db';
+import { courses, departments, documents, levels, programs, resourceTypes, schools, userProfiles } from '@/lib/db/schema';
+import { eq, sql } from 'drizzle-orm';
+
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> | { id: string } }
 ) {
   try {
-    // Handle both async and sync params
     const resolvedParams = await Promise.resolve(params);
     const id = resolvedParams.id;
-    
-    const documentId = parseInt(id);
+    const documentId = Number.parseInt(id, 10);
 
-    if (isNaN(documentId) || !id) {
+    if (!id || Number.isNaN(documentId)) {
       return new Response(
         JSON.stringify({
           success: false,
@@ -19,64 +22,62 @@ export async function GET(
       );
     }
 
-    // Mock documents
-    const mockDocuments: { [key: number]: any } = {
-      1: {
-        id: 1,
-        title: "Calculus I Mid-term Examination 2024",
-        course_code: "MATH101",
-        course_name: "Calculus I",
-        year: 2024,
-        semester: 1,
-        exam_type: "semester",
-        school_name: "School of Science",
-        department_name: "Mathematics",
-        file_path: "https://example.com/papers/calc1-midterm-2024.pdf",
-        download_count: 145,
-        resource_type_name: "Past Papers",
-        author: null,
-        publication_date: null,
-        abstract: null,
-      },
-      2: {
-        id: 2,
-        title: "Applied Calculus in Engineering Simulations",
-        course_code: "ENG201",
-        course_name: "Engineering Mathematics",
-        year: 2023,
-        semester: 2,
-        exam_type: "final",
-        school_name: "School of Engineering",
-        department_name: "Civil Engineering",
-        file_path: "https://example.com/journals/applied-calc-eng.pdf",
-        download_count: 82,
-        resource_type_name: "Journal",
-        author: "Dr. A. Phiri",
-        publication_date: "2023-06-15",
-        abstract: "An exploration of calculus applications in modern engineering projects.",
-      },
-      3: {
-        id: 3,
-        title: "Numerical Methods in Differential Calculus",
-        course_code: "MATH201",
-        course_name: "Numerical Methods",
-        year: 2022,
-        semester: 1,
-        exam_type: "continuous",
-        school_name: "School of Science",
-        department_name: "Mathematics",
-        file_path: "https://example.com/dissertations/numerical-methods.pdf",
-        download_count: 37,
-        resource_type_name: "Dissertations",
-        author: "C. Banda",
-        publication_date: "2022-05-20",
-        abstract: "A comprehensive study on numerical approaches to solving differential equations.",
-      },
-    };
+    const session = await getServerSession();
+    const user = session?.user;
 
-    const document = mockDocuments[documentId];
+    const profileRows = user?.id
+      ? await db
+          .select({ levelId: userProfiles.levelId })
+          .from(userProfiles)
+          .where(eq(userProfiles.userId, user.id))
+          .limit(1)
+      : [];
+
+    const userLevelId = profileRows[0]?.levelId ?? null;
+    const isAdmin = user?.role === 'admin';
+
+    const rows = await db
+      .select({
+        id: documents.id,
+        title: documents.title,
+        course_code: courses.code,
+        course_name: courses.name,
+        year: documents.year,
+        semester: documents.semester,
+        exam_type: documents.examType,
+        school_name: schools.name,
+        department_name: departments.name,
+        file_path: documents.filePath,
+        download_count: documents.downloadCount,
+        resource_type_name: resourceTypes.name,
+        author: sql<string | null>`NULL`,
+        publication_date: sql<string | null>`NULL`,
+        abstract: sql<string | null>`NULL`,
+        level_id: documents.levelId,
+      })
+      .from(documents)
+      .leftJoin(courses, eq(documents.courseId, courses.id))
+      .leftJoin(programs, eq(courses.programId, programs.id))
+      .leftJoin(departments, eq(programs.departmentId, departments.id))
+      .leftJoin(schools, eq(departments.schoolId, schools.id))
+      .leftJoin(resourceTypes, eq(documents.resourceTypeId, resourceTypes.id))
+      .leftJoin(levels, eq(documents.levelId, levels.id))
+      .where(eq(documents.id, documentId))
+      .limit(1);
+
+    const document = rows[0];
 
     if (!document) {
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: 'Document not found',
+        }),
+        { status: 404 }
+      );
+    }
+
+    if (!isAdmin && userLevelId !== null && document.level_id !== userLevelId) {
       return new Response(
         JSON.stringify({
           success: false,
