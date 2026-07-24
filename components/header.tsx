@@ -32,6 +32,7 @@ interface UserSessionProps {
     emailVerified: boolean;
     name: string;
     image?: string | null | undefined;
+    role?: string;
   };
 }
 
@@ -40,6 +41,8 @@ export function Header({ onSearchChange, onMenuClick, onSearchClick, onFilterCli
   const [searchQuery, setSearchQuery] = useState('');
   const { data: session } = authClient.useSession();
   const currentUser = UserSession?.user ?? session?.user;
+  const userRole = (session?.user as { role?: string } | undefined)?.role ?? UserSession?.user?.role;
+  const isAdmin = userRole === 'admin';
 
   const handleSearchChange = (value: string) => {
     setSearchQuery(value);
@@ -89,14 +92,16 @@ export function Header({ onSearchChange, onMenuClick, onSearchClick, onFilterCli
           </Link>
 
           {/* Admin Dashboard Button - Desktop Only */}
-          <Link
-            href="/admin"
-            className="hidden md:flex items-center gap-2 px-3 py-2 hover:bg-[#1F2557] dark:hover:bg-slate-700 rounded-lg transition-colors"
-            aria-label="Admin"
-          >
-            <Shield size={18} />
-            <span className="text-sm font-medium">Admin</span>
-          </Link>
+          {isAdmin && (
+            <Link
+              href="/admin"
+              className="hidden md:flex items-center gap-2 px-3 py-2 hover:bg-[#1F2557] dark:hover:bg-slate-700 rounded-lg transition-colors"
+              aria-label="Admin"
+            >
+              <Shield size={18} />
+              <span className="text-sm font-medium">Admin</span>
+            </Link>
+          )}
 
           {/* Search Button - Mobile */}
           <button
