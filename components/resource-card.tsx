@@ -46,10 +46,9 @@ export function ResourceCard({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
-  const isExternalPdf = filePath && (filePath.startsWith('http') || filePath.startsWith('https'));
 
   const handleCardClick = () => {
-    if (isExternalPdf) {
+    if (filePath) {
       setIsModalOpen(true);
     }
   };
@@ -127,7 +126,18 @@ export function ResourceCard({
   // Mobile-optimized card with large icon display
   return (
     <>
-      <div className="rounded-xl overflow-hidden border border-gray-200/80 dark:border-slate-700 shadow-sm hover:shadow-md dark:hover:shadow-slate-950 transition-all dark:bg-slate-900">
+      <div
+        className="rounded-xl overflow-hidden border border-gray-200/80 dark:border-slate-700 shadow-sm hover:shadow-md dark:hover:shadow-slate-950 transition-all dark:bg-slate-900 cursor-pointer"
+        onClick={handleCardClick}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            handleCardClick();
+          }
+        }}
+      >
         {/* Card Background */}
         <div className="p-3 dark:bg-slate-800" style={{ backgroundColor: typeBackground }}>
           {/* Type Badge and Download Count */}
@@ -182,7 +192,10 @@ export function ResourceCard({
             {/* Mobile Row Layout - Icons Only for Get and Share */}
             <div className="flex md:hidden gap-2 w-full">
               <button
-                onClick={handleDownload}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  handleDownload(event);
+                }}
                 disabled={isDownloading}
                 className="flex-1 flex items-center justify-center p-2 rounded-lg font-semibold text-white transition-all"
                 style={{
@@ -195,7 +208,10 @@ export function ResourceCard({
                 <Download size={18} />
               </button>
               <button
-                onClick={() => setIsShareModalOpen(true)}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  setIsShareModalOpen(true);
+                }}
                 className="flex-1 flex items-center justify-center p-2 rounded-lg font-semibold transition-all border text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-slate-700"
                 style={{ borderColor: typeColor }}
                 title="Share resource"
@@ -205,6 +221,7 @@ export function ResourceCard({
               </button>
               <Link
                 href={`/document/${id}`}
+                onClick={(event) => event.stopPropagation()}
                 className="flex-1 flex items-center justify-center gap-2 py-2 px-2.5 rounded-lg font-semibold text-sm transition-all border text-gray-900 dark:text-white dark:hover:bg-slate-700"
                 style={{ borderColor: typeColor }}
               >
@@ -216,7 +233,10 @@ export function ResourceCard({
             {/* Desktop Layout - Single Row */}
             <div className="hidden md:flex gap-2 w-full">
               <button
-                onClick={handleDownload}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  handleDownload(event);
+                }}
                 disabled={isDownloading}
                 className="flex-1 flex items-center justify-center gap-2 py-2 px-2.5 rounded-lg font-semibold text-sm transition-all text-white"
                 style={{
@@ -228,7 +248,10 @@ export function ResourceCard({
                 {isDownloading ? 'Loading...' : 'Get'}
               </button>
               <button
-                onClick={() => setIsShareModalOpen(true)}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  setIsShareModalOpen(true);
+                }}
                 className="flex-1 flex items-center justify-center gap-2 py-2 px-2.5 rounded-lg font-semibold text-sm transition-all border text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-slate-700"
                 style={{ borderColor: typeColor }}
                 aria-label="Share resource"
@@ -238,6 +261,7 @@ export function ResourceCard({
               </button>
               <Link
                 href={`/document/${id}`}
+                onClick={(event) => event.stopPropagation()}
                 className="flex-1 flex items-center justify-center gap-2 py-2 px-2.5 rounded-lg font-semibold text-sm transition-all border text-gray-900 dark:text-white dark:hover:bg-slate-700"
                 style={{ borderColor: typeColor }}
               >
