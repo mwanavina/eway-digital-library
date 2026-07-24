@@ -69,6 +69,11 @@ export function AdminUploadForm({
     return null;
   };
 
+  const selectClassName =
+    'w-full px-4 py-2.5 border border-slate-300 bg-white text-slate-900 rounded-lg shadow-sm focus:ring-2 focus:ring-[#1782C5] focus:border-transparent dark:border-slate-700 dark:bg-slate-900 dark:text-slate-50 disabled:cursor-not-allowed disabled:border-slate-300 disabled:bg-slate-100 disabled:text-slate-500 dark:disabled:border-slate-700 dark:disabled:bg-slate-800 dark:disabled:text-slate-400';
+
+  const labelClassName = 'block text-sm font-semibold text-slate-700 dark:text-slate-200';
+
   const selectedResourceTypeDetails = resourceTypes.find((resourceType) => String(resourceType.id) === String(selectedResourceType));
   const isPastPaperResource = selectedResourceTypeDetails?.name === 'Past Papers';
   const yearOptions = Array.from({ length: 15 }, (_, index) => new Date().getFullYear() - index);
@@ -257,7 +262,7 @@ export function AdminUploadForm({
       <div className="grid md:grid-cols-2 gap-4">
         {/* Resource Type Selection */}
         <div className="space-y-2">
-          <label className="block text-sm font-medium text-foreground">Resource Type</label>
+          <label className={labelClassName}>Resource Type</label>
           <select
             value={selectedResourceType}
             onChange={(e) => {
@@ -271,7 +276,7 @@ export function AdminUploadForm({
                 setExamType('Mid-semester');
               }
             }}
-            className="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-[#1782C5] focus:border-transparent"
+            className={selectClassName}
           >
             <option value="">Select a resource type...</option>
             {resourceTypes.map((resourceType) => (
@@ -284,7 +289,7 @@ export function AdminUploadForm({
 
         {/* School Selection */}
         <div className="space-y-2">
-          <label className="block text-sm font-medium text-foreground">School</label>
+          <label className={labelClassName}>School</label>
           <select
             value={selectedSchool}
             onChange={(e) => {
@@ -293,7 +298,7 @@ export function AdminUploadForm({
               setSelectedProgram('');
               setSelectedCourse('');
             }}
-            className="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-[#1782C5] focus:border-transparent"
+            className={selectClassName}
           >
             <option value="">Select a school...</option>
             {schools.map((school) => (
@@ -306,7 +311,7 @@ export function AdminUploadForm({
 
         {/* Department Selection */}
         <div className="space-y-2">
-          <label className="block text-sm font-medium text-foreground">Department</label>
+          <label className={labelClassName}>Department</label>
           <select
             value={selectedDepartment}
             onChange={(e) => {
@@ -315,7 +320,7 @@ export function AdminUploadForm({
               setSelectedCourse('');
             }}
             disabled={!selectedSchool}
-            className="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-[#1782C5] focus:border-transparent disabled:bg-muted disabled:text-muted-foreground"
+            className={selectClassName}
           >
             <option value="">Select a department...</option>
             {filteredDepartments.map((dept) => (
@@ -328,7 +333,7 @@ export function AdminUploadForm({
 
         {/* Program Selection */}
         <div className="space-y-2">
-          <label className="block text-sm font-medium text-foreground">Program</label>
+          <label className={labelClassName}>Program</label>
           <select
             value={selectedProgram}
             onChange={(e) => {
@@ -336,7 +341,7 @@ export function AdminUploadForm({
               setSelectedCourse('');
             }}
             disabled={!selectedDepartment}
-            className="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-[#1782C5] focus:border-transparent disabled:bg-muted disabled:text-muted-foreground"
+            className={selectClassName}
           >
             <option value="">Select a program...</option>
             {filteredPrograms.map((prog) => (
@@ -349,12 +354,12 @@ export function AdminUploadForm({
 
         {/* Course Selection */}
         <div className="space-y-2">
-          <label className="block text-sm font-medium text-foreground">Course</label>
+          <label className={labelClassName}>Course</label>
           <select
             value={selectedCourse}
             onChange={(e) => setSelectedCourse(e.target.value)}
             disabled={!selectedProgram}
-            className="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-[#1782C5] focus:border-transparent disabled:bg-muted disabled:text-muted-foreground"
+            className={selectClassName}
           >
             <option value="">Select a course...</option>
             {filteredCourses.map((course) => (
@@ -367,11 +372,11 @@ export function AdminUploadForm({
 
         {/* Year Selection */}
         <div className="space-y-2">
-          <label className="block text-sm font-medium text-foreground">Year</label>
+          <label className={labelClassName}>Year</label>
           <select
             value={year}
             onChange={(e) => setYear(e.target.value)}
-            className="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-[#1782C5] focus:border-transparent"
+            className={selectClassName}
           >
             {yearOptions.map((y) => (
               <option key={y} value={y}>
@@ -383,11 +388,11 @@ export function AdminUploadForm({
 
         {/* Level Selection */}
         <div className="space-y-2">
-          <label className="block text-sm font-medium text-foreground">Level</label>
+          <label className={labelClassName}>Level</label>
           <select
             value={selectedLevel}
             onChange={(e) => setSelectedLevel(e.target.value)}
-            className="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-[#1782C5] focus:border-transparent"
+            className={selectClassName}
           >
             <option value="">Select a level...</option>
             {levels.map((level) => (
@@ -400,11 +405,11 @@ export function AdminUploadForm({
 
         {/* Semester Selection */}
         <div className="space-y-2">
-          <label className="block text-sm font-medium text-foreground">Semester</label>
+          <label className={labelClassName}>Semester</label>
           <select
             value={semester}
             onChange={(e) => setSemester(e.target.value)}
-            className="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-[#1782C5] focus:border-transparent"
+            className={selectClassName}
           >
             <option value="1">Semester 1</option>
             <option value="2">Semester 2</option>
