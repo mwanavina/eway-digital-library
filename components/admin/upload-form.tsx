@@ -5,6 +5,7 @@ import { Upload, AlertCircle } from 'lucide-react';
 import { UploadButton, UploadDropzone } from "@/utils/uploadthing";
 import { createDocument } from '@/app/actions/documents';
 import { genUploader } from 'uploadthing/client';
+import { toast } from 'sonner';
 
 const { uploadFiles } = genUploader();
 
@@ -122,6 +123,7 @@ export function AdminUploadForm({
   const handleUploadComplete = async (res: any) => {
     if (!res || !res[0]) {
       setError('Upload failed');
+      toast.error('Upload failed. Please try again.');
       return;
     }
 
@@ -158,9 +160,12 @@ export function AdminUploadForm({
         thumbnailUrl,
       });
       setSuccess('PDF uploaded and thumbnail generated. Review below, then click Save to persist to the database.');
+      toast.success('PDF uploaded. Review and save the document to finish.');
     } catch (err) {
       console.error(err);
-      setError(err instanceof Error ? err.message : 'Failed to generate thumbnail');
+      const message = err instanceof Error ? err.message : 'Failed to generate thumbnail';
+      setError(message);
+      toast.error(message);
     } finally {
       setIsUploading(false);
     }
@@ -216,6 +221,7 @@ export function AdminUploadForm({
 
       if (result.success) {
         setSuccess('Document saved successfully.');
+        toast.success('Document saved successfully.');
         setPendingUpload(null);
         setSelectedSchool('');
         setSelectedDepartment('');
@@ -231,10 +237,14 @@ export function AdminUploadForm({
           onSuccess?.();
         }, 1000);
       } else {
-        setError(result.error ?? 'Failed to save document');
+        const message = result.error ?? 'Failed to save document';
+        setError(message);
+        toast.error(message);
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to save document');
+      const message = err instanceof Error ? err.message : 'Failed to save document';
+      setError(message);
+      toast.error(message);
     } finally {
       setIsSaving(false);
     }
