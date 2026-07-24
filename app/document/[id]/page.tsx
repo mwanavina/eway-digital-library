@@ -20,9 +20,9 @@ interface DocumentDetail {
   file_path: string;
   download_count?: number;
   resource_type_name?: string;
-  author?: string;
-  publication_date?: string;
-  abstract?: string;
+  author?: string | null;
+  publication_date?: string | null;
+  abstract?: string | null;
 }
 
 export default function DocumentDetailPage() {
@@ -53,27 +53,28 @@ export default function DocumentDetailPage() {
     }
   }, [id]);
 
+  const handlePreview = () => {
+    if (!document) return;
+    window.open(document.file_path, '_blank', 'noopener,noreferrer');
+  };
+
   const handleDownload = async () => {
     if (!document) return;
-    
+
     setIsDownloading(true);
     try {
-      // Track the download via API
       fetch('/api/documents/track-download', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ documentId: document.id }),
       }).catch(err => console.error('[v0] Error tracking download:', err));
 
-      // Fetch the PDF as a blob
       const response = await fetch(document.file_path);
       if (!response.ok) {
         throw new Error('Failed to download PDF');
       }
 
       const blob = await response.blob();
-
-      // Create a blob URL and trigger download
       const blobUrl = window.URL.createObjectURL(blob);
       const link = globalThis.document.createElement('a');
       link.href = blobUrl;
@@ -82,8 +83,6 @@ export default function DocumentDetailPage() {
       link.click();
       globalThis.document.body.removeChild(link);
       window.URL.revokeObjectURL(blobUrl);
-
-      console.log('[v0] PDF downloaded:', document.title);
     } catch (error) {
       console.error('[v0] Error downloading PDF:', error);
       alert('Failed to download PDF. Please try again.');
@@ -316,11 +315,17 @@ export default function DocumentDetailPage() {
 
         {/* Action Buttons */}
         <div className="grid grid-cols-3 gap-3 mb-6">
-          <button className="flex flex-col items-center gap-1 py-3 px-2 rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors">
+          <button
+            onClick={handlePreview}
+            className="flex flex-col items-center gap-1 py-3 px-2 rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors"
+          >
             <Eye size={20} className="text-gray-700" />
             <span className="text-xs text-gray-700">Preview</span>
           </button>
-          <button className="flex flex-col items-center gap-1 py-3 px-2 rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors">
+          <button
+            onClick={handlePreview}
+            className="flex flex-col items-center gap-1 py-3 px-2 rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors"
+          >
             <Eye size={20} className="text-gray-700" />
             <span className="text-xs text-gray-700">PDF</span>
           </button>
