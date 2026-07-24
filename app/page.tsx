@@ -130,10 +130,10 @@ export default function Home() {
         const response = await fetch('/api/filters');
         const data = await response.json();
         if (data.success) {
-          setSchools(data.schools || []);
-          setDepartments(data.departments || []);
-          setPrograms(data.programs || []);
-          setCourses(data.courses || []);
+          setSchools(data.schools || data.data?.schools || []);
+          setDepartments(data.departments || data.data?.departments || []);
+          setPrograms(data.programs || data.data?.programs || []);
+          setCourses(data.courses || data.data?.courses || []);
         }
       } catch (error) {
         console.error('[v0] Error fetching filter options:', error);
