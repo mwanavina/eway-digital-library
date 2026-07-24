@@ -43,10 +43,10 @@ type ResourceType = 'all' | 'past-papers' | 'journals' | 'dissertations' | 'cour
 const RESOURCE_TYPES = [
   { id: 'all', name: 'All Resources', icon: FileText, color: '#6B7280' },
   { id: 'past-papers', name: 'Past Papers', icon: FileText, color: '#1782C5' },
-  { id: 'journals', name: 'Journals', icon: BookOpen, color: '#1F2557' },
-  { id: 'dissertations', name: 'Dissertations', icon: Book, color: '#8B5A8F' },
+  // { id: 'journals', name: 'Journals', icon: BookOpen, color: '#1F2557' },
+  // { id: 'dissertations', name: 'Dissertations', icon: Book, color: '#8B5A8F' },
   { id: 'course-outlines', name: 'Course Outlines', icon: ClipboardList, color: '#F59E0B' },
-  { id: 'research-papers', name: 'Research Papers', icon: Microscope, color: '#10B981' },
+  // { id: 'research-papers', name: 'Research Papers', icon: Microscope, color: '#10B981' },
 ];
 
 export default function Home() {
@@ -419,8 +419,8 @@ export default function Home() {
               {[
                 { id: 'all', label: 'All' },
                 { id: 'past-papers', label: 'Past Papers' },
-                { id: 'journals', label: 'Journals' },
-                { id: 'dissertations', label: 'Dissertations' },
+                // { id: 'journals', label: 'Journals' },
+                // { id: 'dissertations', label: 'Dissertations' },
                 { id: 'course-outlines', label: 'Course Outlines' },
               ].map((type) => (
                 <button
@@ -465,7 +465,7 @@ export default function Home() {
                   {documents.length.toLocaleString()} results for {searchQuery ? `"${searchQuery}"` : 'all resources'}
                 </p>
               </div>
-              <div className="hidden md:flex items-center gap-3">
+              {/* <div className="hidden md:flex items-center gap-3">
                 <select className="px-3 py-1 border border-gray-300 rounded text-sm text-gray-700 bg-white">
                   <option>Sort by</option>
                   <option>Most downloaded</option>
@@ -476,7 +476,7 @@ export default function Home() {
                   <option>Most downloaded</option>
                   <option>Least downloaded</option>
                 </select>
-              </div>
+              </div> */}
             </div>
 
             {/* Documents Grid - 1 Column on Mobile, 2 on Desktop */}
