@@ -489,7 +489,7 @@ export default function Home() {
                 <Spinner />
               </div>
             ) : documents.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6">
                 {documents.map((doc) => (
                   <ResourceCard
                     key={doc.id}

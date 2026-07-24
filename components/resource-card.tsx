@@ -146,12 +146,12 @@ export function ResourceCard({
           </div>
 
           {/* Thumbnail Image Container */}
-          <div className="mb-4 aspect-square bg-gradient-to-b from-gray-50 to-gray-100 dark:from-slate-700 dark:to-slate-800 rounded-lg overflow-hidden border border-gray-200 dark:border-slate-700 flex items-center justify-center">
+          <div className="mb-4 aspect-[4/3] bg-gradient-to-b from-gray-50 to-gray-100 dark:from-slate-700 dark:to-slate-800 rounded-lg overflow-hidden border border-gray-200 dark:border-slate-700 flex items-center justify-center">
             {thumbnailUrl ? (
               <img
                 src={thumbnailUrl}
                 alt={title}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover object-center"
               />
             ) : (
               <div
