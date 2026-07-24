@@ -78,13 +78,11 @@ export default function Home() {
     examType: '',
   });
 
-  // Fetch documents based on current filters and search
   const fetchDocuments = useCallback(async () => {
     setLoading(true);
     try {
       const params = new URLSearchParams();
 
-      // Add resource type filter
       if (activeResourceType !== 'all') {
         const typeMap: { [key: string]: string } = {
           'past-papers': 'Past Papers',
@@ -96,16 +94,19 @@ export default function Home() {
         params.append('resourceType', typeMap[activeResourceType]);
       }
 
-      // Add other filters
       if (filters.schoolId) params.append('schoolId', filters.schoolId);
       if (filters.departmentId) params.append('departmentId', filters.departmentId);
+      if (filters.programId) params.append('programId', filters.programId);
       if (filters.courseId) params.append('courseId', filters.courseId);
+      if (filters.levelId) params.append('levelId', filters.levelId);
       if (filters.year) params.append('year', filters.year);
       if (filters.semester) params.append('semester', filters.semester);
       if (filters.examType) params.append('examType', filters.examType);
       if (searchQuery) params.append('search', searchQuery);
 
-      const response = await fetch(`/api/documents?${params.toString()}`);
+      const response = await fetch(`/api/documents?${params.toString()}`, {
+        cache: 'no-store',
+      });
       const data = await response.json();
 
       if (data.success) {
@@ -118,10 +119,9 @@ export default function Home() {
     }
   }, [filters, searchQuery, activeResourceType]);
 
-  // Fetch documents on mount
   useEffect(() => {
     fetchDocuments();
-  }, []);
+  }, [fetchDocuments]);
 
   // Fetch filter options on mount
   useEffect(() => {
@@ -177,12 +177,16 @@ export default function Home() {
     });
   };
 
-  // Fetch documents when filters or search change (with debounce)
   useEffect(() => {
+    const shouldFetch = searchQuery || Object.values(filters).some((v) => v !== '') || activeResourceType !== 'all';
+
+    if (!shouldFetch) {
+      void fetchDocuments();
+      return;
+    }
+
     const debounceTimer = setTimeout(() => {
-      if (searchQuery || Object.values(filters).some((v) => v !== '') || activeResourceType !== 'all') {
-        fetchDocuments();
-      }
+      void fetchDocuments();
     }, 300);
 
     return () => clearTimeout(debounceTimer);
