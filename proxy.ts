@@ -22,8 +22,12 @@ export async function proxy(request: NextRequest) {
 			return NextResponse.redirect(new URL(isAdmin ? "/admin" : "/", request.url));
 		}
 
-		// Admin users accessing root or dashboard -> redirect to /admin
-		if (isAdmin && (path === "/" || path.startsWith("/dashboard"))) {
+		// Admin users can browse the public home page, but dashboard routes still go to the admin workspace.
+		if (isAdmin && path === "/") {
+			return NextResponse.next();
+		}
+
+		if (isAdmin && path.startsWith("/dashboard")) {
 			return NextResponse.redirect(new URL("/admin", request.url));
 		}
 
