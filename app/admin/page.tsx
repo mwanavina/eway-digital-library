@@ -38,6 +38,7 @@ import { AdminModal } from '@/components/admin/admin-modal';
 import { ConfirmDialog } from '@/components/admin/confirm-dialog';
 import { AdminForm } from '@/components/admin/admin-form';
 import { Tab, AdminItem, AdminFormData } from '@/components/admin/admin-types';
+import { toast } from 'sonner';
 
 export default function AdminPage() {
   const router = useRouter();
@@ -140,46 +141,60 @@ export default function AdminPage() {
     setLoading(true);
 
     try {
+      let itemLabel = 'item';
+
       if (editingItem) {
         switch (activeTab) {
           case 'schools':
             await updateSchool(editingItem.id, data.name ?? '');
+            itemLabel = 'school';
             break;
           case 'departments':
             await updateDepartment(editingItem.id, data.name ?? '', Number.parseInt(data.school_id ?? '0', 10));
+            itemLabel = 'department';
             break;
           case 'programs':
             await updateProgram(editingItem.id, data.name ?? '', Number.parseInt(data.department_id ?? '0', 10));
+            itemLabel = 'program';
             break;
           case 'courses':
             await updateCourse(editingItem.id, data.code ?? '', data.name ?? '', Number.parseInt(data.program_id ?? '0', 10));
+            itemLabel = 'course';
             break;
           case 'levels':
             await updateLevel(editingItem.id, Number.parseInt(data.level_number ?? '0', 10), data.description ?? '');
+            itemLabel = 'level';
             break;
           case 'resource-types':
             await updateResourceType(editingItem.id, data.name ?? '', data.description ?? '');
+            itemLabel = 'resource type';
             break;
         }
       } else {
         switch (activeTab) {
           case 'schools':
             await createSchool({ name: data.name ?? '' });
+            itemLabel = 'school';
             break;
           case 'departments':
             await createDepartment({ name: data.name ?? '', schoolId: Number.parseInt(data.school_id ?? '0', 10) });
+            itemLabel = 'department';
             break;
           case 'programs':
             await createProgram({ name: data.name ?? '', departmentId: Number.parseInt(data.department_id ?? '0', 10) });
+            itemLabel = 'program';
             break;
           case 'courses':
             await createCourse({ code: data.code ?? '', name: data.name ?? '', programId: Number.parseInt(data.program_id ?? '0', 10) });
+            itemLabel = 'course';
             break;
           case 'levels':
             await createLevel({ levelNumber: Number.parseInt(data.level_number ?? '0', 10), description: data.description ?? '' });
+            itemLabel = 'level';
             break;
           case 'resource-types':
             await createResourceType({ name: data.name ?? '', description: data.description ?? '' });
+            itemLabel = 'resource type';
             break;
         }
       }
@@ -188,8 +203,10 @@ export default function AdminPage() {
       setIsModalOpen(false);
       setFormData({});
       setEditingItem(null);
+      toast.success(editingItem ? `Updated ${itemLabel} successfully.` : `Created ${itemLabel} successfully.`);
     } catch (error) {
       console.error('[v0] Error:', error);
+      toast.error(editingItem ? 'Failed to update the selected item.' : 'Failed to create the selected item.');
     } finally {
       setLoading(false);
     }
@@ -200,31 +217,41 @@ export default function AdminPage() {
     setLoading(true);
 
     try {
+      let itemLabel = 'item';
+
       switch (activeTab) {
         case 'schools':
           await deleteSchool(confirmDelete.id);
+          itemLabel = 'school';
           break;
         case 'departments':
           await deleteDepartment(confirmDelete.id);
+          itemLabel = 'department';
           break;
         case 'programs':
           await deleteProgram(confirmDelete.id);
+          itemLabel = 'program';
           break;
         case 'courses':
           await deleteCourse(confirmDelete.id);
+          itemLabel = 'course';
           break;
         case 'levels':
           await deleteLevel(confirmDelete.id);
+          itemLabel = 'level';
           break;
         case 'resource-types':
           await deleteResourceType(confirmDelete.id);
+          itemLabel = 'resource type';
           break;
       }
 
       await Promise.all([loadAllData(), loadDocuments()]);
       setConfirmDelete(null);
+      toast.success(`Deleted ${itemLabel} successfully.`);
     } catch (error) {
       console.error('[v0] Error:', error);
+      toast.error('Failed to delete the selected item.');
     } finally {
       setLoading(false);
     }
