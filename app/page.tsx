@@ -577,8 +577,17 @@ export default function Home() {
                       key={doc.id}
                       type="button"
                       onClick={() => setSelectedDocument(doc)}
-                      className="flex w-full items-center justify-between rounded-xl border border-gray-200 bg-white p-4 text-left shadow-sm transition hover:border-[#1782C5] hover:shadow-md dark:border-slate-800 dark:bg-slate-900"
+                      className="flex w-full items-center gap-3 rounded-xl border border-gray-200 bg-white p-3 text-left shadow-sm transition hover:border-[#1782C5] hover:shadow-md dark:border-slate-800 dark:bg-slate-900"
                     >
+                      <div className="h-14 w-14 shrink-0 overflow-hidden rounded-lg border border-gray-200 bg-gray-50 dark:border-slate-700 dark:bg-slate-800">
+                        {doc.thumbnail_url ? (
+                          <img src={doc.thumbnail_url} alt={doc.title} className="h-full w-full object-cover" />
+                        ) : (
+                          <div className="flex h-full w-full items-center justify-center bg-[#1782C5]/10 text-[#1782C5]">
+                            <FileText size={20} />
+                          </div>
+                        )}
+                      </div>
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-sm font-semibold text-gray-900 dark:text-slate-100">{doc.title}</p>
                         <p className="mt-1 text-xs text-gray-600 dark:text-slate-400">
@@ -588,7 +597,7 @@ export default function Home() {
                           {doc.school_name} • {doc.department_name}
                         </p>
                       </div>
-                      <div className="ml-4 rounded-full bg-[#1782C5]/10 px-2.5 py-1 text-[11px] font-semibold text-[#1782C5]">
+                      <div className="ml-2 shrink-0 rounded-full bg-[#1782C5]/10 px-2.5 py-1 text-[11px] font-semibold text-[#1782C5]">
                         {doc.resource_type_name || 'Document'}
                       </div>
                     </button>
