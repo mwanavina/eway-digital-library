@@ -23,24 +23,34 @@ interface SearchDocument {
   download_count?: number | null;
 }
 
+interface ResourceTypeCount {
+  resourceTypeName: string | null;
+  count: number;
+}
+
 interface SearchPageClientProps {
   initialQuery: string;
   initialResults: SearchDocument[];
+  resourceTypeCounts: ResourceTypeCount[];
 }
 
-export function SearchPageClient({ initialQuery, initialResults }: SearchPageClientProps) {
+export function SearchPageClient({ initialQuery, initialResults, resourceTypeCounts }: SearchPageClientProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [searchQuery, setSearchQuery] = useState(initialQuery);
   const [selectedDocument, setSelectedDocument] = useState<SearchDocument | null>(null);
 
-  const resourceTypes = useMemo(() => [
-    { id: 'past-papers', label: 'Past Papers', icon: FileText, color: '#4A90E2', count: 548 },
-    { id: 'journals', label: 'Journals', icon: Book, color: '#50C878', count: 214 },
-    { id: 'dissertations', label: 'Dissertations', icon: BookOpen, color: '#9B59B6', count: 187 },
-    { id: 'course-outlines', label: 'Course Outlines', icon: GraduationCap, color: '#F39C12', count: 299 },
-  ], []);
+  const resourceTypes = useMemo(() => {
+    const countMap = new Map(resourceTypeCounts.map((item) => [item.resourceTypeName?.toLowerCase(), item.count]));
+
+    return [
+      { id: 'past-papers', label: 'Past Papers', icon: FileText, color: '#4A90E2', count: countMap.get('past papers') ?? 0 },
+      { id: 'journals', label: 'Journals', icon: Book, color: '#50C878', count: countMap.get('journals') ?? 0 },
+      { id: 'dissertations', label: 'Dissertations', icon: BookOpen, color: '#9B59B6', count: countMap.get('dissertations') ?? 0 },
+      { id: 'course-outlines', label: 'Course Outlines', icon: GraduationCap, color: '#F39C12', count: countMap.get('course outlines') ?? 0 },
+    ];
+  }, [resourceTypeCounts]);
 
   useEffect(() => {
     setSearchQuery(initialQuery);
