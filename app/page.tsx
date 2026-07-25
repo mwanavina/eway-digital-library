@@ -500,30 +500,32 @@ export default function Home() {
                   {resultsHeading}
                 </p>
               </div>
-              <div className="flex items-center gap-2 self-start rounded-full border border-gray-200 bg-white p-1 shadow-sm md:ml-auto md:self-auto">
+              <div className="ml-auto flex items-center gap-2 self-start rounded-full border border-gray-200 bg-white p-1 shadow-sm md:self-auto">
                 <button
                   type="button"
                   onClick={() => setViewMode('list')}
-                  className={`flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-semibold transition-colors ${
+                  className={`flex items-center justify-center rounded-full p-2 transition-colors md:px-3 md:py-1.5 md:gap-2 md:text-xs md:font-semibold ${
                     viewMode === 'list'
                       ? 'bg-[#1782C5] text-white'
                       : 'text-gray-600 hover:bg-gray-100'
                   }`}
+                  aria-label="List layout"
                 >
                   <List size={16} />
-                  <span>List layout</span>
+                  <span className="hidden md:inline">List layout</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => setViewMode('grid')}
-                  className={`flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-semibold transition-colors ${
+                  className={`flex items-center justify-center rounded-full p-2 transition-colors md:px-3 md:py-1.5 md:gap-2 md:text-xs md:font-semibold ${
                     viewMode === 'grid'
                       ? 'bg-[#1782C5] text-white'
                       : 'text-gray-600 hover:bg-gray-100'
                   }`}
+                  aria-label="Grid layout"
                 >
                   <LayoutGrid size={16} />
-                  <span>Grid layout</span>
+                  <span className="hidden md:inline">Grid layout</span>
                 </button>
               </div>
             </div>
