@@ -173,7 +173,7 @@ export function ResourceCard({
                   className="flex w-full items-center gap-2 rounded-lg px-2 py-2 text-left text-sm text-gray-700 transition hover:bg-gray-50 dark:text-slate-200 dark:hover:bg-slate-800"
                 >
                   <Download size={16} />
-                  {isDownloading ? 'Loading...' : 'Get'}
+                  {isDownloading ? 'Loading...' : 'Download'}
                 </button>
                 <button
                   type="button"
