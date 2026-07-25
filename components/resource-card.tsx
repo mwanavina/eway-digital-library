@@ -226,9 +226,10 @@ export function ResourceCard({
           </h3>
 
           {/* Course Code and Info */}
-          <div className="text-center text-[11px] mb-0">
+          <div className="flex items-center justify-center gap-1 text-[11px] mb-0 text-center">
             <p className="font-semibold text-gray-900 dark:text-white">{courseCode}</p>
-            <p className="text-gray-600 dark:text-gray-400 line-clamp-1">{courseName}</p>
+            <span className="text-gray-400 dark:text-gray-500">•</span>
+            <p className="truncate text-gray-600 dark:text-gray-400">{courseName}</p>
           </div>
 
         </div>
