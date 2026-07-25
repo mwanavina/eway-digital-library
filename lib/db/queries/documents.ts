@@ -26,6 +26,43 @@ interface GetDocumentsOptions {
   resourceType?: string;
 }
 
+export async function getResourceTypeCountsForUser(options: GetDocumentsOptions) {
+  const isAdmin = options.userRole === 'admin';
+
+  const profileRows = options.userId
+    ? await db
+        .select({ levelId: userProfiles.levelId })
+        .from(userProfiles)
+        .where(eq(userProfiles.userId, options.userId))
+        .limit(1)
+    : [];
+
+  const userLevelId = profileRows[0]?.levelId ?? null;
+
+  if (!isAdmin && !userLevelId) {
+    return [];
+  }
+
+  const whereConditions = [] as any[];
+
+  if (!isAdmin && userLevelId !== null) {
+    whereConditions.push(eq(documents.levelId, userLevelId));
+  }
+
+  const rows = await db
+    .select({
+      resourceTypeName: resourceTypes.name,
+      count: sql<number>`count(*)::int`,
+    })
+    .from(documents)
+    .leftJoin(resourceTypes, eq(documents.resourceTypeId, resourceTypes.id))
+    .where(whereConditions.length > 0 ? and(...whereConditions) : undefined)
+    .groupBy(resourceTypes.name)
+    .orderBy(resourceTypes.name);
+
+  return rows;
+}
+
 export async function getDocumentsForUser(options: GetDocumentsOptions) {
   const isAdmin = options.userRole === 'admin';
   const normalizedSearch = options.search?.trim();
