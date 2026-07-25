@@ -16,7 +16,7 @@ import { PastPapersFilter } from '@/components/filters/past-papers-filter';
 import { JournalsFilter } from '@/components/filters/journals-filter';
 import { DissertationsFilter } from '@/components/filters/dissertations-filter';
 import { CourseOutlinesFilter } from '@/components/filters/course-outlines-filter';
-import { FileText, BookOpen, Book, ClipboardList, Microscope, Menu, Sliders } from 'lucide-react';
+import { FileText, BookOpen, Book, ClipboardList, Microscope, Menu, Sliders, LayoutGrid, List } from 'lucide-react';
 import { authClient } from '@/lib/auth-client';
 
 interface Document {
@@ -40,6 +40,7 @@ interface Document {
 }
 
 type ResourceType = 'all' | 'past-papers' | 'journals' | 'dissertations' | 'course-outlines' | 'research-papers';
+type ViewMode = 'grid' | 'list';
 
 const RESOURCE_TYPES = [
   { id: 'all', name: 'All Resources', icon: FileText, color: '#6B7280' },
@@ -67,6 +68,7 @@ export default function Home() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState(() => searchParams.get('q') ?? '');
   const [activeResourceType, setActiveResourceType] = useState<ResourceType>('all');
+  const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [schools, setSchools] = useState<any[]>([]);
   const [departments, setDepartments] = useState<any[]>([]);
   const [programs, setPrograms] = useState<any[]>([]);
@@ -498,18 +500,32 @@ export default function Home() {
                   {resultsHeading}
                 </p>
               </div>
-              {/* <div className="hidden md:flex items-center gap-3">
-                <select className="px-3 py-1 border border-gray-300 rounded text-sm text-gray-700 bg-white">
-                  <option>Sort by</option>
-                  <option>Most downloaded</option>
-                  <option>Newest</option>
-                  <option>Oldest</option>
-                </select>
-                <select className="px-3 py-1 border border-gray-300 rounded text-sm text-gray-700 bg-white">
-                  <option>Most downloaded</option>
-                  <option>Least downloaded</option>
-                </select>
-              </div> */}
+              <div className="ml-auto flex items-center gap-2 rounded-full border border-gray-200 bg-white p-1 shadow-sm">
+                <button
+                  type="button"
+                  onClick={() => setViewMode('list')}
+                  className={`flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-semibold transition-colors ${
+                    viewMode === 'list'
+                      ? 'bg-[#1782C5] text-white'
+                      : 'text-gray-600 hover:bg-gray-100'
+                  }`}
+                >
+                  <List size={16} />
+                  <span>List layout</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setViewMode('grid')}
+                  className={`flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-semibold transition-colors ${
+                    viewMode === 'grid'
+                      ? 'bg-[#1782C5] text-white'
+                      : 'text-gray-600 hover:bg-gray-100'
+                  }`}
+                >
+                  <LayoutGrid size={16} />
+                  <span>Grid layout</span>
+                </button>
+              </div>
             </div>
 
             {/* Documents Grid - 1 Column on Mobile, 2 on Desktop */}
@@ -518,29 +534,53 @@ export default function Home() {
                 <Spinner />
               </div>
             ) : documents.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6">
-                {documents.map((doc: Document) => (
-                  <ResourceCard
-                    key={doc.id}
-                    id={doc.id}
-                    title={doc.title}
-                    resourceType={doc.resource_type_name || 'Past Papers'}
-                    courseName={doc.course_name}
-                    courseCode={doc.course_code}
-                    departmentName={doc.department_name}
-                    schoolName={doc.school_name}
-                    filePath={doc.file_path}
-                    thumbnailUrl={doc.thumbnail_url}
-                    author={doc.author}
-                    publicationDate={doc.publication_date}
-                    abstract={doc.abstract}
-                    year={doc.year}
-                    semester={doc.semester}
-                    examType={doc.exam_type}
-                    downloadCount={doc.download_count}
-                  />
-                ))}
-              </div>
+              viewMode === 'grid' ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6">
+                  {documents.map((doc: Document) => (
+                    <ResourceCard
+                      key={doc.id}
+                      id={doc.id}
+                      title={doc.title}
+                      resourceType={doc.resource_type_name || 'Past Papers'}
+                      courseName={doc.course_name}
+                      courseCode={doc.course_code}
+                      departmentName={doc.department_name}
+                      schoolName={doc.school_name}
+                      filePath={doc.file_path}
+                      thumbnailUrl={doc.thumbnail_url}
+                      author={doc.author}
+                      publicationDate={doc.publication_date}
+                      abstract={doc.abstract}
+                      year={doc.year}
+                      semester={doc.semester}
+                      examType={doc.exam_type}
+                      downloadCount={doc.download_count}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {documents.map((doc: Document) => (
+                    <div
+                      key={doc.id}
+                      className="flex items-center justify-between rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition hover:border-[#1782C5] hover:shadow-md dark:border-slate-800 dark:bg-slate-900"
+                    >
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-semibold text-gray-900 dark:text-slate-100">{doc.title}</p>
+                        <p className="mt-1 text-xs text-gray-600 dark:text-slate-400">
+                          {doc.course_name} • {doc.course_code}
+                        </p>
+                        <p className="mt-1 text-xs text-gray-500 dark:text-slate-500">
+                          {doc.school_name} • {doc.department_name}
+                        </p>
+                      </div>
+                      <div className="ml-4 rounded-full bg-[#1782C5]/10 px-2.5 py-1 text-[11px] font-semibold text-[#1782C5]">
+                        {doc.resource_type_name || 'Document'}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )
             ) : (
               <Empty
                 title="No documents found"
