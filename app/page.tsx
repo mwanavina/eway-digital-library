@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, Suspense } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { Header } from '@/components/header';
 import { FilterSidebar } from '@/components/filter-sidebar';
@@ -52,12 +52,12 @@ const RESOURCE_TYPES = [
   // { id: 'research-papers', name: 'Research Papers', icon: Microscope, color: '#10B981' },
 ];
 
-export default function Home() {
-    const {
-      data: session,
-      isPending,
-      error,
-    } = authClient.useSession();
+function HomeContent() {
+  const {
+    data: session,
+    isPending,
+    error,
+  } = authClient.useSession();
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -614,5 +614,20 @@ export default function Home() {
         </main>
       </div>
     </div>
+  );
+}
+
+export default function Home() {
+  return (
+    <Suspense fallback={(
+      <div className="flex h-screen items-center justify-center">
+        <div className="flex items-center gap-2 text-lg font-semibold text-slate-700 dark:text-slate-300">
+          <Spinner data-icon="inline-start" />
+          <span>Loading...</span>
+        </div>
+      </div>
+    )}>
+      <HomeContent />
+    </Suspense>
   );
 }
