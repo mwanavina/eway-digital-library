@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Header } from '@/components/header';
 import { BottomNav } from '@/components/bottom-nav';
-import { Edit2, Mail, Calendar, LogOut } from 'lucide-react';
+import { Edit2, Mail, Calendar, LogOut, ArrowLeft } from 'lucide-react';
 import { authClient } from '@/lib/auth-client';
 import { getBookmarkCount } from '@/app/actions/documents';
 
@@ -112,6 +112,14 @@ export default function AccountPage() {
         <div className="max-w-2xl mx-auto p-4 md:p-6">
           {/* Profile Header */}
           <div className="mb-8">
+            <button
+              type="button"
+              onClick={() => router.push('/')}
+              className="mb-4 hidden items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 md:flex dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
+            >
+              <ArrowLeft size={16} />
+              Back to Home
+            </button>
             <div className="flex items-center gap-4">
               <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full border border-slate-200 bg-slate-100 shadow-sm">
                 {currentUser?.image ? (
