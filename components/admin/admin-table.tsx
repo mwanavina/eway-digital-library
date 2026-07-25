@@ -64,7 +64,7 @@ export function AdminTable({ columns, data, onEdit, onDelete, loading }: AdminTa
                   </button>
                   <button
                     onClick={() => onDelete(item)}
-                    className="p-2 hover:bg-destructive hover:text-destructive-foreground rounded-lg transition-colors"
+                    className="rounded-lg bg-red-600 p-2 text-white transition-colors hover:bg-red-700"
                     title="Delete"
                   >
                     <Trash2 size={16} />
