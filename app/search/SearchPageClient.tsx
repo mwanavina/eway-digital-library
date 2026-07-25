@@ -46,8 +46,6 @@ export function SearchPageClient({ initialQuery, initialResults, resourceTypeCou
 
     return [
       { id: 'past-papers', label: 'Past Papers', icon: FileText, color: '#4A90E2', count: countMap.get('past papers') ?? 0 },
-      { id: 'journals', label: 'Journals', icon: Book, color: '#50C878', count: countMap.get('journals') ?? 0 },
-      { id: 'dissertations', label: 'Dissertations', icon: BookOpen, color: '#9B59B6', count: countMap.get('dissertations') ?? 0 },
       { id: 'course-outlines', label: 'Course Outlines', icon: GraduationCap, color: '#F39C12', count: countMap.get('course outlines') ?? 0 },
     ];
   }, [resourceTypeCounts]);
