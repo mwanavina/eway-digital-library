@@ -25,6 +25,12 @@ interface BookmarksPageClientProps {
 }
 
 export function BookmarksPageClient({ bookmarks }: BookmarksPageClientProps) {
+  const [items, setItems] = useState(bookmarks);
+
+  const handleRemoveBookmark = (documentId: number) => {
+    setItems((current) => current.filter((item) => item.id !== documentId));
+  };
+
   return (
     <main className="min-h-screen bg-background pb-20 dark:bg-slate-950">
       <section className="border-b border-gray-200/80 bg-white/80 px-4 py-6 dark:border-slate-800 dark:bg-slate-950/80 sm:px-6 lg:px-8">
@@ -42,16 +48,16 @@ export function BookmarksPageClient({ bookmarks }: BookmarksPageClientProps) {
           </div>
 
           <div className="rounded-full border border-[#1782C5]/20 bg-[#1782C5]/10 px-3 py-2 text-sm font-medium text-[#1782C5] dark:border-[#1782C5]/30 dark:bg-[#1782C5]/15">
-            {bookmarks.length} saved {bookmarks.length === 1 ? 'resource' : 'resources'}
+            {items.length} saved {items.length === 1 ? 'resource' : 'resources'}
           </div>
         </div>
       </section>
 
       <section className="px-4 py-6 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-6xl">
-          {bookmarks.length > 0 ? (
+          {items.length > 0 ? (
             <div className="grid gap-4 xl:grid-cols-2">
-              {bookmarks.map((doc) => (
+              {items.map((doc) => (
                 <DocumentCard
                   key={doc.id}
                   id={doc.id}
@@ -65,6 +71,8 @@ export function BookmarksPageClient({ bookmarks }: BookmarksPageClientProps) {
                   departmentName={doc.department_name ?? 'Unknown'}
                   filePath={doc.file_path ?? ''}
                   thumbnailUrl={doc.thumbnail_url ?? undefined}
+                  showRemoveBookmark
+                  onRemove={handleRemoveBookmark}
                 />
               ))}
             </div>

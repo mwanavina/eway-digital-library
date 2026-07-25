@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
-import { Download, FileText, Share2 } from 'lucide-react';
+import { useState, useTransition } from 'react';
+import { BookmarkMinus, Download, FileText, Share2 } from 'lucide-react';
 import { PDFModal } from './pdf-modal';
 import { ShareModal } from './share-modal';
+import { toggleBookmark } from '@/app/actions/documents';
 
 interface DocumentCardProps {
   id: number;
@@ -17,6 +18,8 @@ interface DocumentCardProps {
   departmentName: string;
   filePath: string;
   thumbnailUrl?: string;
+  showRemoveBookmark?: boolean;
+  onRemove?: (documentId: number) => void;
 }
 
 export function DocumentCard({
@@ -31,10 +34,13 @@ export function DocumentCard({
   departmentName,
   filePath,
   thumbnailUrl,
+  showRemoveBookmark = false,
+  onRemove,
 }: DocumentCardProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  const [isRemovingBookmark, startRemovingBookmark] = useTransition();
   const isExternalPdf = filePath && (filePath.startsWith('http') || filePath.startsWith('https'));
 
   const handleShare = (e: React.MouseEvent) => {
@@ -98,6 +104,18 @@ export function DocumentCard({
     }
   };
 
+  const handleRemoveBookmark = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!showRemoveBookmark) return;
+
+    startRemovingBookmark(async () => {
+      const result = await toggleBookmark(id);
+      if (result.success && result.bookmarked === false) {
+        onRemove?.(id);
+      }
+    });
+  };
+
   return (
     <>
       <div 
@@ -107,8 +125,8 @@ export function DocumentCard({
       {/* Header */}
       <div className="bg-gradient-to-r from-[#1782C5] to-[#1F2557] p-4 text-white">
         <div className="flex items-start gap-3">
-          <div className="flex-shrink-0 w-12 h-12 bg-[#EDD899] rounded-lg flex items-center justify-center">
-            <FileText size={24} className="text-[#1F2557]" />
+          <div className="flex-shrink-0 w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
+            <FileText size={24} className="text-red-600" />
           </div>
           <div className="flex-1 min-w-0">
             <h3 className="font-semibold text-sm line-clamp-2">{title}</h3>
@@ -169,6 +187,16 @@ export function DocumentCard({
 
       {/* Footer */}
       <div className="px-4 py-3 bg-gray-50 border-t border-gray-200 space-y-2">
+        {showRemoveBookmark && (
+          <button
+            onClick={handleRemoveBookmark}
+            disabled={isRemovingBookmark}
+            className="w-full flex items-center justify-center gap-2 bg-white text-red-600 py-2 px-4 rounded-lg border border-red-200 hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium text-sm"
+          >
+            <BookmarkMinus size={16} />
+            {isRemovingBookmark ? 'Removing...' : 'Remove bookmark'}
+          </button>
+        )}
         <button
           onClick={handleDownload}
           disabled={isDownloading}
