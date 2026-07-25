@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { Header } from '@/components/header';
 import { FilterSidebar } from '@/components/filter-sidebar';
 import { DocumentCard } from '@/components/document-card';
@@ -55,13 +56,16 @@ export default function Home() {
       isPending,
       error,
     } = authClient.useSession();
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   const [documents, setDocuments] = useState<Document[]>([]);
   const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
   const [searchModalOpen, setSearchModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState(() => searchParams.get('q') ?? '');
   const [activeResourceType, setActiveResourceType] = useState<ResourceType>('all');
   const [schools, setSchools] = useState<any[]>([]);
   const [departments, setDepartments] = useState<any[]>([]);
@@ -118,6 +122,11 @@ export default function Home() {
       setLoading(false);
     }
   }, [filters, searchQuery, activeResourceType]);
+
+  useEffect(() => {
+    const urlQuery = searchParams.get('q') ?? '';
+    setSearchQuery(urlQuery);
+  }, [searchParams]);
 
   useEffect(() => {
     fetchDocuments();
@@ -193,7 +202,21 @@ export default function Home() {
   }, [filters, searchQuery, fetchDocuments, activeResourceType]);
 
   const handleSearchChange = (query: string) => {
+    const nextQuery = query.trim();
     setSearchQuery(query);
+
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (nextQuery) {
+      params.set('q', nextQuery);
+    } else {
+      params.delete('q');
+    }
+
+    const nextUrl = params.toString() ? `${pathname}?${params.toString()}` : pathname;
+
+    window.history.replaceState({}, '', nextUrl);
+    router.replace(nextUrl, { scroll: false });
   };
 
   // Calculate active filter count
