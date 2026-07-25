@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { Bookmark } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { ArrowLeft, Bookmark } from 'lucide-react';
 import { DocumentCard } from '@/components/document-card';
 
 interface BookmarkDocument {
@@ -26,6 +27,7 @@ interface BookmarksPageClientProps {
 }
 
 export function BookmarksPageClient({ bookmarks }: BookmarksPageClientProps) {
+  const router = useRouter();
   const [items, setItems] = useState(bookmarks);
 
   const handleRemoveBookmark = (documentId: number) => {
@@ -36,15 +38,25 @@ export function BookmarksPageClient({ bookmarks }: BookmarksPageClientProps) {
     <main className="min-h-screen bg-background pb-20 dark:bg-slate-950">
       <section className="border-b border-gray-200/80 bg-white/80 px-4 py-6 dark:border-slate-800 dark:bg-slate-950/80 sm:px-6 lg:px-8">
         <div className="mx-auto flex max-w-6xl flex-col gap-4 md:flex-row md:items-end md:justify-between">
-          <div className="flex items-start gap-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#1782C5]/10">
-              <Bookmark size={24} className="text-[#1782C5]" />
-            </div>
-            <div>
-              <h1 className="text-xl font-bold text-slate-900 dark:text-white">My Bookmarks</h1>
-              <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
-                Keep your saved resources handy and easy to revisit.
-              </p>
+          <div className="flex flex-col gap-3">
+            <button
+              type="button"
+              onClick={() => router.push('/')}
+              className="hidden items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 md:flex dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
+            >
+              <ArrowLeft size={16} />
+              Back to Home
+            </button>
+            <div className="flex items-start gap-3">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#1782C5]/10">
+                <Bookmark size={24} className="text-[#1782C5]" />
+              </div>
+              <div>
+                <h1 className="text-xl font-bold text-slate-900 dark:text-white">My Bookmarks</h1>
+                <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
+                  Keep your saved resources handy and easy to revisit.
+                </p>
+              </div>
             </div>
           </div>
 
