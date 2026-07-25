@@ -59,6 +59,20 @@ export function ResourceCard({
     }
   };
 
+  const handleToggleBookmark = (event?: React.MouseEvent) => {
+    event?.stopPropagation();
+    const optimisticValue = !isBookmarked;
+    setIsBookmarked(optimisticValue);
+    setIsMenuOpen(false);
+
+    startTransition(async () => {
+      const result = await toggleBookmark(id);
+      if (!result.success) {
+        setIsBookmarked(!optimisticValue);
+      }
+    });
+  };
+
   const handleDownload = async (e: React.MouseEvent) => {
     e.stopPropagation();
     setIsDownloading(true);
@@ -147,24 +161,38 @@ export function ResourceCard({
         {/* Card Background */}
         <div className="p-3 dark:bg-slate-800" style={{ backgroundColor: typeBackground }}>
           {/* Type Badge and Overflow Menu */}
-          <div className="relative mb-2 flex items-start justify-between">
+          <div className="relative mb-2 flex items-start justify-between gap-2">
             <span
               className="px-2 py-1 text-[11px] font-semibold text-white rounded-full"
               style={{ backgroundColor: typeColor }}
             >
               {resourceType}
             </span>
-            <button
-              type="button"
-              onClick={(event) => {
-                event.stopPropagation();
-                setIsMenuOpen((prev) => !prev);
-              }}
-              className="rounded-full border border-white/50 bg-white/80 p-1.5 text-gray-700 shadow-sm transition hover:bg-white dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-200"
-              aria-label="Open actions"
-            >
-              <MoreHorizontal size={16} />
-            </button>
+            <div className="flex items-center gap-1.5">
+              <button
+                type="button"
+                onClick={handleToggleBookmark}
+                className={`rounded-full border p-1.5 shadow-sm transition ${
+                  isBookmarked
+                    ? 'border-red-200 bg-red-50 text-red-600 dark:border-red-900/50 dark:bg-red-950/40 dark:text-red-400'
+                    : 'border-white/50 bg-white/80 text-gray-700 hover:bg-white dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-200'
+                }`}
+                aria-label={isBookmarked ? 'Remove bookmark' : 'Bookmark'}
+              >
+                <BookmarkIcon size={16} className={isBookmarked ? 'fill-current' : ''} />
+              </button>
+              <button
+                type="button"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  setIsMenuOpen((prev) => !prev);
+                }}
+                className="rounded-full border border-white/50 bg-white/80 p-1.5 text-gray-700 shadow-sm transition hover:bg-white dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-200"
+                aria-label="Open actions"
+              >
+                <MoreHorizontal size={16} />
+              </button>
+            </div>
             {isMenuOpen && (
               <div className="absolute right-0 top-9 z-10 w-40 rounded-xl border border-gray-200 bg-white p-2 shadow-lg dark:border-slate-700 dark:bg-slate-900">
                 <button
@@ -196,15 +224,7 @@ export function ResourceCard({
                   type="button"
                   onClick={(event) => {
                     event.stopPropagation();
-                    setIsMenuOpen(false);
-                    const optimisticValue = !isBookmarked;
-                    setIsBookmarked(optimisticValue);
-                    startTransition(async () => {
-                      const result = await toggleBookmark(id);
-                      if (!result.success) {
-                        setIsBookmarked(isBookmarked);
-                      }
-                    });
+                    handleToggleBookmark(event);
                   }}
                   disabled={isPending}
                   className="flex w-full items-center gap-2 rounded-lg px-2 py-2 text-left text-sm text-gray-700 transition hover:bg-gray-50 disabled:opacity-50 dark:text-slate-200 dark:hover:bg-slate-800"

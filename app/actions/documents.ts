@@ -107,6 +107,23 @@ export async function deleteDocument(documentId: number): Promise<any> {
   }
 }
 
+export async function getBookmarkCount(): Promise<number> {
+  try {
+    const session = await getServerSession();
+    const user = session?.user;
+
+    if (!user?.id) {
+      return 0;
+    }
+
+    const savedBookmarks = await db.select().from(bookmarks).where(eq(bookmarks.userId, user.id));
+    return savedBookmarks.length;
+  } catch (error) {
+    console.error('Error getting bookmark count:', error);
+    return 0;
+  }
+}
+
 export async function toggleBookmark(documentId: number): Promise<{ success: boolean; bookmarked?: boolean; error?: string }> {
   try {
     const session = await getServerSession();

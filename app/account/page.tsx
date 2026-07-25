@@ -6,6 +6,7 @@ import { Header } from '@/components/header';
 import { BottomNav } from '@/components/bottom-nav';
 import { Edit2, Mail, Calendar, LogOut } from 'lucide-react';
 import { authClient } from '@/lib/auth-client';
+import { getBookmarkCount } from '@/app/actions/documents';
 
 export default function AccountPage() {
   const router = useRouter();
@@ -24,6 +25,7 @@ export default function AccountPage() {
   });
 
   const [tempFormData, setTempFormData] = useState(formData);
+  const [savedResourcesCount, setSavedResourcesCount] = useState(0);
 
   useEffect(() => {
     if (!currentUser) return;
@@ -51,6 +53,23 @@ export default function AccountPage() {
     setFormData(nextProfile);
     setTempFormData(nextProfile);
   }, [currentUser?.name, currentUser?.email, currentUser?.createdAt]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadBookmarkCount = async () => {
+      const count = await getBookmarkCount();
+      if (isMounted) {
+        setSavedResourcesCount(count);
+      }
+    };
+
+    loadBookmarkCount();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [currentUser?.id]);
 
   const handleEditClick = () => {
     setTempFormData(formData);
@@ -234,16 +253,8 @@ export default function AccountPage() {
             </div>
             <div className="p-4 md:p-6 space-y-3">
               <div className="flex justify-between items-center">
-                <span className="text-gray-700 dark:text-slate-300">Downloads</span>
-                <span className="font-semibold text-gray-900 dark:text-slate-100">24</span>
-              </div>
-              <div className="flex justify-between items-center">
                 <span className="text-gray-700 dark:text-slate-300">Saved Resources</span>
-                <span className="font-semibold text-gray-900 dark:text-slate-100">12</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-gray-700 dark:text-slate-300">Last Access</span>
-                <span className="font-semibold text-gray-900 dark:text-slate-100">Today</span>
+                <span className="font-semibold text-gray-900 dark:text-slate-100">{savedResourcesCount}</span>
               </div>
             </div>
           </div>
@@ -251,7 +262,7 @@ export default function AccountPage() {
           <div className="mt-6 rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-900/50 dark:bg-red-950/30 md:p-6">
             <button
               onClick={handleSignOut}
-              className="flex items-center gap-2 font-medium text-red-600 transition-colors hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
+              className="flex w-full items-center justify-start gap-2 font-medium text-red-600 transition-colors hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
             >
               <LogOut size={18} />
               Sign out
