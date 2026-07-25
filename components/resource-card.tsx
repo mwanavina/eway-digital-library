@@ -197,10 +197,12 @@ export function ResourceCard({
                   onClick={(event) => {
                     event.stopPropagation();
                     setIsMenuOpen(false);
+                    const optimisticValue = !isBookmarked;
+                    setIsBookmarked(optimisticValue);
                     startTransition(async () => {
                       const result = await toggleBookmark(id);
-                      if (result.success) {
-                        setIsBookmarked(result.bookmarked ?? !isBookmarked);
+                      if (!result.success) {
+                        setIsBookmarked(isBookmarked);
                       }
                     });
                   }}

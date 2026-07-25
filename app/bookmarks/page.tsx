@@ -38,7 +38,7 @@ export default async function BookmarksPage() {
 
   return (
     <>
-      <Header onSearchClick={() => {}} />
+      <Header />
       <BookmarksPageClient bookmarks={bookmarkedDocs as BookmarkDocument[]} />
       <BottomNav activeTab="bookmarks" />
     </>
