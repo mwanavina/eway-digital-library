@@ -1,7 +1,18 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ArrowLeft, X, Sliders } from 'lucide-react';
+
+interface SearchResult {
+  id: number;
+  title: string;
+  course_code: string;
+  course_name: string;
+  school_name?: string | null;
+  department_name?: string | null;
+  resource_type_name?: string | null;
+  file_path?: string | null;
+}
 
 interface SearchModalProps {
   isOpen: boolean;
@@ -19,6 +30,47 @@ export function SearchModal({
   searchQuery,
 }: SearchModalProps) {
   const [query, setQuery] = useState(searchQuery);
+  const [results, setResults] = useState<SearchResult[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+
+  useEffect(() => {
+    setQuery(searchQuery);
+  }, [searchQuery]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const trimmed = query.trim();
+    if (!trimmed) {
+      setResults([]);
+      setIsSearching(false);
+      return;
+    }
+
+    const controller = new AbortController();
+    const runSearch = async () => {
+      setIsSearching(true);
+      try {
+        const response = await fetch(`/api/documents?search=${encodeURIComponent(trimmed)}`, {
+          signal: controller.signal,
+          cache: 'no-store',
+        });
+        const payload = await response.json();
+        if (!controller.signal.aborted && payload.success) {
+          setResults(payload.data ?? []);
+        }
+      } catch {
+        setResults([]);
+      } finally {
+        if (!controller.signal.aborted) {
+          setIsSearching(false);
+        }
+      }
+    };
+
+    runSearch();
+    return () => controller.abort();
+  }, [isOpen, query]);
 
   if (!isOpen) return null;
 
@@ -31,6 +83,7 @@ export function SearchModal({
   const handleClear = () => {
     setQuery('');
     onSearchChange('');
+    setResults([]);
   };
 
   const handleClose = () => {
@@ -88,11 +141,37 @@ export function SearchModal({
         </button>
       </div>
 
-      {/* Empty State */}
-      <div className="p-6 text-center">
-        <p className="text-gray-600 text-sm">
-          {query ? 'Type to search' : 'Start typing to search for documents'}
-        </p>
+      {/* Results */}
+      <div className="flex-1 overflow-y-auto bg-gray-50 p-4">
+        {isSearching ? (
+          <div className="py-8 text-center text-sm text-gray-600">Searching...</div>
+        ) : query.trim() ? (
+          results.length > 0 ? (
+            <div className="space-y-2">
+              {results.map((doc) => (
+                <a
+                  key={doc.id}
+                  href={doc.file_path ?? '#'}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="block rounded-lg border border-gray-200 bg-white p-3 text-left shadow-sm transition hover:border-[#1782C5]"
+                >
+                  <p className="text-sm font-semibold text-gray-900">{doc.title}</p>
+                  <p className="mt-1 text-xs text-gray-600">
+                    {doc.course_name} • {doc.course_code}
+                  </p>
+                  <p className="mt-1 text-xs text-gray-500">
+                    {doc.school_name ?? 'School'} • {doc.department_name ?? 'Department'}
+                  </p>
+                </a>
+              ))}
+            </div>
+          ) : (
+            <div className="py-8 text-center text-sm text-gray-600">No documents found</div>
+          )
+        ) : (
+          <div className="py-8 text-center text-sm text-gray-600">Start typing to search for documents</div>
+        )}
       </div>
     </div>
   );
