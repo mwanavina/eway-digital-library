@@ -2,6 +2,7 @@ import { Suspense } from 'react';
 import { redirect } from 'next/navigation';
 import { getServerSession } from '@/lib/server/session';
 import { getDocumentsForUser } from '@/lib/db/queries/documents';
+import { getResourceTypeCountsForUser } from '@/lib/db/queries/documents';
 import { SearchPageClient } from './SearchPageClient';
 
 interface SearchDocument {
@@ -43,9 +44,18 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       })
     : [];
 
+  const resourceTypeCounts = await getResourceTypeCountsForUser({
+    userId: user.id,
+    userRole: user.role ?? undefined,
+  });
+
   return (
     <Suspense fallback={null}>
-      <SearchPageClient initialQuery={query} initialResults={documents as SearchDocument[]} />
+      <SearchPageClient
+        initialQuery={query}
+        initialResults={documents as SearchDocument[]}
+        resourceTypeCounts={resourceTypeCounts}
+      />
     </Suspense>
   );
 }
