@@ -202,7 +202,10 @@ export default function Home() {
   if (isPending) {
     return (
       <div className="flex h-screen items-center justify-center">
-        <p className="text-lg font-semibold text-slate-700 dark:text-slate-300">Loading...</p>
+        <div className="flex items-center gap-2 text-lg font-semibold text-slate-700 dark:text-slate-300">
+          <Spinner data-icon="inline-start" />
+          <span>Loading...</span>
+        </div>
       </div>
     );
   }
@@ -449,7 +452,7 @@ export default function Home() {
                   <button
                     key={type.id}
                     onClick={() => handleResourceTypeChange(type.id as ResourceType)}
-                    className={`px-3 lg:px-4 py-1.5 lg:py-2 rounded-full text-xs lg:text-sm font-medium transition-all flex-shrink-0 whitespace-nowrap ${
+                    className={`px-3 lg:px-4 py-1.5 lg:py-2 rounded-full text-xs lg:text-sm font-medium transition-all shrink-0 whitespace-nowrap ${
                       isActive
                         ? 'text-white'
                         : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
