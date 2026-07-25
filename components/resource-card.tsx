@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Download, FileText, ChevronRight, Share2 } from 'lucide-react';
+import { Download, FileText, ChevronRight, Share2, MoreHorizontal } from 'lucide-react';
 import Link from 'next/link';
 import { PDFModal } from './pdf-modal';
 import { ShareModal } from './share-modal';
@@ -46,6 +46,7 @@ export function ResourceCard({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const handleCardClick = () => {
     if (filePath) {
@@ -140,18 +141,64 @@ export function ResourceCard({
       >
         {/* Card Background */}
         <div className="p-3 dark:bg-slate-800" style={{ backgroundColor: typeBackground }}>
-          {/* Type Badge and Download Count */}
-          <div className="flex items-start justify-between mb-2">
+          {/* Type Badge and Overflow Menu */}
+          <div className="relative mb-2 flex items-start justify-between">
             <span
               className="px-2 py-1 text-[11px] font-semibold text-white rounded-full"
               style={{ backgroundColor: typeColor }}
             >
               {resourceType}
             </span>
-            {downloadCount !== undefined && (
-              <span className="text-[11px] font-medium text-gray-600 dark:text-gray-400">
-                {downloadCount} <span className="text-gray-500 dark:text-gray-600">↓</span>
-              </span>
+            <button
+              type="button"
+              onClick={(event) => {
+                event.stopPropagation();
+                setIsMenuOpen((prev) => !prev);
+              }}
+              className="rounded-full border border-white/50 bg-white/80 p-1.5 text-gray-700 shadow-sm transition hover:bg-white dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-200"
+              aria-label="Open actions"
+            >
+              <MoreHorizontal size={16} />
+            </button>
+            {isMenuOpen && (
+              <div className="absolute right-0 top-9 z-10 w-40 rounded-xl border border-gray-200 bg-white p-2 shadow-lg dark:border-slate-700 dark:bg-slate-900">
+                <button
+                  type="button"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    setIsMenuOpen(false);
+                    handleDownload(event);
+                  }}
+                  disabled={isDownloading}
+                  className="flex w-full items-center gap-2 rounded-lg px-2 py-2 text-left text-sm text-gray-700 transition hover:bg-gray-50 dark:text-slate-200 dark:hover:bg-slate-800"
+                >
+                  <Download size={16} />
+                  {isDownloading ? 'Loading...' : 'Get'}
+                </button>
+                <button
+                  type="button"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    setIsMenuOpen(false);
+                    setIsShareModalOpen(true);
+                  }}
+                  className="flex w-full items-center gap-2 rounded-lg px-2 py-2 text-left text-sm text-gray-700 transition hover:bg-gray-50 dark:text-slate-200 dark:hover:bg-slate-800"
+                >
+                  <Share2 size={16} />
+                  Share
+                </button>
+                <Link
+                  href={`/document/${id}`}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    setIsMenuOpen(false);
+                  }}
+                  className="flex w-full items-center gap-2 rounded-lg px-2 py-2 text-left text-sm text-gray-700 transition hover:bg-gray-50 dark:text-slate-200 dark:hover:bg-slate-800"
+                >
+                  <ChevronRight size={16} />
+                  Details
+                </Link>
+              </div>
             )}
           </div>
 
@@ -186,91 +233,6 @@ export function ResourceCard({
 
         </div>
 
-        {/* Action Buttons */}
-        <div className="px-3 py-2.5 bg-white dark:bg-slate-800 border-t border-gray-200 dark:border-slate-700">
-          <div className="flex md:flex-col gap-1.5 items-stretch">
-            {/* Mobile Row Layout - Icons Only for Get and Share */}
-            <div className="flex md:hidden gap-2 w-full">
-              <button
-                onClick={(event) => {
-                  event.stopPropagation();
-                  handleDownload(event);
-                }}
-                disabled={isDownloading}
-                className="flex-1 flex items-center justify-center p-2 rounded-lg font-semibold text-white transition-all"
-                style={{
-                  backgroundColor: typeColor,
-                  opacity: isDownloading ? 0.7 : 1,
-                }}
-                title={isDownloading ? 'Loading...' : 'Get'}
-                aria-label="Get resource"
-              >
-                <Download size={18} />
-              </button>
-              <button
-                onClick={(event) => {
-                  event.stopPropagation();
-                  setIsShareModalOpen(true);
-                }}
-                className="flex-1 flex items-center justify-center p-2 rounded-lg font-semibold transition-all border text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-slate-700"
-                style={{ borderColor: typeColor }}
-                title="Share resource"
-                aria-label="Share resource"
-              >
-                <Share2 size={18} />
-              </button>
-              <Link
-                href={`/document/${id}`}
-                onClick={(event) => event.stopPropagation()}
-                className="flex-1 flex items-center justify-center gap-2 py-2 px-2.5 rounded-lg font-semibold text-sm transition-all border text-gray-900 dark:text-white dark:hover:bg-slate-700"
-                style={{ borderColor: typeColor }}
-              >
-                Details
-                <ChevronRight size={16} />
-              </Link>
-            </div>
-
-            {/* Desktop Layout - Single Row */}
-            <div className="hidden md:flex gap-2 w-full">
-              <button
-                onClick={(event) => {
-                  event.stopPropagation();
-                  handleDownload(event);
-                }}
-                disabled={isDownloading}
-                className="flex-1 flex items-center justify-center gap-2 py-2 px-2.5 rounded-lg font-semibold text-sm transition-all text-white"
-                style={{
-                  backgroundColor: typeColor,
-                  opacity: isDownloading ? 0.7 : 1,
-                }}
-              >
-                <Download size={16} />
-                {isDownloading ? 'Loading...' : 'Get'}
-              </button>
-              <button
-                onClick={(event) => {
-                  event.stopPropagation();
-                  setIsShareModalOpen(true);
-                }}
-                className="flex-1 flex items-center justify-center gap-2 py-2 px-2.5 rounded-lg font-semibold text-sm transition-all border text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-slate-700"
-                style={{ borderColor: typeColor }}
-                aria-label="Share resource"
-              >
-                <Share2 size={16} />
-                Share
-              </button>
-              <Link
-                href={`/document/${id}`}
-                onClick={(event) => event.stopPropagation()}
-                className="flex-1 flex items-center justify-center gap-2 py-2 px-2.5 rounded-lg font-semibold text-sm transition-all border text-gray-900 dark:text-white dark:hover:bg-slate-700"
-                style={{ borderColor: typeColor }}
-              >
-                Details
-                <ChevronRight size={16} />
-              </Link>
-            </div>
-          </div>
-        </div>
       </div>
 
       {/* PDF Modal */}
