@@ -46,10 +46,8 @@ export function SearchPageClient({ initialQuery, initialResults }: SearchPageCli
     setSearchQuery(initialQuery);
   }, [initialQuery]);
 
-  const handleSearch = (query: string) => {
-    const nextValue = query.trim();
-    setSearchQuery(query);
-
+  const updateSearchUrl = (value: string) => {
+    const nextValue = value.trim();
     const params = new URLSearchParams(searchParams.toString());
 
     if (nextValue) {
@@ -59,15 +57,19 @@ export function SearchPageClient({ initialQuery, initialResults }: SearchPageCli
     }
 
     const nextUrl = params.toString() ? `${pathname}?${params.toString()}` : pathname;
+
+    window.history.replaceState({}, '', nextUrl);
     router.replace(nextUrl, { scroll: false });
+  };
+
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+    updateSearchUrl(query);
   };
 
   const clearSearch = () => {
     setSearchQuery('');
-    const params = new URLSearchParams(searchParams.toString());
-    params.delete('q');
-    const nextUrl = params.toString() ? `${pathname}?${params.toString()}` : pathname;
-    router.replace(nextUrl, { scroll: false });
+    updateSearchUrl('');
   };
 
   const activeQuery = searchQuery.trim();
