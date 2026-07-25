@@ -11,6 +11,7 @@ import { FilterDrawer } from '@/components/filter-drawer';
 import { SearchModal } from '@/components/search-modal';
 import { Spinner } from '@/components/ui/spinner';
 import { Empty } from '@/components/ui/empty';
+import { PDFModal } from '@/components/pdf-modal';
 import { AllResourcesFilter } from '@/components/filters/all-resources-filter';
 import { PastPapersFilter } from '@/components/filters/past-papers-filter';
 import { JournalsFilter } from '@/components/filters/journals-filter';
@@ -69,6 +70,7 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState(() => searchParams.get('q') ?? '');
   const [activeResourceType, setActiveResourceType] = useState<ResourceType>('all');
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
+  const [selectedDocument, setSelectedDocument] = useState<Document | null>(null);
   const [schools, setSchools] = useState<any[]>([]);
   const [departments, setDepartments] = useState<any[]>([]);
   const [programs, setPrograms] = useState<any[]>([]);
@@ -268,6 +270,14 @@ export default function Home() {
         onFilterClick={() => setFilterDrawerOpen(true)} // Mobile filter drawer
       />
       <BottomNav activeTab="browse" UserSession={{ user }} />
+      <PDFModal
+        isOpen={Boolean(selectedDocument)}
+        onClose={() => setSelectedDocument(null)}
+        title={selectedDocument?.title ?? ''}
+        pdfUrl={selectedDocument?.file_path ?? ''}
+        documentId={selectedDocument?.id ?? 0}
+        onDownload={async () => Promise.resolve()}
+      />
 
       {/* Search Modal */}
       <SearchModal
@@ -563,9 +573,11 @@ export default function Home() {
               ) : (
                 <div className="space-y-3">
                   {documents.map((doc: Document) => (
-                    <div
+                    <button
                       key={doc.id}
-                      className="flex items-center justify-between rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition hover:border-[#1782C5] hover:shadow-md dark:border-slate-800 dark:bg-slate-900"
+                      type="button"
+                      onClick={() => setSelectedDocument(doc)}
+                      className="flex w-full items-center justify-between rounded-xl border border-gray-200 bg-white p-4 text-left shadow-sm transition hover:border-[#1782C5] hover:shadow-md dark:border-slate-800 dark:bg-slate-900"
                     >
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-sm font-semibold text-gray-900 dark:text-slate-100">{doc.title}</p>
@@ -579,7 +591,7 @@ export default function Home() {
                       <div className="ml-4 rounded-full bg-[#1782C5]/10 px-2.5 py-1 text-[11px] font-semibold text-[#1782C5]">
                         {doc.resource_type_name || 'Document'}
                       </div>
-                    </div>
+                    </button>
                   ))}
                 </div>
               )
