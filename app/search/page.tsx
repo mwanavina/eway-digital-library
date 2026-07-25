@@ -1,116 +1,129 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Search, X, FileText, Book, BookOpen, GraduationCap } from 'lucide-react';
 import { Header } from '@/components/header';
 import { BottomNav } from '@/components/bottom-nav';
-import { DocumentCard } from '@/components/document-card';
+import { PDFModal } from '@/components/pdf-modal';
+
+interface SearchDocument {
+  id: number;
+  title: string;
+  course_code: string;
+  course_name: string;
+  year?: number | null;
+  semester?: number | null;
+  exam_type?: string | null;
+  school_name?: string | null;
+  department_name?: string | null;
+  file_path?: string | null;
+  thumbnail_url?: string | null;
+  resource_type_name?: string | null;
+  download_count?: number | null;
+}
 
 export default function SearchPage() {
-  const [searchQuery, setSearchQuery] = useState('');
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('q') ?? '');
   const [isSearching, setIsSearching] = useState(false);
-  const [searchResults, setSearchResults] = useState<any[]>([]);
-  const [recentSearches, setRecentSearches] = useState([
-    'Database systems',
-    'Network security 2023',
-    'Calculus I midterm',
-  ]);
+  const [searchResults, setSearchResults] = useState<SearchDocument[]>([]);
+  const [recentSearches, setRecentSearches] = useState<string[]>([]);
+  const [selectedDocument, setSelectedDocument] = useState<SearchDocument | null>(null);
 
-  // Mock documents for demo
-  const mockDocuments = [
-    {
-      id: 1,
-      title: 'Database Systems',
-      courseName: 'Data Management',
-      courseCode: 'IT304',
-      year: 2024,
-      semester: 1,
-      examType: 'End-semester',
-      schoolName: 'School of ICT',
-      departmentName: 'Computer Science',
-      filePath: '/sample.pdf',
-    },
-    {
-      id: 2,
-      title: 'Database Systems Mid-semester 2023',
-      courseName: 'Data Management',
-      courseCode: 'IT304',
-      year: 2023,
-      semester: 1,
-      examType: 'Mid-semester',
-      schoolName: 'School of ICT',
-      departmentName: 'Computer Science',
-      filePath: '/sample.pdf',
-    },
-    {
-      id: 3,
-      title: 'NoSQL vs Relational Database Systems',
-      courseName: 'Advanced Databases',
-      courseCode: 'IT405',
-      year: 2024,
-      semester: 2,
-      examType: 'Journal',
-      schoolName: 'School of ICT',
-      departmentName: 'Computer Science',
-      filePath: '/sample.pdf',
-    },
-    {
-      id: 4,
-      title: 'IT304 Course Outline — Database...',
-      courseName: 'Data Management',
-      courseCode: 'IT304',
-      year: 2024,
-      semester: 2,
-      examType: 'Course Outline',
-      schoolName: 'School of ICT',
-      departmentName: 'Computer Science',
-      filePath: '/sample.pdf',
-    },
-  ];
-
-  const resourceTypes = [
+  const resourceTypes = useMemo(() => [
     { id: 'past-papers', label: 'Past Papers', icon: FileText, color: '#4A90E2', count: 548 },
     { id: 'journals', label: 'Journals', icon: Book, color: '#50C878', count: 214 },
     { id: 'dissertations', label: 'Dissertations', icon: BookOpen, color: '#9B59B6', count: 187 },
     { id: 'course-outlines', label: 'Course Outlines', icon: GraduationCap, color: '#F39C12', count: 299 },
-  ];
+  ], []);
+
+  useEffect(() => {
+    const query = searchParams.get('q') ?? '';
+    setSearchQuery(query);
+
+    if (!query.trim()) {
+      setSearchResults([]);
+      setIsSearching(false);
+      return;
+    }
+
+    let ignore = false;
+    const controller = new AbortController();
+
+    const runSearch = async () => {
+      setIsSearching(true);
+      try {
+        const response = await fetch(`/api/documents?search=${encodeURIComponent(query)}`, {
+          signal: controller.signal,
+          cache: 'no-store',
+        });
+        const payload = await response.json();
+
+        if (!ignore && payload.success) {
+          setSearchResults(payload.data ?? []);
+          setRecentSearches((prev) => {
+            const next = [query, ...prev.filter((item) => item.toLowerCase() !== query.toLowerCase())];
+            return next.slice(0, 6);
+          });
+        }
+      } catch (error) {
+        if (!ignore && (error as Error).name !== 'AbortError') {
+          setSearchResults([]);
+        }
+      } finally {
+        if (!ignore) {
+          setIsSearching(false);
+        }
+      }
+    };
+
+    runSearch();
+
+    return () => {
+      ignore = true;
+      controller.abort();
+    };
+  }, [searchParams]);
 
   const handleSearch = (query: string) => {
     setSearchQuery(query);
+
+    const params = new URLSearchParams(searchParams.toString());
+
     if (query.trim()) {
-      setIsSearching(true);
-      // Simulate search delay
-      setTimeout(() => {
-        setSearchResults(mockDocuments);
-        setIsSearching(false);
-        // Add to recent searches if not already there
-        if (!recentSearches.includes(query)) {
-          setRecentSearches([query, ...recentSearches.slice(0, 4)]);
-        }
-      }, 300);
+      params.set('q', query.trim());
     } else {
-      setSearchResults([]);
+      params.delete('q');
     }
+
+    router.replace(`/search?${params.toString()}`);
   };
 
   const handleRemoveRecent = (search: string) => {
-    setRecentSearches(recentSearches.filter((s) => s !== search));
+    setRecentSearches((prev) => prev.filter((item) => item !== search));
   };
 
   const clearSearch = () => {
     setSearchQuery('');
     setSearchResults([]);
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete('q');
+    router.replace(`/search?${params.toString()}`);
   };
 
+  const activeQuery = searchQuery.trim();
+
   // Initial search state
-  if (!searchQuery && searchResults.length === 0) {
+  if (!activeQuery && searchResults.length === 0) {
     return (
       <>
         <Header onSearchClick={() => {}} />
         <main className="bg-background dark:bg-slate-950 min-h-screen pb-20">
           {/* Search Header */}
           <div className="bg-gradient-to-b from-muted to-background dark:from-slate-900 dark:to-slate-950 p-4 sticky top-16 z-30 shadow-sm">
-              <div className="flex items-center gap-2 bg-background dark:bg-slate-900 border-2 border-[#1782C5] rounded-lg px-3 py-2">
+            <div className="flex items-center gap-2 bg-background dark:bg-slate-900 border-2 border-[#1782C5] rounded-lg px-3 py-2">
               <Search size={20} className="text-gray-600" />
               <input
                 type="text"
@@ -224,28 +237,35 @@ export default function SearchPage() {
           </div>
         </div>
 
-        {/* Results Grid */}
+        {/* Results List */}
         <div className="px-4 py-6">
           {isSearching ? (
             <div className="flex items-center justify-center py-12">
               <p className="text-gray-500">Searching...</p>
             </div>
           ) : searchResults.length > 0 ? (
-            <div className="grid gap-4">
+            <div className="space-y-3">
               {searchResults.map((doc) => (
-                <DocumentCard
+                <button
                   key={doc.id}
-                  id={doc.id}
-                  title={doc.title}
-                  courseName={doc.courseName}
-                  courseCode={doc.courseCode}
-                  year={doc.year}
-                  semester={doc.semester}
-                  examType={doc.examType}
-                  schoolName={doc.schoolName}
-                  departmentName={doc.departmentName}
-                  filePath={doc.filePath}
-                />
+                  onClick={() => setSelectedDocument(doc)}
+                  className="w-full rounded-xl border border-gray-200 bg-white p-4 text-left shadow-sm transition hover:border-[#1782C5] hover:shadow-md dark:border-slate-800 dark:bg-slate-900"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-semibold text-gray-900 dark:text-slate-100">{doc.title}</p>
+                      <p className="mt-1 text-xs text-gray-600 dark:text-slate-400">
+                        {doc.course_name} • {doc.course_code}
+                      </p>
+                      <p className="mt-1 text-xs text-gray-500 dark:text-slate-500">
+                        {doc.school_name ?? 'School'} • {doc.department_name ?? 'Department'}
+                      </p>
+                    </div>
+                    <div className="rounded-full bg-[#1782C5]/10 px-2.5 py-1 text-[11px] font-semibold text-[#1782C5]">
+                      {doc.resource_type_name ?? 'Document'}
+                    </div>
+                  </div>
+                </button>
               ))}
             </div>
           ) : (
@@ -257,6 +277,14 @@ export default function SearchPage() {
         </div>
       </main>
       <BottomNav activeTab="search" />
+      <PDFModal
+        isOpen={Boolean(selectedDocument)}
+        onClose={() => setSelectedDocument(null)}
+        title={selectedDocument?.title ?? ''}
+        pdfUrl={selectedDocument?.file_path ?? ''}
+        documentId={selectedDocument?.id ?? 0}
+        onDownload={async () => Promise.resolve()}
+      />
     </>
   );
 }
