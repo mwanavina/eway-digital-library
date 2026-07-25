@@ -73,6 +73,9 @@ export function SearchPageClient({ initialQuery, initialResults }: SearchPageCli
   };
 
   const activeQuery = searchQuery.trim();
+  const hasActiveSearch = Boolean(activeQuery);
+  const resultsHeading = hasActiveSearch ? `${initialResults.length.toLocaleString()} results for all resources` : 'Suggested files';
+  const resultsSubtitle = hasActiveSearch ? `${initialResults.length} results for "${searchQuery}"` : 'Files picked for you';
 
   if (!activeQuery && initialResults.length === 0) {
     return (
@@ -142,8 +145,8 @@ export function SearchPageClient({ initialQuery, initialResults }: SearchPageCli
           </div>
           <div className="flex items-center justify-between px-1">
             <div>
-              <p className="text-sm font-semibold text-gray-900">All ({initialResults.length})</p>
-              <p className="text-xs text-gray-600">{initialResults.length} results for "{searchQuery}"</p>
+              <p className="text-sm font-semibold text-gray-900">{resultsHeading}</p>
+              <p className="text-xs text-gray-600">{resultsSubtitle}</p>
             </div>
           </div>
         </div>
