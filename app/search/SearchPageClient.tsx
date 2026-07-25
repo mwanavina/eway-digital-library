@@ -1,8 +1,8 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Search, X, FileText, Book, BookOpen, GraduationCap } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { Header } from '@/components/header';
 import { BottomNav } from '@/components/bottom-nav';
 import { PDFModal } from '@/components/pdf-modal';
@@ -30,6 +30,8 @@ interface SearchPageClientProps {
 
 export function SearchPageClient({ initialQuery, initialResults }: SearchPageClientProps) {
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [searchQuery, setSearchQuery] = useState(initialQuery);
   const [selectedDocument, setSelectedDocument] = useState<SearchDocument | null>(null);
 
@@ -40,20 +42,32 @@ export function SearchPageClient({ initialQuery, initialResults }: SearchPageCli
     { id: 'course-outlines', label: 'Course Outlines', icon: GraduationCap, color: '#F39C12', count: 299 },
   ], []);
 
-  const handleSearch = (query: string) => {
-    setSearchQuery(query);
-    const params = new URLSearchParams();
+  useEffect(() => {
+    setSearchQuery(initialQuery);
+  }, [initialQuery]);
 
-    if (query.trim()) {
-      params.set('q', query.trim());
+  const handleSearch = (query: string) => {
+    const nextValue = query.trim();
+    setSearchQuery(query);
+
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (nextValue) {
+      params.set('q', nextValue);
+    } else {
+      params.delete('q');
     }
 
-    router.replace(`/search${params.toString() ? `?${params.toString()}` : ''}`);
+    const nextUrl = params.toString() ? `${pathname}?${params.toString()}` : pathname;
+    router.replace(nextUrl, { scroll: false });
   };
 
   const clearSearch = () => {
     setSearchQuery('');
-    router.replace('/search');
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete('q');
+    const nextUrl = params.toString() ? `${pathname}?${params.toString()}` : pathname;
+    router.replace(nextUrl, { scroll: false });
   };
 
   const activeQuery = searchQuery.trim();
