@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useTransition } from 'react';
 import { Download, FileText, ChevronRight, Share2, MoreHorizontal, Bookmark as BookmarkIcon } from 'lucide-react';
 import Link from 'next/link';
+import { toggleBookmark } from '@/app/actions/documents';
 import { PDFModal } from './pdf-modal';
 import { ShareModal } from './share-modal';
 
@@ -50,6 +51,7 @@ export function ResourceCard({
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isBookmarked, setIsBookmarked] = useState(initialBookmarked);
+  const [isPending, startTransition] = useTransition();
 
   const handleCardClick = () => {
     if (filePath) {
@@ -192,26 +194,21 @@ export function ResourceCard({
                 </button>
                 <button
                   type="button"
-                  onClick={async (event) => {
+                  onClick={(event) => {
                     event.stopPropagation();
                     setIsMenuOpen(false);
-                    try {
-                      const response = await fetch('/api/documents/bookmark', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ documentId: id }),
-                      });
-                      if (response.ok) {
-                        setIsBookmarked((prev) => !prev);
+                    startTransition(async () => {
+                      const result = await toggleBookmark(id);
+                      if (result.success) {
+                        setIsBookmarked(result.bookmarked ?? !isBookmarked);
                       }
-                    } catch (error) {
-                      console.error('[v0] Error toggling bookmark:', error);
-                    }
+                    });
                   }}
-                  className="flex w-full items-center gap-2 rounded-lg px-2 py-2 text-left text-sm text-gray-700 transition hover:bg-gray-50 dark:text-slate-200 dark:hover:bg-slate-800"
+                  disabled={isPending}
+                  className="flex w-full items-center gap-2 rounded-lg px-2 py-2 text-left text-sm text-gray-700 transition hover:bg-gray-50 disabled:opacity-50 dark:text-slate-200 dark:hover:bg-slate-800"
                 >
                   <BookmarkIcon size={16} />
-                  {isBookmarked ? 'Remove bookmark' : 'Bookmark'}
+                  {isPending ? 'Working...' : isBookmarked ? 'Remove bookmark' : 'Bookmark'}
                 </button>
                 <Link
                   href={`/document/${id}`}

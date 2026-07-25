@@ -1,8 +1,10 @@
 'use server';
 
+import { and, eq } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import { db } from '@/lib/db';
-import { documents } from '@/lib/db/schema';
+import { bookmarks, documents } from '@/lib/db/schema';
+import { getServerSession } from '@/lib/server/session';
 
 interface CreateDocumentInput {
   title: string;
@@ -102,6 +104,43 @@ export async function deleteDocument(documentId: number): Promise<any> {
   } catch (error) {
     console.error('Error deleting document:', error);
     throw error;
+  }
+}
+
+export async function toggleBookmark(documentId: number): Promise<{ success: boolean; bookmarked?: boolean; error?: string }> {
+  try {
+    const session = await getServerSession();
+    const user = session?.user;
+
+    if (!user?.id) {
+      return { success: false, error: 'Unauthorized' };
+    }
+
+    const normalizedDocumentId = Number(documentId);
+    const existing = await db
+      .select()
+      .from(bookmarks)
+      .where(and(eq(bookmarks.userId, user.id), eq(bookmarks.documentId, normalizedDocumentId)))
+      .limit(1);
+
+    if (existing.length > 0) {
+      await db.delete(bookmarks).where(and(eq(bookmarks.userId, user.id), eq(bookmarks.documentId, normalizedDocumentId)));
+      revalidatePath('/bookmarks');
+      revalidatePath('/');
+      return { success: true, bookmarked: false };
+    }
+
+    await db.insert(bookmarks).values({
+      userId: user.id,
+      documentId: normalizedDocumentId,
+    });
+
+    revalidatePath('/bookmarks');
+    revalidatePath('/');
+    return { success: true, bookmarked: true };
+  } catch (error) {
+    console.error('Error toggling bookmark:', error);
+    return { success: false, error: 'Failed to toggle bookmark' };
   }
 }
 
