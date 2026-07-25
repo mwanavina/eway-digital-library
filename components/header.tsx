@@ -81,7 +81,7 @@ export function Header({ onSearchChange, onMenuClick, onSearchClick, onFilterCli
 
         {/* Right Icons - Search, Filter, Settings, User */}
         <div className="flex items-center gap-1 shrink-0">
-          {/* Dashboard Button - Desktop Only */}
+          {/* Dashboard Button - Desktop Only
           <Link
             href="/dashboard"
             className="hidden md:flex items-center gap-2 px-3 py-2 hover:bg-[#1F2557] dark:hover:bg-slate-700 rounded-lg transition-colors"
@@ -89,7 +89,7 @@ export function Header({ onSearchChange, onMenuClick, onSearchClick, onFilterCli
           >
             <BarChart3 size={18} />
             <span className="text-sm font-medium">Dashboard</span>
-          </Link>
+          </Link> */}
 
           {/* Admin Dashboard Button - Desktop Only */}
           {isAdmin && (
