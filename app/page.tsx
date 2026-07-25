@@ -494,13 +494,13 @@ export default function Home() {
             </div>
 
             {/* Results Header */}
-            <div className="mb-4 lg:mb-6 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-              <div>
+            <div className="mb-4 lg:mb-6 flex flex-row items-center justify-between gap-3">
+              <div className="flex min-w-0 items-center">
                 <p className="text-gray-700 text-xs lg:text-sm font-medium">
                   {resultsHeading}
                 </p>
               </div>
-              <div className="ml-auto flex items-center gap-2 self-start rounded-full border border-gray-200 bg-white p-1 shadow-sm md:self-auto">
+              <div className="ml-auto flex shrink-0 items-center gap-2 rounded-full border border-gray-200 bg-white p-1 shadow-sm">
                 <button
                   type="button"
                   onClick={() => setViewMode('list')}
