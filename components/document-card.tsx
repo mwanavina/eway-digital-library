@@ -123,9 +123,9 @@ export function DocumentCard({
         className={`bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow overflow-hidden border border-gray-100 ${isExternalPdf ? 'cursor-pointer' : ''}`}
       >
       {/* Header */}
-      <div className="bg-gradient-to-r from-[#1782C5] to-[#1F2557] p-4 text-white">
+      <div className="bg-linear-to-r from-[#1782C5] to-[#1F2557] p-4 text-white">
         <div className="flex items-start gap-3">
-          <div className="flex-shrink-0 w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
+          <div className="shrink-0 w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
             <FileText size={24} className="text-red-600" />
           </div>
           <div className="flex-1 min-w-0">
@@ -138,7 +138,7 @@ export function DocumentCard({
       </div>
 
       {/* Thumbnail */}
-      <div className="aspect-video bg-gradient-to-b from-gray-50 to-gray-100 border-b border-gray-200 relative group overflow-hidden">
+      <div className="aspect-video bg-linear-to-b from-gray-50 to-gray-100 border-b border-gray-200 relative group overflow-hidden">
         {thumbnailUrl ? (
           <img
             src={thumbnailUrl}
@@ -146,7 +146,7 @@ export function DocumentCard({
             className="w-full h-full object-cover group-hover:scale-105 transition-transform"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#1782C5] to-[#1F2557]">
+          <div className="w-full h-full flex items-center justify-center bg-linear-to-br from-[#1782C5] to-[#1F2557]">
             <div className="text-center text-white">
               <FileText size={32} className="mx-auto mb-2 opacity-80" />
               <p className="text-xs font-medium">PDF Document</p>

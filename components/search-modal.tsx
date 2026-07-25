@@ -98,7 +98,7 @@ export function SearchModal({
           {/* Back Button */}
           <button
             onClick={handleClose}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0"
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors shrink-0"
             aria-label="Go back"
           >
             <ArrowLeft size={20} className="text-gray-900" />
