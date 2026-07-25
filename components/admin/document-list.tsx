@@ -160,10 +160,10 @@ export function AdminDocumentList({ documents, onDelete }: AdminDocumentListProp
                   <button
                     onClick={() => handleDelete(doc.id)}
                     disabled={deleting === doc.id}
-                    className="inline-flex items-center justify-center p-2 hover:bg-muted rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="inline-flex items-center justify-center rounded-lg bg-red-600 p-2 text-white transition-colors hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
                     title="Delete document"
                   >
-                    <Trash2 size={16} className="text-destructive" />
+                    <Trash2 size={16} />
                   </button>
                 </td>
               </tr>
