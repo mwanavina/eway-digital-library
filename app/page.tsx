@@ -219,6 +219,9 @@ export default function Home() {
     router.replace(nextUrl, { scroll: false });
   };
 
+  const hasActiveSearchOrFilters = Boolean(searchQuery.trim()) || activeResourceType !== 'all' || Object.values(filters).some((value) => value !== '');
+  const resultsHeading = hasActiveSearchOrFilters ? `${documents.length.toLocaleString()} results for all resources` : 'Suggested files';
+
   // Calculate active filter count
   const activeFilterCount = Object.values(filters).filter((v) => v !== '').length + (searchQuery ? 1 : 0);
   
@@ -492,7 +495,7 @@ export default function Home() {
             <div className="hidden md:flex mb-4 lg:mb-6 flex-col md:flex-row md:items-center md:justify-between gap-3">
               <div>
                 <p className="text-gray-700 text-xs lg:text-sm font-medium">
-                  {documents.length.toLocaleString()} results for {searchQuery ? `"${searchQuery}"` : 'all resources'}
+                  {resultsHeading}
                 </p>
               </div>
               {/* <div className="hidden md:flex items-center gap-3">
