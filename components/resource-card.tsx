@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Download, FileText, ChevronRight, Share2, MoreHorizontal } from 'lucide-react';
+import { Download, FileText, ChevronRight, Share2, MoreHorizontal, Bookmark as BookmarkIcon } from 'lucide-react';
 import Link from 'next/link';
 import { PDFModal } from './pdf-modal';
 import { ShareModal } from './share-modal';
@@ -23,6 +23,7 @@ interface ResourceCardProps {
   semester?: number;
   examType?: string;
   downloadCount?: number;
+  initialBookmarked?: boolean;
 }
 
 export function ResourceCard({
@@ -42,11 +43,13 @@ export function ResourceCard({
   semester,
   examType,
   downloadCount,
+  initialBookmarked = false,
 }: ResourceCardProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isBookmarked, setIsBookmarked] = useState(initialBookmarked);
 
   const handleCardClick = () => {
     if (filePath) {
@@ -186,6 +189,29 @@ export function ResourceCard({
                 >
                   <Share2 size={16} />
                   Share
+                </button>
+                <button
+                  type="button"
+                  onClick={async (event) => {
+                    event.stopPropagation();
+                    setIsMenuOpen(false);
+                    try {
+                      const response = await fetch('/api/documents/bookmark', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ documentId: id }),
+                      });
+                      if (response.ok) {
+                        setIsBookmarked((prev) => !prev);
+                      }
+                    } catch (error) {
+                      console.error('[v0] Error toggling bookmark:', error);
+                    }
+                  }}
+                  className="flex w-full items-center gap-2 rounded-lg px-2 py-2 text-left text-sm text-gray-700 transition hover:bg-gray-50 dark:text-slate-200 dark:hover:bg-slate-800"
+                >
+                  <BookmarkIcon size={16} />
+                  {isBookmarked ? 'Remove bookmark' : 'Bookmark'}
                 </button>
                 <Link
                   href={`/document/${id}`}

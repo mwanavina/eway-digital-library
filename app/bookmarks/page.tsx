@@ -1,72 +1,68 @@
 'use client';
 
-import { useState } from 'react';
-import { Bookmark, Download, Eye, Clock, Flame, TrendingUp, MoreVertical } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Bookmark, Download, Eye, Clock, MoreVertical } from 'lucide-react';
 import { Header } from '@/components/header';
 import { BottomNav } from '@/components/bottom-nav';
 import { DocumentCard } from '@/components/document-card';
+import { authClient } from '@/lib/auth-client';
+
+interface BookmarkDocument {
+  id: number;
+  title: string;
+  course_code: string;
+  course_name: string;
+  year?: number | null;
+  semester?: number | null;
+  exam_type?: string | null;
+  school_name?: string | null;
+  department_name?: string | null;
+  file_path?: string | null;
+  thumbnail_url?: string | null;
+  resource_type_name?: string | null;
+  download_count?: number | null;
+  bookmarked_at?: string | Date | null;
+}
 
 export default function BookmarksPage() {
   const [activeTab, setActiveTab] = useState<'bookmarks' | 'activity'>('bookmarks');
+  const [bookmarkedDocs, setBookmarkedDocs] = useState<BookmarkDocument[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { data: session } = authClient.useSession();
 
-  // Mock bookmarked documents
-  const bookmarkedDocs = [
-    {
-      id: 1,
-      title: 'IT304 Database Systems',
-      courseName: 'Data Management',
-      courseCode: 'IT304',
-      year: 2024,
-      semester: 1,
-      examType: 'End-semester',
-      schoolName: 'School of ICT',
-      departmentName: 'Computer Science',
-      filePath: '/sample.pdf',
-      bookmarkedDate: '3 days ago',
-    },
-    {
-      id: 2,
-      title: 'Network Security Fundamentals',
-      courseName: 'Network Security',
-      courseCode: 'IT320',
-      year: 2024,
-      semester: 1,
-      examType: 'Past Paper',
-      schoolName: 'School of ICT',
-      departmentName: 'Computer Science',
-      filePath: '/sample.pdf',
-      bookmarkedDate: '1 week ago',
-    },
-    {
-      id: 3,
-      title: 'Calculus I Midterm Exam',
-      courseName: 'Mathematics I',
-      courseCode: 'MATH101',
-      year: 2024,
-      semester: 1,
-      examType: 'Midterm',
-      schoolName: 'School of Science',
-      departmentName: 'Mathematics',
-      filePath: '/sample.pdf',
-      bookmarkedDate: '2 weeks ago',
-    },
-  ];
+  useEffect(() => {
+    const loadBookmarks = async () => {
+      if (!session?.user?.id) {
+        setLoading(false);
+        return;
+      }
 
-  // Mock activity data
+      try {
+        const response = await fetch('/api/documents/bookmarks');
+        const data = await response.json();
+        if (data.success) {
+          setBookmarkedDocs(data.data || []);
+        }
+      } catch (error) {
+        console.error('[v0] Error loading bookmarks:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    void loadBookmarks();
+  }, [session?.user?.id]);
+
   const activityItems = [
-    { id: 1, type: 'download', title: 'Downloaded IT304 Database Systems', time: 'Today, 2:30 PM', icon: Download },
-    { id: 2, type: 'view', title: 'Viewed Network Security Fundamentals', time: 'Today, 1:15 PM', icon: Eye },
-    { id: 3, type: 'bookmark', title: 'Bookmarked Calculus I Midterm Exam', time: 'Yesterday, 4:45 PM', icon: Bookmark },
-    { id: 4, type: 'download', title: 'Downloaded Applied Calculus in Engineering', time: 'Yesterday, 3:20 PM', icon: Download },
-    { id: 5, type: 'view', title: 'Viewed Numerical Methods Dissertation', time: '2 days ago, 11:00 AM', icon: Eye },
-    { id: 6, type: 'bookmark', title: 'Bookmarked Database Systems Journal', time: '3 days ago, 5:30 PM', icon: Bookmark },
+    { id: 1, type: 'download', title: 'Downloaded bookmarked resources', time: 'Recently updated', icon: Download },
+    { id: 2, type: 'view', title: 'Opened saved documents', time: 'Recently updated', icon: Eye },
+    { id: 3, type: 'bookmark', title: 'Saved documents are synced with your account', time: 'Live', icon: Bookmark },
   ];
 
-  // Mock statistics
   const stats = [
-    { label: 'Total Bookmarks', value: '23', icon: Bookmark, color: '#1782C5' },
-    { label: 'Downloads This Week', value: '8', icon: Download, color: '#50C878' },
-    { label: 'Resources Viewed', value: '45', icon: Eye, color: '#F39C12' },
+    { label: 'Total Bookmarks', value: bookmarkedDocs.length.toString(), icon: Bookmark, color: '#1782C5' },
+    { label: 'Downloads This Week', value: '0', icon: Download, color: '#50C878' },
+    { label: 'Resources Viewed', value: '0', icon: Eye, color: '#F39C12' },
   ];
 
   return (
@@ -133,7 +129,9 @@ export default function BookmarksPage() {
         {/* Bookmarks Tab */}
         {activeTab === 'bookmarks' && (
           <div className="px-4 py-6 space-y-4">
-            {bookmarkedDocs.length > 0 ? (
+            {loading ? (
+              <div className="text-center py-12 text-sm text-gray-600">Loading your bookmarks...</div>
+            ) : bookmarkedDocs.length > 0 ? (
               <>
                 <p className="text-xs text-gray-600">You have {bookmarkedDocs.length} bookmarked resources</p>
                 <div className="space-y-4">
@@ -142,14 +140,15 @@ export default function BookmarksPage() {
                       key={doc.id}
                       id={doc.id}
                       title={doc.title}
-                      courseName={doc.courseName}
-                      courseCode={doc.courseCode}
-                      year={doc.year}
-                      semester={doc.semester}
-                      examType={doc.examType}
-                      schoolName={doc.schoolName}
-                      departmentName={doc.departmentName}
-                      filePath={doc.filePath}
+                      courseName={doc.course_name}
+                      courseCode={doc.course_code}
+                      year={doc.year ?? 0}
+                      semester={doc.semester ?? 0}
+                      examType={doc.exam_type ?? ''}
+                      schoolName={doc.school_name ?? 'Unknown'}
+                      departmentName={doc.department_name ?? 'Unknown'}
+                      filePath={doc.file_path ?? ''}
+                      thumbnailUrl={doc.thumbnail_url ?? undefined}
                     />
                   ))}
                 </div>

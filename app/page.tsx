@@ -38,6 +38,7 @@ interface Document {
   author?: string;
   publication_date?: string;
   abstract?: string;
+  is_bookmarked?: boolean;
 }
 
 type ResourceType = 'all' | 'past-papers' | 'journals' | 'dissertations' | 'course-outlines' | 'research-papers';
@@ -567,6 +568,7 @@ function HomeContent() {
                       semester={doc.semester}
                       examType={doc.exam_type}
                       downloadCount={doc.download_count}
+                      initialBookmarked={Boolean(doc.is_bookmarked)}
                     />
                   ))}
                 </div>

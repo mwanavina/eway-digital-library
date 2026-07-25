@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Search, Settings, User, Sliders, BarChart3, Shield } from 'lucide-react';
+import { Search, Bookmark, User, Sliders, BarChart3, Shield } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ThemeSwitcher } from './theme-switcher';
@@ -133,13 +133,13 @@ export function Header({ onSearchChange, onMenuClick, onSearchClick, onFilterCli
 
           <ThemeSwitcher />
           
-          {/* Settings Button - Desktop Only with Link */}
+          {/* Bookmarks Button - Desktop Only with Link */}
           <Link
-            href="/settings"
+            href="/bookmarks"
             className="hidden md:flex p-2 hover:bg-[#1F2557] dark:hover:bg-slate-700 rounded-lg transition-colors"
-            aria-label="Settings"
+            aria-label="Bookmarks"
           >
-            <Settings size={18} />
+            <Bookmark size={18} />
           </Link>
 
           {/* User Profile Button - Desktop Only with Popover */}

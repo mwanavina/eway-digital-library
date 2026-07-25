@@ -1,6 +1,7 @@
 import { and, desc, eq, ilike, or, sql } from 'drizzle-orm';
 import { db } from '@/lib/db';
 import {
+  bookmarks,
   courses,
   departments,
   documents,
@@ -158,6 +159,7 @@ export async function getDocumentsForUser(options: GetDocumentsOptions) {
       level_id: documents.levelId,
       level_name: levels.description,
       level_number: levels.levelNumber,
+      is_bookmarked: sql<boolean>`CASE WHEN EXISTS (SELECT 1 FROM bookmarks b WHERE b.user_id = ${options.userId ?? ''} AND b.document_id = documents.id) THEN true ELSE false END`,
     })
     .from(documents)
     .leftJoin(courses, eq(documents.courseId, courses.id))

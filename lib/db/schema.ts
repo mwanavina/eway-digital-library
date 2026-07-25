@@ -8,6 +8,7 @@ import {
   serial,
   text,
   timestamp,
+  uniqueIndex,
   varchar,
 } from "drizzle-orm/pg-core";
 
@@ -163,6 +164,21 @@ export const documents = pgTable("documents", {
   createdAt: timestamp("created_at", { withTimezone: false }).defaultNow().notNull(),
 });
 
+export const bookmarks = pgTable(
+  "bookmarks",
+  {
+    id: serial("id").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    documentId: integer("document_id")
+      .notNull()
+      .references(() => documents.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at", { withTimezone: false }).defaultNow().notNull(),
+  },
+  (table) => [uniqueIndex("bookmarks_user_document_unique_idx").on(table.userId, table.documentId)]
+);
+
 export const downloadLogs = pgTable("download_logs", {
   id: serial("id").primaryKey(),
   documentId: integer("document_id")
@@ -208,6 +224,7 @@ export const userRelations = relations(user, ({ one, many }) => ({
   profile: one(userProfiles),
   uploadedDocuments: many(documents),
   downloadLogs: many(downloadLogs),
+  bookmarks: many(bookmarks),
 }));
 
 export const userProfilesRelations = relations(userProfiles, ({ one }) => ({
@@ -283,6 +300,17 @@ export const resourceTypesRelations = relations(resourceTypes, ({ many }) => ({
   documents: many(documents),
 }));
 
+export const bookmarksRelations = relations(bookmarks, ({ one }) => ({
+  user: one(user, {
+    fields: [bookmarks.userId],
+    references: [user.id],
+  }),
+  document: one(documents, {
+    fields: [bookmarks.documentId],
+    references: [documents.id],
+  }),
+}));
+
 export const documentsRelations = relations(documents, ({ one, many }) => ({
   course: one(courses, {
     fields: [documents.courseId],
@@ -301,6 +329,7 @@ export const documentsRelations = relations(documents, ({ one, many }) => ({
     references: [user.id],
   }),
   downloadLogs: many(downloadLogs),
+  bookmarks: many(bookmarks),
 }));
 
 export const downloadLogsRelations = relations(downloadLogs, ({ one }) => ({
