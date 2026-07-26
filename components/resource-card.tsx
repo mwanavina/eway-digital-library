@@ -3,7 +3,7 @@
 import { useState, useTransition } from 'react';
 import { Download, FileText, ChevronRight, Share2, MoreHorizontal, Bookmark as BookmarkIcon } from 'lucide-react';
 import Link from 'next/link';
-import { toggleBookmark } from '@/app/actions/documents';
+import { toggleBookmark, trackDownload } from '@/app/actions/documents';
 import { PDFModal } from './pdf-modal';
 import { ShareModal } from './share-modal';
 
@@ -77,12 +77,8 @@ export function ResourceCard({
     e.stopPropagation();
     setIsDownloading(true);
     try {
-      // Track the download via API
-      fetch('/api/documents/track-download', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ documentId: id }),
-      }).catch(err => console.error('[v0] Error tracking download:', err));
+      // Track the download via server action
+      trackDownload(id).catch(err => console.error('[v0] Error tracking download:', err));
 
       // Fetch the PDF as a blob
       const response = await fetch(filePath);
@@ -113,11 +109,7 @@ export function ResourceCard({
 
   const trackDownloadCallback = async (documentId: number) => {
     try {
-      await fetch('/api/documents/track-download', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ documentId }),
-      });
+      await trackDownload(documentId);
     } catch (error) {
       console.error('[v0] Error tracking download:', error);
     }
