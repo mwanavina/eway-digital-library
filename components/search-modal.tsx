@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { ArrowLeft, X, Sliders } from 'lucide-react';
+import { PDFModal } from './pdf-modal';
 
 interface SearchResult {
   id: number;
@@ -32,6 +33,7 @@ export function SearchModal({
   const [query, setQuery] = useState(searchQuery);
   const [results, setResults] = useState<SearchResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [selectedDocument, setSelectedDocument] = useState<SearchResult | null>(null);
 
   useEffect(() => {
     setQuery(searchQuery);
@@ -149,12 +151,10 @@ export function SearchModal({
           results.length > 0 ? (
             <div className="space-y-2">
               {results.map((doc) => (
-                <a
+                <button
                   key={doc.id}
-                  href={doc.file_path ?? '#'}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="block rounded-lg border border-gray-200 bg-white p-3 text-left shadow-sm transition hover:border-[#1782C5]"
+                  onClick={() => setSelectedDocument(doc)}
+                  className="w-full block rounded-lg border border-gray-200 bg-white p-3 text-left shadow-sm transition hover:border-[#1782C5] hover:shadow-md"
                 >
                   <p className="text-sm font-semibold text-gray-900">{doc.title}</p>
                   <p className="mt-1 text-xs text-gray-600">
@@ -163,7 +163,7 @@ export function SearchModal({
                   <p className="mt-1 text-xs text-gray-500">
                     {doc.school_name ?? 'School'} • {doc.department_name ?? 'Department'}
                   </p>
-                </a>
+                </button>
               ))}
             </div>
           ) : (
@@ -173,6 +173,17 @@ export function SearchModal({
           <div className="py-8 text-center text-sm text-gray-600">Start typing to search for documents</div>
         )}
       </div>
+
+      {/* PDF Preview Modal */}
+      {selectedDocument && (
+        <PDFModal
+          isOpen={!!selectedDocument}
+          onClose={() => setSelectedDocument(null)}
+          pdfUrl={selectedDocument.file_path || ''}
+          title={selectedDocument.title}
+          documentId={selectedDocument.id}
+        />
+      )}
     </div>
   );
 }
