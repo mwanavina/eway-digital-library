@@ -4,7 +4,7 @@ import { useState, useTransition } from 'react';
 import { BookmarkMinus, Download, FileText, Share2 } from 'lucide-react';
 import { PDFModal } from './pdf-modal';
 import { ShareModal } from './share-modal';
-import { toggleBookmark } from '@/app/actions/documents';
+import { toggleBookmark, trackDownload } from '@/app/actions/documents';
 
 interface DocumentCardProps {
   id: number;
@@ -58,12 +58,8 @@ export function DocumentCard({
     e.stopPropagation();
     setIsDownloading(true);
     try {
-      // Track the download via API
-      fetch('/api/documents/track-download', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ documentId: id }),
-      }).catch(err => console.error('[v0] Error tracking download:', err));
+      // Track the download via server action
+      trackDownload(id).catch(err => console.error('[v0] Error tracking download:', err));
 
       // Fetch the PDF as a blob
       const response = await fetch(filePath);
@@ -94,11 +90,7 @@ export function DocumentCard({
 
   const trackDownloadCallback = async (documentId: number) => {
     try {
-      await fetch('/api/documents/track-download', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ documentId }),
-      });
+      await trackDownload(documentId);
     } catch (error) {
       console.error('[v0] Error tracking download:', error);
     }
