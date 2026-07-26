@@ -120,7 +120,7 @@ export function JournalsFilter({
         </button>
       </div>
 
-      <div className="hidden lg:block p-4 bg-purple-50 border-b border-purple-200 flex-shrink-0">
+      <div className="hidden lg:block p-4 bg-purple-50 border-b border-purple-200 shrink-0">
         <h2 className="font-bold text-gray-800">Journals & Research Papers</h2>
         <p className="text-xs text-gray-900 mt-1">Filter by academic area</p>
       </div>
@@ -143,7 +143,7 @@ export function JournalsFilter({
         )}
       </div>
 
-      <div className="sticky bottom-0 p-4 bg-white border-t border-gray-200 flex-shrink-0">
+      <div className="sticky bottom-0 p-4 bg-white border-t border-gray-200 shrink-0">
         <button
           onClick={onClearFilters}
           className="w-full px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium transition-colors"

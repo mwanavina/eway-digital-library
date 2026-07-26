@@ -174,7 +174,7 @@ export function PastPapersFilter({
         </button>
       </div>
 
-      <div className="hidden lg:block p-4 bg-blue-50 border-b border-blue-200 flex-shrink-0">
+      <div className="hidden lg:block p-4 bg-blue-50 border-b border-blue-200 shrink-0">
         <h2 className="font-bold text-gray-800">Past Papers</h2>
       </div>
 
@@ -229,7 +229,7 @@ export function PastPapersFilter({
         />
       </div>
 
-      <div className="sticky bottom-0 p-4 bg-white border-t border-gray-200 flex-shrink-0">
+      <div className="sticky bottom-0 p-4 bg-white border-t border-gray-200 shrink-0">
         <button
           onClick={onClearFilters}
           className="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"

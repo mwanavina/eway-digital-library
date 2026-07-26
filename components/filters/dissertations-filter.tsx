@@ -120,7 +120,7 @@ export function DissertationsFilter({
         </button>
       </div>
 
-      <div className="hidden lg:block p-4 bg-indigo-50 border-b border-indigo-200 flex-shrink-0">
+      <div className="hidden lg:block p-4 bg-indigo-50 border-b border-indigo-200 shrink-0">
         <h2 className="font-bold text-gray-800">Dissertations & Theses</h2>
         <p className="text-xs text-gray-900 mt-1">Browse student research</p>
       </div>
@@ -143,7 +143,7 @@ export function DissertationsFilter({
         )}
       </div>
 
-      <div className="sticky bottom-0 p-4 bg-white border-t border-gray-200 flex-shrink-0">
+      <div className="sticky bottom-0 p-4 bg-white border-t border-gray-200 shrink-0">
         <button
           onClick={onClearFilters}
           className="w-full px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium transition-colors"
