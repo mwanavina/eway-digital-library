@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { ArrowLeft, Download, FileText, Calendar, User, BookOpen, Eye } from 'lucide-react';
 import { Spinner } from '@/components/ui/spinner';
 import { BottomNav } from '@/components/bottom-nav';
+import { trackDownload } from '@/app/actions/documents';
 
 interface DocumentDetail {
   id: number;
@@ -63,11 +64,7 @@ export default function DocumentDetailPage() {
 
     setIsDownloading(true);
     try {
-      fetch('/api/documents/track-download', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ documentId: document.id }),
-      }).catch(err => console.error('[v0] Error tracking download:', err));
+      trackDownload(document.id).catch(err => console.error('[v0] Error tracking download:', err));
 
       const response = await fetch(document.file_path);
       if (!response.ok) {
