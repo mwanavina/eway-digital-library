@@ -1,7 +1,7 @@
 'use server';
 
 import { db } from '@/lib/db';
-import { user, userProfiles, levels, documents, programs, departments, schools } from '@/lib/db/schema';
+import { user, userProfiles, levels, documents, programs, departments, schools, courses } from '@/lib/db/schema';
 import { eq, desc, count, sql } from 'drizzle-orm';
 
 export async function fetchAllUsers() {
@@ -72,7 +72,8 @@ export async function fetchTopDocumentsByDownloads() {
       })
       .from(documents)
       .leftJoin(levels, eq(documents.levelId, levels.id))
-      .leftJoin(programs, eq(documents.courseId, programs.id))
+      .leftJoin(courses, eq(documents.courseId, courses.id))
+      .leftJoin(programs, eq(courses.programId, programs.id))
       .leftJoin(departments, eq(programs.departmentId, departments.id))
       .leftJoin(schools, eq(departments.schoolId, schools.id))
       .orderBy(desc(documents.downloadCount))
