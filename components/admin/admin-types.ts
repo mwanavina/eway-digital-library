@@ -1,6 +1,6 @@
 'use client';
 
-export type Tab = 'schools' | 'departments' | 'programs' | 'courses' | 'levels' | 'resource-types' | 'documents' | 'upload';
+export type Tab = 'schools' | 'departments' | 'programs' | 'courses' | 'levels' | 'resource-types' | 'documents' | 'upload' | 'users' | 'analytics';
 
 export interface AdminItem {
   [key: string]: any;
