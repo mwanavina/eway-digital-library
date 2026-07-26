@@ -37,6 +37,8 @@ import { AdminContent } from '@/components/admin/admin-content';
 import { AdminModal } from '@/components/admin/admin-modal';
 import { ConfirmDialog } from '@/components/admin/confirm-dialog';
 import { AdminForm } from '@/components/admin/admin-form';
+import { AdminAnalytics } from '@/components/admin/admin-analytics';
+import { AdminUsersList } from '@/components/admin/admin-users-list';
 import { Tab, AdminItem, AdminFormData } from '@/components/admin/admin-types';
 import { toast } from 'sonner';
 
@@ -284,6 +286,8 @@ export default function AdminPage() {
   const tabs: { id: Tab; label: string }[] = [
     { id: 'upload', label: 'Upload Documents' },
     { id: 'documents', label: 'Manage Documents' },
+    { id: 'users', label: 'Users' },
+    { id: 'analytics', label: 'Analytics' },
     { id: 'schools', label: 'Schools' },
     { id: 'departments', label: 'Departments' },
     { id: 'programs', label: 'Programs' },
@@ -317,24 +321,32 @@ export default function AdminPage() {
             onDocumentsTabClick={loadDocuments}
           />
 
-          <AdminContent
-            activeTab={activeTab}
-            schools={schools}
-            departments={departments}
-            programs={programs}
-            courses={courses}
-            levels={levels}
-            resources={resourceTypes}
-            documents={documents}
-            loading={loading}
-            onCreateClick={openCreateModal}
-            onEdit={openEditModal}
-            onDelete={(item) => setConfirmDelete(item)}
-            onUploadSuccess={() => {
-              setActiveTab('documents');
-              loadDocuments();
-            }}
-          />
+          <div className="space-y-6">
+            {activeTab === 'users' ? (
+              <AdminUsersList />
+            ) : activeTab === 'analytics' ? (
+              <AdminAnalytics />
+            ) : (
+              <AdminContent
+                activeTab={activeTab}
+                schools={schools}
+                departments={departments}
+                programs={programs}
+                courses={courses}
+                levels={levels}
+                resources={resourceTypes}
+                documents={documents}
+                loading={loading}
+                onCreateClick={openCreateModal}
+                onEdit={openEditModal}
+                onDelete={(item) => setConfirmDelete(item)}
+                onUploadSuccess={() => {
+                  setActiveTab('documents');
+                  loadDocuments();
+                }}
+              />
+            )}
+          </div>
         </section>
       </main>
 
