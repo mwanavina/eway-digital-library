@@ -48,6 +48,16 @@ export function AdminContent({
       subtitle: 'Review and manage every uploaded resource in one place.',
       actionLabel: 'Upload documents',
     },
+    users: {
+      title: 'Users',
+      subtitle: 'View and manage all registered users on the platform.',
+      actionLabel: 'Add user',
+    },
+    analytics: {
+      title: 'Analytics',
+      subtitle: 'Track user engagement, downloads, and content performance.',
+      actionLabel: 'View analytics',
+    },
     schools: {
       title: 'Schools',
       subtitle: 'Create and manage the schools that power the platform.',
