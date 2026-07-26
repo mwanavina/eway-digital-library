@@ -3,7 +3,7 @@
 import { and, eq } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import { db } from '@/lib/db';
-import { bookmarks, documents } from '@/lib/db/schema';
+import { bookmarks, documents, downloadLogs } from '@/lib/db/schema';
 import { getServerSession } from '@/lib/server/session';
 
 interface CreateDocumentInput {
@@ -173,5 +173,50 @@ export async function updateDocumentStatus(
   } catch (error) {
     console.error('Error updating document status:', error);
     throw error;
+  }
+}
+
+/**
+ * Track a document download and increment the download count
+ */
+export async function trackDownload(documentId: number): Promise<{ success: boolean; error?: string }> {
+  try {
+    const session = await getServerSession();
+    const user = session?.user;
+
+    if (!user?.id) {
+      return { success: false, error: 'Unauthorized' };
+    }
+
+    const normalizedDocumentId = Number(documentId);
+
+    // Record the download in downloadLogs
+    await db.insert(downloadLogs).values({
+      documentId: normalizedDocumentId,
+      userId: user.id,
+      downloadedAt: new Date(),
+    });
+
+    // Update the download count on the document
+    const currentDoc = await db
+      .select({ downloadCount: documents.downloadCount })
+      .from(documents)
+      .where(eq(documents.id, normalizedDocumentId))
+      .limit(1);
+
+    if (currentDoc.length > 0) {
+      const newCount = (currentDoc[0].downloadCount ?? 0) + 1;
+      await db
+        .update(documents)
+        .set({ downloadCount: newCount })
+        .where(eq(documents.id, normalizedDocumentId));
+    }
+
+    console.log('[v0] Download tracked for document:', documentId, 'by user:', user.id);
+
+    return { success: true };
+  } catch (error) {
+    console.error('[v0] Error tracking download:', error);
+    return { success: false, error: 'Failed to track download' };
   }
 }
