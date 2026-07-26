@@ -1,10 +1,10 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { asc, desc, eq } from 'drizzle-orm';
+import { asc, desc, eq, count, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import { db } from "@/lib/db";
-import { schools, departments, programs, courses, levels, documents, resourceTypes } from "@/lib/db/schema";
+import { schools, departments, programs, courses, levels, documents, resourceTypes, user, userProfiles } from "@/lib/db/schema";
 
 type NewSchool = typeof schools.$inferInsert;
 
