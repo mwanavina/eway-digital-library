@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -39,6 +39,7 @@ import { ConfirmDialog } from '@/components/admin/confirm-dialog';
 import { AdminForm } from '@/components/admin/admin-form';
 import { AdminAnalytics } from '@/components/admin/admin-analytics';
 import { AdminUsersList } from '@/components/admin/admin-users-list';
+import { AdminLayout } from '@/components/admin/admin-layout';
 import { Tab, AdminItem, AdminFormData } from '@/components/admin/admin-types';
 import { toast } from 'sonner';
 
@@ -296,59 +297,60 @@ export default function AdminPage() {
     { id: 'resource-types', label: 'Resource Types' },
   ];
 
-  return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
-      <AdminHeader onSignOut={handleSignOut} userSession={{ user }} />
+  const headerContent = <AdminHeader onSignOut={handleSignOut} userSession={{ user }} />;
 
-      <main className="mx-auto max-w-7xl px-4 py-6 md:px-6 lg:px-8 lg:py-8">
-        <AdminOverview
-          documentsCount={documents.length}
-          coursesCount={courses.length}
-          schoolsCount={schools.length}
-          programsCount={programs.length}
-          academicUnitCount={schools.length + departments.length}
-        />
+  const sidebarContent = (isMinimized: boolean) => (
+    <AdminSidebar
+      activeTab={activeTab}
+      tabs={tabs}
+      onTabChange={(tab) => {
+        setActiveTab(tab);
+        if (tab === 'documents') loadDocuments();
+      }}
+      onCreateClick={openCreateModal}
+      onDocumentsTabClick={loadDocuments}
+      isMinimized={isMinimized}
+    />
+  );
 
-        <section className="mt-6 grid gap-6 lg:grid-cols-[260px_minmax(0,1fr)]">
-          <AdminSidebar
-            activeTab={activeTab}
-            tabs={tabs}
-            onTabChange={(tab) => {
-              setActiveTab(tab);
-              if (tab === 'documents') loadDocuments();
-            }}
-            onCreateClick={openCreateModal}
-            onDocumentsTabClick={loadDocuments}
+  const mainContent = (
+    <>
+      <div className="space-y-6">
+        {(activeTab === 'upload' || activeTab === 'documents') && (
+          <AdminOverview
+            documentsCount={documents.length}
+            coursesCount={courses.length}
+            schoolsCount={schools.length}
+            programsCount={programs.length}
+            academicUnitCount={schools.length + departments.length}
           />
+        )}
 
-          <div className="space-y-6">
-            {activeTab === 'users' ? (
-              <AdminUsersList />
-            ) : activeTab === 'analytics' ? (
-              <AdminAnalytics />
-            ) : (
-              <AdminContent
-                activeTab={activeTab}
-                schools={schools}
-                departments={departments}
-                programs={programs}
-                courses={courses}
-                levels={levels}
-                resources={resourceTypes}
-                documents={documents}
-                loading={loading}
-                onCreateClick={openCreateModal}
-                onEdit={openEditModal}
-                onDelete={(item) => setConfirmDelete(item)}
-                onUploadSuccess={() => {
-                  setActiveTab('documents');
-                  loadDocuments();
-                }}
-              />
-            )}
-          </div>
-        </section>
-      </main>
+        {activeTab === 'users' ? (
+          <AdminUsersList />
+        ) : activeTab === 'analytics' ? (
+          <AdminAnalytics />
+        ) : (
+          <AdminContent
+            activeTab={activeTab}
+            schools={schools}
+            departments={departments}
+            programs={programs}
+            courses={courses}
+            levels={levels}
+            resources={resourceTypes}
+            documents={documents}
+            loading={loading}
+            onCreateClick={openCreateModal}
+            onEdit={openEditModal}
+            onDelete={(item) => setConfirmDelete(item)}
+            onUploadSuccess={() => {
+              setActiveTab('documents');
+              loadDocuments();
+            }}
+          />
+        )}
+      </div>
 
       <AdminModal
         isOpen={isModalOpen}
@@ -384,6 +386,8 @@ export default function AdminPage() {
         onCancel={() => setConfirmDelete(null)}
         loading={loading}
       />
-    </div>
+    </>
   );
+
+  return <AdminLayout sidebar={sidebarContent} header={headerContent} content={mainContent} />;
 }
