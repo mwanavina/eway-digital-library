@@ -54,11 +54,11 @@ export function AdminHeader({ onSignOut, userSession }: AdminHeaderProps & { use
         {/* Right: Actions */}
         <div className="flex items-center gap-2">
           <Link
-            href="/dashboard"
+            href="/"
             className="hidden items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700 md:flex"
           >
             <Home size={16} />
-            <span className="hidden lg:inline">Dashboard</span>
+            <span className="hidden lg:inline">Home</span>
           </Link>
           <ThemeSwitcher />
           <Popover>

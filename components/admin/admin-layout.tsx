@@ -45,10 +45,11 @@ export function AdminLayout({ sidebar, header, content }: AdminLayoutProps) {
               <div className="border-t border-slate-200 p-3 dark:border-slate-800">
                 <button
                   onClick={() => setSidebarMinimized(!sidebarMinimized)}
-                  className="flex w-full items-center justify-center rounded-lg p-2 text-slate-600 transition-colors hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800"
+                  className="flex w-full items-center justify-center rounded-lg bg-slate-50 p-2.5 text-slate-700 transition-colors hover:bg-slate-100 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
                   aria-label={sidebarMinimized ? 'Expand sidebar' : 'Minimize sidebar'}
+                  title={sidebarMinimized ? 'Expand sidebar' : 'Minimize sidebar'}
                 >
-                  {sidebarMinimized ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
+                  {sidebarMinimized ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
                 </button>
               </div>
             </div>
@@ -61,10 +62,11 @@ export function AdminLayout({ sidebar, header, content }: AdminLayoutProps) {
           {!sidebarOpen && (
             <button
               onClick={() => setSidebarOpen(true)}
-              className="absolute left-4 top-20 z-30 rounded-lg border border-slate-200 bg-white p-2 text-slate-600 shadow-lg transition-colors hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-400 dark:hover:bg-slate-800"
+              className="absolute left-4 top-20 z-30 rounded-lg border border-slate-300 bg-white p-2.5 text-slate-700 shadow-md transition-colors hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
               aria-label="Open sidebar"
+              title="Open sidebar"
             >
-              <ChevronRight size={18} />
+              <ChevronRight size={20} />
             </button>
           )}
 
@@ -72,10 +74,11 @@ export function AdminLayout({ sidebar, header, content }: AdminLayoutProps) {
           {sidebarOpen && !sidebarMinimized && (
             <button
               onClick={() => setSidebarOpen(false)}
-              className="absolute left-64 top-20 z-30 rounded-lg border border-slate-200 bg-white p-2 text-slate-600 shadow-lg transition-colors hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-400 dark:hover:bg-slate-800"
+              className="absolute left-64 top-20 z-30 rounded-lg border border-slate-300 bg-white p-2.5 text-slate-700 shadow-md transition-colors hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
               aria-label="Close sidebar"
+              title="Close sidebar"
             >
-              <ChevronLeft size={18} />
+              <ChevronLeft size={20} />
             </button>
           )}
 
