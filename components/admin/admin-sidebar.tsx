@@ -22,6 +22,7 @@ interface AdminSidebarProps {
   onTabChange: (tab: Tab) => void;
   onCreateClick: () => void;
   onDocumentsTabClick: () => void;
+  isMinimized?: boolean;
 }
 
 const iconMap: Record<Tab, React.ReactNode> = {
@@ -43,10 +44,92 @@ export function AdminSidebar({
   onTabChange,
   onCreateClick,
   onDocumentsTabClick,
+  isMinimized = false,
 }: AdminSidebarProps) {
   const quickActionTabs = ['upload', 'documents'];
   const academicTabs = ['schools', 'departments', 'programs', 'courses', 'levels', 'resource-types'];
   const systemTabs = ['users', 'analytics'];
+
+  // Minimized view with icon buttons
+  if (isMinimized) {
+    return (
+      <aside className="flex h-full flex-col items-center gap-2">
+        {/* Quick Actions */}
+        <button
+          onClick={() => onTabChange('upload')}
+          className={cn(
+            'rounded-lg p-2.5 transition-all duration-200',
+            activeTab === 'upload'
+              ? 'bg-gradient-to-r from-[#1782C5] to-[#1F2557] text-white shadow-md'
+              : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800'
+          )}
+          title="Upload Documents"
+        >
+          <UploadCloud size={20} />
+        </button>
+        <button
+          onClick={() => {
+            onTabChange('schools');
+            onCreateClick();
+          }}
+          className={cn(
+            'rounded-lg p-2.5 transition-all duration-200',
+            activeTab === 'schools'
+              ? 'bg-gradient-to-r from-[#1782C5] to-[#1F2557] text-white shadow-md'
+              : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800'
+          )}
+          title="Add Structure"
+        >
+          <Database size={20} />
+        </button>
+
+        <div className="my-1 h-px w-6 bg-slate-200 dark:bg-slate-700" />
+
+        {/* Academic Management Icons */}
+        {tabs
+          .filter((tab) => academicTabs.includes(tab.id))
+          .map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => onTabChange(tab.id)}
+              className={cn(
+                'rounded-lg p-2.5 transition-all duration-200',
+                activeTab === tab.id
+                  ? 'bg-gradient-to-r from-[#1782C5] to-[#1F2557] text-white shadow-md'
+                  : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800'
+              )}
+              title={tab.label}
+            >
+              {iconMap[tab.id]}
+            </button>
+          ))}
+
+        <div className="my-1 h-px w-6 bg-slate-200 dark:bg-slate-700" />
+
+        {/* System & Monitoring Icons */}
+        {tabs
+          .filter((tab) => systemTabs.includes(tab.id))
+          .map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => onTabChange(tab.id)}
+              className={cn(
+                'rounded-lg p-2.5 transition-all duration-200',
+                activeTab === tab.id
+                  ? 'bg-gradient-to-r from-[#1782C5] to-[#1F2557] text-white shadow-md'
+                  : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800'
+              )}
+              title={tab.label}
+            >
+              {iconMap[tab.id]}
+            </button>
+          ))}
+
+        {/* Spacer */}
+        <div className="flex-1" />
+      </aside>
+    );
+  }
 
   return (
     <aside className="flex h-full flex-col">

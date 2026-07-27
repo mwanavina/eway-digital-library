@@ -5,7 +5,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface AdminLayoutProps {
-  sidebar: React.ReactNode;
+  sidebar: (isMinimized: boolean) => React.ReactNode;
   header: React.ReactNode;
   content: React.ReactNode;
 }
@@ -34,11 +34,7 @@ export function AdminLayout({ sidebar, header, content }: AdminLayoutProps) {
             <div className="flex h-full flex-col">
               {/* Sidebar Content */}
               <div className={cn('flex-1 overflow-y-auto', sidebarMinimized ? 'px-2 py-4' : 'px-4 py-6')}>
-                {sidebarMinimized ? (
-                  <div className="space-y-2">{/* Minimized icon buttons will go here */}</div>
-                ) : (
-                  sidebar
-                )}
+                {sidebar(sidebarMinimized)}
               </div>
 
               {/* Sidebar Footer with Toggle */}

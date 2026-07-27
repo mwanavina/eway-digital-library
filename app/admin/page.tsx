@@ -299,7 +299,7 @@ export default function AdminPage() {
 
   const headerContent = <AdminHeader onSignOut={handleSignOut} userSession={{ user }} />;
 
-  const sidebarContent = (
+  const sidebarContent = (isMinimized: boolean) => (
     <AdminSidebar
       activeTab={activeTab}
       tabs={tabs}
@@ -309,6 +309,7 @@ export default function AdminPage() {
       }}
       onCreateClick={openCreateModal}
       onDocumentsTabClick={loadDocuments}
+      isMinimized={isMinimized}
     />
   );
 
