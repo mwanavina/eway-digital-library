@@ -60,7 +60,7 @@ export function AdminSidebar({
           className={cn(
             'rounded-lg p-2.5 transition-all duration-200',
             activeTab === 'upload'
-              ? 'bg-gradient-to-r from-[#1782C5] to-[#1F2557] text-white shadow-md'
+              ? 'bg-linear-to-r from-[#1782C5] to-[#1F2557] text-white shadow-md'
               : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800'
           )}
           title="Upload Documents"
@@ -75,7 +75,7 @@ export function AdminSidebar({
           className={cn(
             'rounded-lg p-2.5 transition-all duration-200',
             activeTab === 'schools'
-              ? 'bg-gradient-to-r from-[#1782C5] to-[#1F2557] text-white shadow-md'
+              ? 'bg-linear-to-r from-[#1782C5] to-[#1F2557] text-white shadow-md'
               : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800'
           )}
           title="Add Structure"
@@ -95,7 +95,7 @@ export function AdminSidebar({
               className={cn(
                 'rounded-lg p-2.5 transition-all duration-200',
                 activeTab === tab.id
-                  ? 'bg-gradient-to-r from-[#1782C5] to-[#1F2557] text-white shadow-md'
+                  ? 'bg-linear-to-r from-[#1782C5] to-[#1F2557] text-white shadow-md'
                   : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800'
               )}
               title={tab.label}
@@ -116,7 +116,7 @@ export function AdminSidebar({
               className={cn(
                 'rounded-lg p-2.5 transition-all duration-200',
                 activeTab === tab.id
-                  ? 'bg-gradient-to-r from-[#1782C5] to-[#1F2557] text-white shadow-md'
+                  ? 'bg-linear-to-r from-[#1782C5] to-[#1F2557] text-white shadow-md'
                   : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800'
               )}
               title={tab.label}
@@ -142,7 +142,7 @@ export function AdminSidebar({
             className={cn(
               'flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium transition-all duration-200',
               activeTab === 'upload'
-                ? 'bg-gradient-to-r from-[#1782C5] to-[#1F2557] text-white shadow-md'
+                ? 'bg-linear-to-r from-[#1782C5] to-[#1F2557] text-white shadow-md'
                 : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800'
             )}
           >
@@ -177,7 +177,7 @@ export function AdminSidebar({
                 className={cn(
                   'flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm transition-all duration-200',
                   activeTab === tab.id
-                    ? 'bg-gradient-to-r from-[#1782C5] to-[#1F2557] text-white shadow-md'
+                    ? 'bg-linear-to-r from-[#1782C5] to-[#1F2557] text-white shadow-md'
                     : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800'
                 )}
               >
@@ -206,7 +206,7 @@ export function AdminSidebar({
                 className={cn(
                   'flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm transition-all duration-200',
                   activeTab === tab.id
-                    ? 'bg-gradient-to-r from-[#1782C5] to-[#1F2557] text-white shadow-md'
+                    ? 'bg-linear-to-r from-[#1782C5] to-[#1F2557] text-white shadow-md'
                     : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800'
                 )}
               >
@@ -233,7 +233,7 @@ export function AdminSidebar({
                 className={cn(
                   'flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm transition-all duration-200',
                   activeTab === tab.id
-                    ? 'bg-gradient-to-r from-[#1782C5] to-[#1F2557] text-white shadow-md'
+                    ? 'bg-linear-to-r from-[#1782C5] to-[#1F2557] text-white shadow-md'
                     : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800'
                 )}
               >
