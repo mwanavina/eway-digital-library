@@ -248,10 +248,10 @@ export function AdminSidebar({
       <div className="flex-1" />
 
       {/* Footer Info */}
-      <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 dark:border-slate-700 dark:bg-slate-800">
+      {/* <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 dark:border-slate-700 dark:bg-slate-800">
         <p className="text-xs font-medium text-slate-600 dark:text-slate-400">Library Version</p>
         <p className="mt-1 text-xs text-slate-500 dark:text-slate-500">Admin Panel v2.0</p>
-      </div>
+      </div> */}
     </aside>
   );
 }
