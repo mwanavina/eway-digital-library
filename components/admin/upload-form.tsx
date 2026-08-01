@@ -6,6 +6,7 @@ import { UploadButton, UploadDropzone } from "@/utils/uploadthing";
 import { createDocument } from '@/app/actions/documents';
 import { genUploader } from 'uploadthing/client';
 import { toast } from 'sonner';
+import type { AdminActivity } from '@/components/admin/admin-types';
 
 const { uploadFiles } = genUploader();
 
@@ -34,6 +35,7 @@ interface UploadFormProps {
   levels: any[];
   resourceTypes?: any[];
   onSuccess?: () => void;
+  onActivity?: (activity: AdminActivity) => void;
 }
 
 export function AdminUploadForm({
@@ -44,6 +46,7 @@ export function AdminUploadForm({
   levels,
   resourceTypes = [],
   onSuccess,
+  onActivity,
 }: UploadFormProps) {
   const [selectedSchool, setSelectedSchool] = useState('');
   const [selectedDepartment, setSelectedDepartment] = useState('');
@@ -220,6 +223,12 @@ export function AdminUploadForm({
       });
 
       if (result.success) {
+        onActivity?.({
+          action: 'uploaded',
+          entity: 'document',
+          title: 'Uploaded a new document',
+          timestamp: new Date().toLocaleString(),
+        });
         setSuccess('Document saved successfully.');
         toast.success('Document saved successfully.');
         setPendingUpload(null);
