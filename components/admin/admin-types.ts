@@ -29,5 +29,6 @@ export interface AdminActivity {
   action: AdminActivityAction;
   entity: string;
   title: string;
+  actorName?: string;
   timestamp: string;
 }

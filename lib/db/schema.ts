@@ -190,6 +190,18 @@ export const downloadLogs = pgTable("download_logs", {
   downloadedAt: timestamp("downloaded_at", { withTimezone: false }).defaultNow().notNull(),
 });
 
+export const adminActivities = pgTable("admin_activities", {
+  id: serial("id").primaryKey(),
+  action: varchar("action", { length: 32 }).notNull(),
+  entity: varchar("entity", { length: 100 }).notNull(),
+  title: text("title").notNull(),
+  actorId: text("actor_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  actorName: varchar("actor_name", { length: 255 }).notNull(),
+  createdAt: timestamp("created_at", { withTimezone: false }).defaultNow().notNull(),
+});
+
 export const userProfiles = pgTable("user_profiles", {
   id: serial("id").primaryKey(),
   userId: text("user_id")
@@ -225,6 +237,7 @@ export const userRelations = relations(user, ({ one, many }) => ({
   uploadedDocuments: many(documents),
   downloadLogs: many(downloadLogs),
   bookmarks: many(bookmarks),
+  adminActivities: many(adminActivities),
 }));
 
 export const userProfilesRelations = relations(userProfiles, ({ one }) => ({
@@ -253,6 +266,13 @@ export const userProfilesRelations = relations(userProfiles, ({ one }) => ({
 export const sessionRelations = relations(session, ({ one }) => ({
   user: one(user, {
     fields: [session.userId],
+    references: [user.id],
+  }),
+}));
+
+export const adminActivitiesRelations = relations(adminActivities, ({ one }) => ({
+  actor: one(user, {
+    fields: [adminActivities.actorId],
     references: [user.id],
   }),
 }));

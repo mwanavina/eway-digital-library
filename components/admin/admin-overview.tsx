@@ -127,7 +127,7 @@ export function AdminOverview({
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-medium text-slate-900 dark:text-white">{activity.title}</p>
                   <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                    {activity.entity} • {activity.timestamp}
+                    {activity.entity} • {activity.actorName ? `${activity.actorName}` : 'System'} • {activity.timestamp}
                   </p>
                 </div>
               </div>
