@@ -5,13 +5,15 @@ import { Trash2, Eye, AlertCircle, CheckCircle2, Clock, XCircle } from 'lucide-r
 import { deleteDocument } from '@/app/actions/documents';
 import { PDFModal } from '@/components/pdf-modal';
 import { toast } from 'sonner';
+import type { AdminActivity } from '@/components/admin/admin-types';
 
 interface AdminDocumentListProps {
   documents: any[];
   onDelete?: () => void;
+  onActivity?: (activity: AdminActivity) => void;
 }
 
-export function AdminDocumentList({ documents, onDelete }: AdminDocumentListProps) {
+export function AdminDocumentList({ documents, onDelete, onActivity }: AdminDocumentListProps) {
   const [deleting, setDeleting] = useState<number | null>(null);
   const [error, setError] = useState('');
   const [previewDocument, setPreviewDocument] = useState<{ id: number; title: string; pdfUrl: string } | null>(null);
@@ -42,6 +44,13 @@ export function AdminDocumentList({ documents, onDelete }: AdminDocumentListProp
 
     try {
       await deleteDocument(docId);
+      const deletedDocument = documents.find((doc) => doc.id === docId);
+      onActivity?.({
+        action: 'deleted',
+        entity: 'document',
+        title: deletedDocument?.title ? `Deleted document: ${deletedDocument.title}` : 'Deleted a document',
+        timestamp: new Date().toLocaleString(),
+      });
       setDeleting(null);
       toast.success('Document deleted successfully.');
       onDelete?.();
