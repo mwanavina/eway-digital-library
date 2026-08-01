@@ -40,7 +40,7 @@ import { AdminForm } from '@/components/admin/admin-form';
 import { AdminAnalytics } from '@/components/admin/admin-analytics';
 import { AdminUsersList } from '@/components/admin/admin-users-list';
 import { AdminLayout } from '@/components/admin/admin-layout';
-import { Tab, AdminItem, AdminFormData } from '@/components/admin/admin-types';
+import { Tab, AdminItem, AdminFormData, type AdminActivity } from '@/components/admin/admin-types';
 import { toast } from 'sonner';
 
 export default function AdminPage() {
@@ -59,6 +59,7 @@ export default function AdminPage() {
   const [levels, setLevels] = useState<AdminItem[]>([]);
   const [documents, setDocuments] = useState<AdminItem[]>([]);
   const [resourceTypes, setResourceTypes] = useState<AdminItem[]>([]);
+  const [activities, setActivities] = useState<AdminActivity[]>([]);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState<AdminItem | null>(null);
@@ -140,6 +141,10 @@ export default function AdminPage() {
     });
   }
 
+  function addActivity(activity: Omit<AdminActivity, 'id'>) {
+    setActivities((prev) => [{ id: `${Date.now()}-${Math.random()}`, ...activity }, ...prev].slice(0, 8));
+  }
+
   async function handleCreate(data: AdminFormData) {
     setLoading(true);
 
@@ -203,6 +208,12 @@ export default function AdminPage() {
       }
 
       await Promise.all([loadAllData(), loadDocuments()]);
+      addActivity({
+        action: editingItem ? 'updated' : 'created',
+        entity: itemLabel,
+        title: `${editingItem ? 'Updated' : 'Created'} ${itemLabel}`,
+        timestamp: new Date().toLocaleString(),
+      });
       setIsModalOpen(false);
       setFormData({});
       setEditingItem(null);
@@ -250,6 +261,12 @@ export default function AdminPage() {
       }
 
       await Promise.all([loadAllData(), loadDocuments()]);
+      addActivity({
+        action: 'deleted',
+        entity: itemLabel,
+        title: `Deleted ${itemLabel}`,
+        timestamp: new Date().toLocaleString(),
+      });
       setConfirmDelete(null);
       toast.success(`Deleted ${itemLabel} successfully.`);
     } catch (error) {
@@ -323,6 +340,7 @@ export default function AdminPage() {
             schoolsCount={schools.length}
             programsCount={programs.length}
             academicUnitCount={schools.length + departments.length}
+            activities={activities}
           />
         )}
 
@@ -348,6 +366,7 @@ export default function AdminPage() {
               setActiveTab('documents');
               loadDocuments();
             }}
+            onActivity={addActivity}
           />
         )}
       </div>
