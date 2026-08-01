@@ -21,3 +21,13 @@ export interface AdminFormData {
   description?: string;
   slug?: string;
 }
+
+export type AdminActivityAction = 'created' | 'updated' | 'deleted' | 'uploaded';
+
+export interface AdminActivity {
+  id?: string;
+  action: AdminActivityAction;
+  entity: string;
+  title: string;
+  timestamp: string;
+}
