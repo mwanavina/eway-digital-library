@@ -1,6 +1,7 @@
 'use client';
 
-import { BookOpen, FileText, BarChart3, Users } from 'lucide-react';
+import { Activity, BookOpen, FileText, BarChart3, Trash2, Upload, Users } from 'lucide-react';
+import type { AdminActivity } from '@/components/admin/admin-types';
 
 interface AdminOverviewProps {
   documentsCount: number;
@@ -8,6 +9,7 @@ interface AdminOverviewProps {
   schoolsCount: number;
   programsCount: number;
   academicUnitCount: number;
+  activities: AdminActivity[];
 }
 
 export function AdminOverview({
@@ -16,6 +18,7 @@ export function AdminOverview({
   schoolsCount,
   programsCount,
   academicUnitCount,
+  activities,
 }: AdminOverviewProps) {
   return (
     <>
@@ -90,6 +93,46 @@ export function AdminOverview({
               <Users size={24} className="text-red-600 dark:text-red-400" />
             </div>
           </div>
+        </div>
+      </section>
+
+      <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <p className="text-lg font-semibold text-slate-900 dark:text-white">Recent admin activity</p>
+            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">The latest actions taken in the library workspace.</p>
+          </div>
+          <div className="rounded-full bg-slate-100 p-2 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+            <Activity size={18} />
+          </div>
+        </div>
+
+        <div className="mt-4 space-y-3">
+          {activities.length === 0 ? (
+            <div className="rounded-xl border border-dashed border-slate-200 p-4 text-sm text-slate-500 dark:border-slate-700 dark:text-slate-400">
+              No recent admin activity yet.
+            </div>
+          ) : (
+            activities.slice(0, 6).map((activity) => (
+              <div key={activity.id} className="flex items-start gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-950/40">
+                <div className="mt-0.5 rounded-lg bg-white p-2 shadow-sm dark:bg-slate-900">
+                  {activity.action === 'deleted' ? (
+                    <Trash2 size={16} className="text-red-500" />
+                  ) : activity.action === 'uploaded' ? (
+                    <Upload size={16} className="text-blue-500" />
+                  ) : (
+                    <Activity size={16} className="text-emerald-500" />
+                  )}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-medium text-slate-900 dark:text-white">{activity.title}</p>
+                  <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                    {activity.entity} • {activity.timestamp}
+                  </p>
+                </div>
+              </div>
+            ))
+          )}
         </div>
       </section>
     </>
