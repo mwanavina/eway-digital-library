@@ -15,6 +15,13 @@
       "when": 1784849989760,
       "tag": "0001_solid_vampiro",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1785545871758,
+      "tag": "0002_admin_activities",
+      "breakpoints": true
     }
   ]
 }
