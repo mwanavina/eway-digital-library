@@ -14,6 +14,7 @@ export async function proxy(request: NextRequest) {
 		path.startsWith("/check-email") ||
 		path.startsWith("/forgot-password") ||
 		path.startsWith("/reset-password");
+	const isPublicRoute = path === "/brochure" || path.startsWith("/brochure/");
 
 	if (session) {
 		const isAdmin = session.user.role === "admin";
@@ -40,7 +41,7 @@ export async function proxy(request: NextRequest) {
 	}
 
 	// Unauthenticated users should only be redirected away from protected routes.
-	if (isAuthRoute) {
+	if (isAuthRoute || isPublicRoute) {
 		return NextResponse.next();
 	}
 
