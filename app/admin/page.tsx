@@ -42,6 +42,7 @@ import { AdminUsersList } from '@/components/admin/admin-users-list';
 import { AdminLayout } from '@/components/admin/admin-layout';
 import { Tab, AdminItem, AdminFormData, type AdminActivity } from '@/components/admin/admin-types';
 import { toast } from 'sonner';
+import { fetchAdminActivities, logAdminActivity } from '@/app/actions/admin-activity';
 
 export default function AdminPage() {
   const router = useRouter();
@@ -74,6 +75,7 @@ export default function AdminPage() {
 
     void loadAllData();
     void loadDocuments();
+    void loadActivities();
   }, [user]);
 
   if (isPending) {
@@ -131,6 +133,17 @@ export default function AdminPage() {
     }
   }
 
+  async function loadActivities() {
+    try {
+      const result = await fetchAdminActivities(8);
+      if (result.success) {
+        setActivities(result.data || []);
+      }
+    } catch (error) {
+      console.error('Error loading admin activities:', error);
+    }
+  }
+
   async function handleSignOut() {
     await authClient.signOut({
       fetchOptions: {
@@ -141,8 +154,17 @@ export default function AdminPage() {
     });
   }
 
-  function addActivity(activity: Omit<AdminActivity, 'id'>) {
-    setActivities((prev) => [{ id: `${Date.now()}-${Math.random()}`, ...activity }, ...prev].slice(0, 8));
+  async function addActivity(activity: Omit<AdminActivity, 'id'>) {
+    const result = await logAdminActivity({
+      action: activity.action,
+      entity: activity.entity,
+      title: activity.title,
+      userName: activity.actorName,
+    });
+
+    if (result.success) {
+      await loadActivities();
+    }
   }
 
   async function handleCreate(data: AdminFormData) {
