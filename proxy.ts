@@ -28,9 +28,9 @@ export async function proxy(request: NextRequest) {
 			return NextResponse.next();
 		}
 
-		if (isAdmin && path.startsWith("/dashboard")) {
-			return NextResponse.redirect(new URL("/admin", request.url));
-		}
+		// if (isAdmin && path.startsWith("/dashboard")) {
+		// 	return NextResponse.redirect(new URL("/admin", request.url));
+		// }
 
 		// Non-admin users trying to access admin -> redirect to /dashboard
 		if (!isAdmin && (path.startsWith("/admin") || path.startsWith("/api/admin"))) {
