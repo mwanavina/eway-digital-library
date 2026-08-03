@@ -6,7 +6,7 @@ import { ArrowRight, BookOpen, Clock3, Search, ShieldCheck, Sparkles, Users, Che
 const problems = [
   {
     title: 'Resources are scattered',
-    description: 'Students and lecturers often waste time searching across multiple places for past papers, course outlines, and study material.',
+    description: 'Students often waste time searching across multiple places for past papers, course outlines, and study material.',
   },
   {
     title: 'Important files are hard to find',
