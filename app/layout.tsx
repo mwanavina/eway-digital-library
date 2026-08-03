@@ -22,9 +22,14 @@ export const metadata: Metadata = {
   title: 'Eway Digital Library',
   description: 'Access academic resources from Eway - Past papers, dissertations, and research materials',
   generator: 'Next.js',
+  manifest: '/site.webmanifest',
   icons: {
-    icon: '/icon.svg',
-    apple: '/apple-icon.png',
+    icon: [
+      { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
+      { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/favicon.ico' },
+    ],
+    apple: '/apple-touch-icon.png',
   },
 }
 
