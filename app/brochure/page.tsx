@@ -43,14 +43,29 @@ const benefits = [
     icon: Clock3,
   },
   {
-    title: 'Improve learning outcomes',
-    description: 'Better access to quality resources helps students prepare more confidently.',
+    title: 'Extend the library beyond the classroom',
+    description: 'A digital archive grows beyond physical limits, making more resources available to more learners.',
+    icon: BookOpen,
+  },
+  {
+    title: 'Support many students at once',
+    description: 'Multiple learners can access the same content simultaneously without delays or bottlenecks.',
+    icon: Users,
+  },
+  {
+    title: 'Make sharing easy',
+    description: 'Students can quickly pass useful materials to classmates and strengthen collaboration around important content.',
+    icon: Search,
+  },
+  {
+    title: 'Access materials 24/7 online',
+    description: 'The library is available anytime, anywhere, so studying is not limited by location or opening hours.',
     icon: Sparkles,
   },
   {
-    title: 'Build a stronger academic community',
-    description: 'A shared digital library supports collaboration across departments and programs.',
-    icon: Users,
+    title: 'Keep everything well organised',
+    description: 'Clear structure, categories, and search tools help users find what they need with less effort and more confidence.',
+    icon: ShieldCheck,
   },
 ];
 
