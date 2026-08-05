@@ -90,7 +90,7 @@ export function SearchPageClient({ initialQuery, initialResults, resourceTypeCou
       <>
         <Header onSearchClick={() => {}} />
         <main className="bg-background dark:bg-slate-950 min-h-screen pb-20">
-          <div className="bg-gradient-to-b from-muted to-background dark:from-slate-900 dark:to-slate-950 p-4 sticky top-16 z-30 shadow-sm">
+          <div className="bg-linear-to-b from-muted to-background dark:from-slate-900 dark:to-slate-950 p-4 sticky top-16 z-30 shadow-sm">
             <div className="flex items-center gap-2 bg-background dark:bg-slate-900 border-2 border-[#1782C5] rounded-lg px-3 py-2">
               <Search size={20} className="text-gray-600" />
               <input
@@ -135,7 +135,7 @@ export function SearchPageClient({ initialQuery, initialResults, resourceTypeCou
     <>
       <Header onSearchClick={() => {}} />
       <main className="bg-background dark:bg-slate-950 min-h-screen pb-20">
-        <div className="bg-gradient-to-b from-gray-50 to-white p-4 sticky top-16 z-30 shadow-sm">
+        <div className="bg-linear-to-b from-gray-50 to-white p-4 sticky top-16 z-30 shadow-sm">
           <div className="flex items-center gap-2 bg-background dark:bg-slate-900 border-2 border-[#1782C5] rounded-lg px-3 py-2 mb-3">
             <Search size={20} className="text-gray-600" />
             <input
