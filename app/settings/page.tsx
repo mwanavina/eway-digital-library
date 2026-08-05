@@ -80,7 +80,7 @@ export default function SettingsPage() {
                           <p className="font-medium text-gray-900">{item.label}</p>
                           <p className="text-sm text-gray-600">{item.description}</p>
                         </div>
-                        <div className="flex-shrink-0">
+                        <div className="shrink-0">
                           <button
                             onClick={() => item.onChange(!item.toggle)}
                             className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
@@ -121,7 +121,7 @@ export default function SettingsPage() {
                       <p className="font-medium text-gray-900">{item.label}</p>
                       <p className="text-sm text-gray-600">{item.description}</p>
                     </div>
-                    <ChevronRight size={20} className="text-gray-400 flex-shrink-0" />
+                    <ChevronRight size={20} className="text-gray-400 shrink-0" />
                   </button>
                 ))}
               </div>
