@@ -182,15 +182,15 @@ export default function Dashboard() {
 
         {/* Quick Actions */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Link href="/search" className="bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-lg p-6 hover:shadow-lg transition-shadow">
+          <Link href="/search" className="bg-linear-to-br from-blue-500 to-blue-600 text-white rounded-lg p-6 hover:shadow-lg transition-shadow">
             <h3 className="font-bold text-lg mb-2">Browse Resources</h3>
             <p className="text-blue-100">Explore our collection of study materials</p>
           </Link>
-          <Link href="/bookmarks" className="bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-lg p-6 hover:shadow-lg transition-shadow">
+          <Link href="/bookmarks" className="bg-linear-to-br from-purple-500 to-purple-600 text-white rounded-lg p-6 hover:shadow-lg transition-shadow">
             <h3 className="font-bold text-lg mb-2">My Bookmarks</h3>
             <p className="text-purple-100">Access your saved resources</p>
           </Link>
-          <Link href="/settings" className="bg-gradient-to-br from-green-500 to-green-600 text-white rounded-lg p-6 hover:shadow-lg transition-shadow">
+          <Link href="/settings" className="bg-linear-to-br from-green-500 to-green-600 text-white rounded-lg p-6 hover:shadow-lg transition-shadow">
             <h3 className="font-bold text-lg mb-2">Settings</h3>
             <p className="text-green-100">Manage your account preferences</p>
           </Link>
