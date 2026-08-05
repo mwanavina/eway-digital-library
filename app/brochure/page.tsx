@@ -101,7 +101,7 @@ export default function BrochurePage() {
             </div>
           </div>
 
-          <div className="w-full max-w-xl rounded-3xl border border-slate-200 bg-gradient-to-br from-[#1782C5] to-[#1F2557] p-8 text-white shadow-xl dark:border-slate-800">
+          <div className="w-full max-w-xl rounded-3xl border border-slate-200 bg-linear-to-br from-[#1782C5] to-[#1F2557] p-8 text-white shadow-xl dark:border-slate-800">
             <p className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-200">What this solves</p>
             <ul className="mt-6 space-y-4 text-sm leading-7 text-slate-100">
               <li className="flex gap-3">
