@@ -39,7 +39,7 @@ export function AdminUploadFormEnhanced({
       
       {error && (
         <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
-          <AlertCircle className="text-red-600 flex-shrink-0 mt-0.5" size={18} />
+          <AlertCircle className="text-red-600 shrink-0 mt-0.5" size={18} />
           <p className="text-sm text-red-600">{error}</p>
         </div>
       )}
