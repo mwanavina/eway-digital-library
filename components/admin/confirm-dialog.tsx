@@ -18,7 +18,7 @@ export function ConfirmDialog({ isOpen, title, message, onConfirm, onCancel, loa
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-card rounded-lg shadow-lg max-w-md w-full mx-4">
         <div className="p-6 flex gap-4">
-          <AlertCircle size={24} className="text-destructive flex-shrink-0" />
+          <AlertCircle size={24} className="text-destructive shrink-0" />
           <div className="flex-1">
             <h2 className="text-lg font-bold text-card-foreground">{title}</h2>
             <p className="text-muted-foreground mt-2">{message}</p>
