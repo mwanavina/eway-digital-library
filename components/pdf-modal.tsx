@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
-import { BookOpen, ChevronLeft, ChevronRight, Download, ExternalLink, RotateCcw, X, ZoomIn, ZoomOut } from 'lucide-react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { BookOpen, Download, ExternalLink, RotateCcw, X, ZoomIn, ZoomOut } from 'lucide-react';
 
 interface PDFModalProps {
   isOpen: boolean;
@@ -11,6 +11,11 @@ interface PDFModalProps {
   documentId: number;
   onDownload?: (documentId: number) => Promise<void>;
 }
+
+const MIN_ZOOM = 0.5;
+const MAX_ZOOM = 3;
+const ZOOM_STEP = 0.25;
+const PAGE_HORIZONTAL_PADDING = 48;
 
 const loadPdfJs = async () => {
   if (typeof window === 'undefined') {
@@ -23,7 +28,7 @@ const loadPdfJs = async () => {
 };
 
 export function PDFModal({ isOpen, onClose, title, pdfUrl, documentId, onDownload }: PDFModalProps) {
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const viewerRef = useRef<HTMLDivElement | null>(null);
   const pageCanvasRefs = useRef<Record<number, HTMLCanvasElement | null>>({});
   const [isDownloading, setIsDownloading] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -31,41 +36,52 @@ export function PDFModal({ isOpen, onClose, title, pdfUrl, documentId, onDownloa
   const [pdfDoc, setPdfDoc] = useState<any>(null);
   const [pageNumber, setPageNumber] = useState(1);
   const [pageCount, setPageCount] = useState(0);
-  const [scale, setScale] = useState(1.2);
+  const [zoom, setZoom] = useState(1);
+  const [containerWidth, setContainerWidth] = useState(0);
   const [viewMode] = useState<'continuous' | 'page'>('continuous');
 
-  const renderPageToCanvas = async (
-    doc: any,
-    pageIndex: number,
-    currentScale: number,
-    canvas: HTMLCanvasElement | null,
-  ) => {
-    if (!canvas) {
-      return;
-    }
+  const getFitScale = useCallback((page: any, availableWidth: number) => {
+    const baseViewport = page.getViewport({ scale: 1 });
+    const safeWidth = Math.max(availableWidth, 240);
+    return safeWidth / baseViewport.width;
+  }, []);
 
-    const page = await doc.getPage(pageIndex);
-    const viewport = page.getViewport({ scale: currentScale });
-    const context = canvas.getContext('2d');
+  const renderPageToCanvas = useCallback(
+    async (doc: any, pageIndex: number, availableWidth: number, zoomLevel: number, canvas: HTMLCanvasElement | null) => {
+      if (!canvas || availableWidth <= 0) {
+        return;
+      }
 
-    if (!context) {
-      throw new Error('Failed to get canvas context');
-    }
+      const page = await doc.getPage(pageIndex);
+      const fitScale = getFitScale(page, availableWidth - PAGE_HORIZONTAL_PADDING);
+      const renderScale = fitScale * zoomLevel;
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const viewport = page.getViewport({ scale: renderScale * dpr });
+      const context = canvas.getContext('2d');
 
-    const dpr = window.devicePixelRatio || 1;
-    canvas.width = Math.floor(viewport.width * dpr);
-    canvas.height = Math.floor(viewport.height * dpr);
-    canvas.style.width = `${Math.floor(viewport.width)}px`;
-    canvas.style.height = `${Math.floor(viewport.height)}px`;
+      if (!context) {
+        throw new Error('Failed to get canvas context');
+      }
 
-    context.setTransform(dpr, 0, 0, dpr, 0, 0);
-    context.clearRect(0, 0, canvas.width, canvas.height);
+      const displayWidth = Math.floor(viewport.width / dpr);
+      const displayHeight = Math.floor(viewport.height / dpr);
 
-    await page.render({
-      canvasContext: context,
-      viewport,
-    }).promise;
-  };
+      canvas.width = Math.floor(viewport.width);
+      canvas.height = Math.floor(viewport.height);
+      canvas.style.width = `${displayWidth}px`;
+      canvas.style.maxWidth = '100%';
+      canvas.style.height = 'auto';
+
+      context.setTransform(1, 0, 0, 1, 0, 0);
+      context.clearRect(0, 0, canvas.width, canvas.height);
+
+      await page.render({
+        canvasContext: context,
+        viewport,
+      }).promise;
+    },
+    [getFitScale],
+  );
 
   useEffect(() => {
     if (!isOpen || !pdfUrl) {
@@ -79,7 +95,7 @@ export function PDFModal({ isOpen, onClose, title, pdfUrl, documentId, onDownloa
         setIsLoading(true);
         setError('');
         setPageNumber(1);
-        setScale(1.2);
+        setZoom(1);
 
         const pdfjsLib = await loadPdfJs();
         const doc = await pdfjsLib.getDocument({ url: pdfUrl }).promise;
@@ -110,7 +126,28 @@ export function PDFModal({ isOpen, onClose, title, pdfUrl, documentId, onDownloa
   }, [isOpen, pdfUrl]);
 
   useEffect(() => {
-    if (!pdfDoc || !isOpen) {
+    if (!isOpen || !viewerRef.current) {
+      return;
+    }
+
+    const updateWidth = () => {
+      if (viewerRef.current) {
+        setContainerWidth(viewerRef.current.clientWidth);
+      }
+    };
+
+    updateWidth();
+
+    const observer = new ResizeObserver(updateWidth);
+    observer.observe(viewerRef.current);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [isOpen, pdfDoc]);
+
+  useEffect(() => {
+    if (!pdfDoc || !isOpen || containerWidth <= 0) {
       return;
     }
 
@@ -124,12 +161,13 @@ export function PDFModal({ isOpen, onClose, title, pdfUrl, documentId, onDownloa
           const pagePromises = Array.from({ length: pageCount }, (_, index) => {
             const pageIndex = index + 1;
             const canvas = pageCanvasRefs.current[pageIndex];
-            return renderPageToCanvas(pdfDoc, pageIndex, scale, canvas);
+            return renderPageToCanvas(pdfDoc, pageIndex, containerWidth, zoom, canvas);
           });
 
           await Promise.all(pagePromises);
         } else {
-          await renderPageToCanvas(pdfDoc, pageNumber, scale, canvasRef.current);
+          const canvas = pageCanvasRefs.current[pageNumber];
+          await renderPageToCanvas(pdfDoc, pageNumber, containerWidth, zoom, canvas);
         }
 
         if (isCancelled) {
@@ -148,7 +186,7 @@ export function PDFModal({ isOpen, onClose, title, pdfUrl, documentId, onDownloa
     return () => {
       isCancelled = true;
     };
-  }, [pdfDoc, pageNumber, pageCount, scale, viewMode, isOpen]);
+  }, [pdfDoc, pageNumber, pageCount, zoom, viewMode, isOpen, containerWidth, renderPageToCanvas]);
 
   const handleDownloadPDF = async () => {
     setIsDownloading(true);
@@ -183,9 +221,22 @@ export function PDFModal({ isOpen, onClose, title, pdfUrl, documentId, onDownloa
     window.open(pdfUrl, '_blank', 'noopener,noreferrer');
   };
 
-  const canGoPrev = pageNumber > 1;
-  const canGoNext = pageNumber < pageCount;
+  const handleZoomOut = () => {
+    setZoom((current) => Math.max(MIN_ZOOM, Number((current - ZOOM_STEP).toFixed(2))));
+  };
+
+  const handleZoomIn = () => {
+    setZoom((current) => Math.min(MAX_ZOOM, Number((current + ZOOM_STEP).toFixed(2))));
+  };
+
+  const handleResetView = () => {
+    setZoom(1);
+    setPageNumber(1);
+    viewerRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const pageList = Array.from({ length: pageCount }, (_, index) => index + 1);
+  const zoomLabel = `${Math.round(zoom * 100)}%`;
 
   if (!isOpen) return null;
 
@@ -231,31 +282,33 @@ export function PDFModal({ isOpen, onClose, title, pdfUrl, documentId, onDownloa
 
         <div className="flex items-center justify-between gap-2 border-b border-slate-200 bg-white px-3 py-2 sm:px-6">
           <div className="flex items-center gap-2">
-            <div className="flex items-center gap-1 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-white sm:text-sm">
+            <div className="flex items-center gap-1 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600 sm:text-sm">
               <BookOpen size={16} className="text-[#1782C5]" />
+              <span>{pageCount > 0 ? `${pageCount} pages` : 'PDF'}</span>
             </div>
           </div>
 
           <div className="flex items-center gap-2">
+            <span className="hidden min-w-12 text-center text-xs font-medium text-slate-500 sm:inline">{zoomLabel}</span>
             <button
-              onClick={() => setScale((current) => Math.max(0.8, Number((current - 0.2).toFixed(1))))}
-              className="rounded-lg border border-slate-300 bg-white p-2 text-slate-700 transition hover:bg-slate-50"
+              onClick={handleZoomOut}
+              disabled={zoom <= MIN_ZOOM}
+              className="rounded-lg border border-slate-300 bg-white p-2 text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
               aria-label="Zoom out"
             >
               <ZoomOut size={18} />
             </button>
+            <span className="min-w-10 text-center text-xs font-medium text-slate-600 sm:hidden">{zoomLabel}</span>
             <button
-              onClick={() => setScale((current) => Math.min(2.5, Number((current + 0.2).toFixed(1))))}
-              className="rounded-lg border border-slate-300 bg-white p-2 text-slate-700 transition hover:bg-slate-50"
+              onClick={handleZoomIn}
+              disabled={zoom >= MAX_ZOOM}
+              className="rounded-lg border border-slate-300 bg-white p-2 text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
               aria-label="Zoom in"
             >
               <ZoomIn size={18} />
             </button>
             <button
-              onClick={() => {
-                setScale(1.2);
-                setPageNumber(1);
-              }}
+              onClick={handleResetView}
               className="rounded-lg border border-slate-300 bg-white p-2 text-slate-700 transition hover:bg-slate-50"
               aria-label="Reset view"
             >
@@ -264,7 +317,7 @@ export function PDFModal({ isOpen, onClose, title, pdfUrl, documentId, onDownloa
           </div>
         </div>
 
-        <div className="flex-1 overflow-auto bg-slate-100 p-3 sm:p-6">
+        <div className="flex-1 overflow-auto bg-slate-100 p-2 sm:p-6">
           {isLoading && (
             <div className="flex min-h-[40vh] items-center justify-center text-center">
               <div>
@@ -289,22 +342,24 @@ export function PDFModal({ isOpen, onClose, title, pdfUrl, documentId, onDownloa
           )}
 
           {!isLoading && !error && pdfDoc && (
-            <div className="space-y-4">
+            <div ref={viewerRef} className="mx-auto w-full max-w-3xl space-y-3 sm:space-y-4">
               {pageList.map((pageIndex) => (
                 <div
                   key={pageIndex}
-                  className="mx-auto max-w-3xl rounded-2xl border border-slate-200 bg-white p-3 shadow-sm"
+                  className="overflow-hidden rounded-xl border border-slate-200 bg-white p-2 shadow-sm sm:rounded-2xl sm:p-3"
                 >
                   <div className="mb-2 text-xs font-semibold text-slate-500 sm:text-sm">
                     Page {pageIndex} of {pageCount}
                   </div>
-                  <canvas
-                    ref={(element) => {
-                      pageCanvasRefs.current[pageIndex] = element;
-                    }}
-                    className="mx-auto max-w-full rounded-xl bg-white"
-                    aria-label={`PDF page ${pageIndex}`}
-                  />
+                  <div className="w-full overflow-x-auto">
+                    <canvas
+                      ref={(element) => {
+                        pageCanvasRefs.current[pageIndex] = element;
+                      }}
+                      className="mx-auto block h-auto max-w-full"
+                      aria-label={`PDF page ${pageIndex}`}
+                    />
+                  </div>
                 </div>
               ))}
             </div>
