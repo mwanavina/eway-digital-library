@@ -72,11 +72,11 @@ export function AuthCarousel() {
         ))}
       </div>
 
-      <div className="absolute inset-x-0 bottom-[60px] z-10 px-10 text-primary-foreground">
-        <h2 className="mb-2 text-balance text-[clamp(1.4rem,2.2vw,2rem)] font-bold leading-tight drop-shadow-md">
+      <div className="absolute inset-x-0 bottom-[60px] z-10 px-10 text-white">
+        <h2 className="mb-2 text-balance text-[clamp(1.4rem,2.2vw,2rem)] font-bold leading-tight text-white drop-shadow-md">
           {slide.title}
         </h2>
-        <p className="text-sm opacity-85">{slide.sub}</p>
+        <p className="text-sm text-white/85">{slide.sub}</p>
       </div>
 
       <div className="absolute bottom-7 left-10 z-10 flex items-center gap-2">
@@ -87,8 +87,8 @@ export function AuthCarousel() {
             aria-label={`Slide ${index + 1}`}
             onClick={() => setCurrent(index)}
             className={cn(
-              "h-2 rounded-full bg-primary-foreground/40 transition-all",
-              current === index ? "w-[22px] rounded bg-primary-foreground" : "w-2",
+              "h-2 rounded-full bg-white/40 transition-all",
+              current === index ? "w-[22px] rounded bg-white" : "w-2",
             )}
           />
         ))}
