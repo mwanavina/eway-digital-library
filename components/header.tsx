@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Search, Bookmark, User, Sliders, BarChart3, Shield } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { ThemeSwitcher } from './theme-switcher';
 import { BrandLogo } from '@/components/brand-logo';
