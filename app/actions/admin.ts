@@ -471,6 +471,8 @@ export async function fetchAllLevels() {
 
 export async function fetchAllDocuments() {
   try {
+    const uploader = user;
+
     const rows = await db.select({
       id: documents.id,
       title: documents.title,
@@ -485,12 +487,16 @@ export async function fetchAllDocuments() {
       upload_status: documents.uploadStatus,
       thumbnail_url: documents.thumbnailUrl,
       file_url: documents.filePath,
+      file_size: documents.fileSize,
+      uploader_name: uploader.name,
       created_at: documents.createdAt,
+      uploaded_at: documents.uploadedAt,
     }).from(documents)
       .leftJoin(courses, eq(documents.courseId, courses.id))
       .leftJoin(programs, eq(courses.programId, programs.id))
       .leftJoin(departments, eq(programs.departmentId, departments.id))
       .leftJoin(schools, eq(departments.schoolId, schools.id))
+      .leftJoin(uploader, eq(documents.uploadedBy, uploader.id))
       .orderBy(desc(documents.createdAt));
 
     return { success: true, data: rows };
