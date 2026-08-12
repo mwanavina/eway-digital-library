@@ -5,6 +5,7 @@ import { useTheme } from 'next-themes';
 import { Download, FileText, ChevronRight, Share2, MoreHorizontal, Bookmark as BookmarkIcon } from 'lucide-react';
 import Link from 'next/link';
 import { toggleBookmark, trackDownload } from '@/app/actions/documents';
+import { formatFileSize } from '@/lib/utils';
 import { PDFModal } from './pdf-modal';
 import { ShareModal } from './share-modal';
 
@@ -25,7 +26,9 @@ interface ResourceCardProps {
   semester?: number;
   examType?: string;
   downloadCount?: number;
+  fileSize?: number | null;
   initialBookmarked?: boolean;
+  onBookmarkChange?: (bookmarked: boolean) => void;
 }
 
 export function ResourceCard({
@@ -45,7 +48,9 @@ export function ResourceCard({
   semester,
   examType,
   downloadCount,
+  fileSize,
   initialBookmarked = false,
+  onBookmarkChange,
 }: ResourceCardProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
@@ -76,7 +81,10 @@ export function ResourceCard({
       const result = await toggleBookmark(id);
       if (!result.success) {
         setIsBookmarked(!optimisticValue);
+        return;
       }
+
+      onBookmarkChange?.(result.bookmarked ?? optimisticValue);
     });
   };
 
@@ -154,6 +162,7 @@ export function ResourceCard({
   const currentTheme = mounted ? (theme === 'system' ? resolvedTheme : theme) : 'light';
   const isDark = currentTheme === 'dark';
   const cardBackground = isDark ? typeDarkBackground : typeBackground;
+  const formattedFileSize = formatFileSize(fileSize);
 
   // Mobile-optimized card with large icon display
   return (
@@ -288,6 +297,12 @@ export function ResourceCard({
             <span className="text-gray-400 dark:text-slate-300">•</span>
             <p className="truncate text-gray-600 dark:text-slate-200">{courseName}</p>
           </div>
+
+          {formattedFileSize && (
+            <p className="mt-1 text-center text-[10px] font-medium text-gray-500 dark:text-slate-400">
+              {formattedFileSize}
+            </p>
+          )}
 
         </div>
 
