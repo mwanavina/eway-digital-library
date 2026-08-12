@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, Bookmark } from 'lucide-react';
-import { DocumentCard } from '@/components/document-card';
+import { ResourceCard } from '@/components/resource-card';
 
 interface BookmarkDocument {
   id: number;
@@ -16,6 +16,7 @@ interface BookmarkDocument {
   school_name?: string | null;
   department_name?: string | null;
   file_path?: string | null;
+  file_size?: number | null;
   thumbnail_url?: string | null;
   resource_type_name?: string | null;
   download_count?: number | null;
@@ -69,23 +70,30 @@ export function BookmarksPageClient({ bookmarks }: BookmarksPageClientProps) {
       <section className="px-4 py-6 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-6xl">
           {items.length > 0 ? (
-            <div className="grid gap-4 xl:grid-cols-2">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 xl:grid-cols-3">
               {items.map((doc) => (
-                <DocumentCard
+                <ResourceCard
                   key={doc.id}
                   id={doc.id}
                   title={doc.title}
+                  resourceType={doc.resource_type_name || 'Past Papers'}
                   courseName={doc.course_name}
                   courseCode={doc.course_code}
-                  year={doc.year ?? 0}
-                  semester={doc.semester ?? 0}
-                  examType={doc.exam_type ?? ''}
-                  schoolName={doc.school_name ?? 'Unknown'}
                   departmentName={doc.department_name ?? 'Unknown'}
+                  schoolName={doc.school_name ?? 'Unknown'}
                   filePath={doc.file_path ?? ''}
+                  fileSize={doc.file_size}
                   thumbnailUrl={doc.thumbnail_url ?? undefined}
-                  showRemoveBookmark
-                  onRemove={handleRemoveBookmark}
+                  year={doc.year ?? undefined}
+                  semester={doc.semester ?? undefined}
+                  examType={doc.exam_type ?? undefined}
+                  downloadCount={doc.download_count ?? undefined}
+                  initialBookmarked
+                  onBookmarkChange={(bookmarked) => {
+                    if (!bookmarked) {
+                      handleRemoveBookmark(doc.id);
+                    }
+                  }}
                 />
               ))}
             </div>
