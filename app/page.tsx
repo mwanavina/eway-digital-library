@@ -592,14 +592,14 @@ function HomeContent() {
                       </div>
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-sm font-semibold text-gray-900 dark:text-slate-100">{doc.title}</p>
-                        <p className="mt-1 text-xs text-gray-600 dark:text-slate-400">
+                        <p className="mt-1 text-xs text-gray-600 dark:text-slate-300">
                           {doc.course_name} • {doc.course_code}
                         </p>
-                        <p className="mt-1 text-xs text-gray-500 dark:text-slate-500">
+                        <p className="mt-1 text-xs text-gray-500 dark:text-slate-400">
                           {doc.school_name} • {doc.department_name}
                         </p>
                       </div>
-                      <div className="ml-2 shrink-0 rounded-full bg-[#1782C5]/10 px-2.5 py-1 text-[11px] font-semibold text-[#1782C5]">
+                      <div className="ml-2 shrink-0 rounded-full bg-[#1782C5]/10 px-2.5 py-1 text-[11px] font-semibold text-[#1782C5] dark:bg-blue-500/20 dark:text-blue-300">
                         {doc.resource_type_name || 'Document'}
                       </div>
                     </button>
