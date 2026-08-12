@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Download, FileText, Calendar, User, BookOpen } from 'lucide-react';
+import { ArrowLeft, Download, FileText, Calendar, User, BookOpen, Eye } from 'lucide-react';
 import { Spinner } from '@/components/ui/spinner';
 import { BottomNav } from '@/components/bottom-nav';
 import { PDFModal } from '@/components/pdf-modal';
@@ -319,15 +319,26 @@ export default function DocumentDetailPage() {
           </div>
         </div>
 
-        <button
-          onClick={handleDownload}
-          disabled={isDownloading}
-          className="w-full flex items-center justify-center gap-2 py-4 px-6 rounded-lg font-semibold text-lg transition-all text-white mb-4 disabled:opacity-70"
-          style={{ backgroundColor: typeColor }}
-        >
-          <Download size={24} />
-          {isDownloading ? 'Downloading...' : 'Download Document'}
-        </button>
+        <div className="flex gap-3 mb-4">
+          <button
+            type="button"
+            onClick={() => setIsPreviewOpen(true)}
+            className="flex-1 flex items-center justify-center gap-2 py-4 px-4 rounded-lg font-semibold text-lg transition-all border-2 dark:border-slate-600 dark:text-white dark:hover:bg-slate-800"
+            style={{ borderColor: typeColor, color: typeColor }}
+          >
+            <Eye size={24} />
+            Preview
+          </button>
+          <button
+            onClick={handleDownload}
+            disabled={isDownloading}
+            className="flex-1 flex items-center justify-center gap-2 py-4 px-4 rounded-lg font-semibold text-lg transition-all text-white disabled:opacity-70"
+            style={{ backgroundColor: typeColor }}
+          >
+            <Download size={24} />
+            {isDownloading ? 'Downloading...' : 'Download'}
+          </button>
+        </div>
       </div>
 
       <PDFModal
