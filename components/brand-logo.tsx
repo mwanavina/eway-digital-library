@@ -28,7 +28,7 @@ const variantConfig = {
   },
   auth: {
     container:
-      'relative h-24 w-24 overflow-hidden rounded-full bg-white shadow-lg shadow-[#1782C5]/10 ring-1 ring-[#1782C5]/15 sm:h-28 sm:w-28 md:h-32 md:w-32 dark:shadow-slate-950/40 dark:ring-[#1782C5]/30',
+      'relative h-24 w-24 overflow-hidden rounded-full bg-white sm:h-28 sm:w-28 md:h-32 md:w-32',
     sizes: '(max-width: 640px) 96px, (max-width: 768px) 112px, 128px',
     priority: true,
   },
