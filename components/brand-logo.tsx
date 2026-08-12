@@ -16,28 +16,19 @@ interface BrandLogoProps {
 const variantConfig = {
   header: {
     container:
-      'flex h-11 w-11 items-center justify-center overflow-hidden rounded-full bg-white p-1 shadow-sm ring-1 ring-white/30 transition-transform hover:scale-[1.03] md:h-12 md:w-12',
-    image: 'h-full w-full object-contain',
-    width: 64,
-    height: 64,
+      'relative h-11 w-11 overflow-hidden rounded-full bg-white shadow-sm ring-1 ring-white/30 transition-transform hover:scale-[1.03] md:h-12 md:w-12 dark:ring-slate-600/40',
     sizes: '48px',
     priority: true,
   },
   admin: {
     container:
-      'flex h-11 w-11 items-center justify-center overflow-hidden rounded-full bg-white p-1 shadow-sm ring-1 ring-slate-200/80 dark:bg-slate-800 dark:ring-slate-700',
-    image: 'h-full w-full object-contain',
-    width: 64,
-    height: 64,
+      'relative h-11 w-11 overflow-hidden rounded-full bg-white shadow-sm ring-1 ring-slate-200/80 dark:ring-slate-600/50',
     sizes: '44px',
     priority: true,
   },
   auth: {
     container:
-      'flex h-24 w-24 items-center justify-center overflow-hidden rounded-full bg-white p-2 shadow-lg shadow-[#1782C5]/10 ring-1 ring-[#1782C5]/15 sm:h-28 sm:w-28 sm:p-2.5 md:h-32 md:w-32 dark:bg-slate-900 dark:shadow-slate-950/40 dark:ring-[#1782C5]/25',
-    image: 'h-full w-full object-contain',
-    width: 128,
-    height: 128,
+      'relative h-24 w-24 overflow-hidden rounded-full bg-white shadow-lg shadow-[#1782C5]/10 ring-1 ring-[#1782C5]/15 sm:h-28 sm:w-28 md:h-32 md:w-32 dark:shadow-slate-950/40 dark:ring-[#1782C5]/30',
     sizes: '(max-width: 640px) 96px, (max-width: 768px) 112px, 128px',
     priority: true,
   },
@@ -52,11 +43,10 @@ export function BrandLogo({ variant = 'header', className, href }: BrandLogoProp
       <Image
         src={LOGO_SRC}
         alt={LOGO_ALT}
-        width={config.width}
-        height={config.height}
+        fill
         priority={config.priority}
         sizes={config.sizes}
-        className={config.image}
+        className="rounded-full bg-white object-contain p-1 sm:p-1.5"
       />
     </div>
   );
