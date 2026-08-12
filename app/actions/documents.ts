@@ -15,6 +15,7 @@ interface CreateDocumentInput {
   fileKey: string;
   fileUrl: string;
   fileName?: string;
+  fileSize?: number;
   thumbnailUrl?: string;
   levelId?: number;
   resourceTypeId?: number;
@@ -25,6 +26,17 @@ interface CreateDocumentInput {
 
 export async function createDocument(input: CreateDocumentInput): Promise<any> {
   try {
+    const session = await getServerSession();
+    const currentUser = session?.user as { id: string; role?: string } | undefined;
+
+    if (!currentUser?.id) {
+      return { success: false, error: 'Unauthorized' };
+    }
+
+    if (currentUser.role !== 'admin') {
+      return { success: false, error: 'Forbidden' };
+    }
+
     console.log('[v0] Creating document:', input.title);
 
     const [createdDocument] = await db.insert(documents).values({
@@ -37,9 +49,10 @@ export async function createDocument(input: CreateDocumentInput): Promise<any> {
       examType: input.examType?.trim() || null,
       filePath: input.fileUrl,
       fileKey: input.fileKey,
+      fileSize: input.fileSize ?? null,
       thumbnailUrl: input.thumbnailUrl ?? null,
       uploadStatus: 'completed',
-      uploadedBy: null,
+      uploadedBy: currentUser.id,
       uploadedAt: new Date(),
     }).returning({
       id: documents.id,
@@ -52,8 +65,10 @@ export async function createDocument(input: CreateDocumentInput): Promise<any> {
       examType: documents.examType,
       filePath: documents.filePath,
       fileKey: documents.fileKey,
+      fileSize: documents.fileSize,
       thumbnailUrl: documents.thumbnailUrl,
       uploadStatus: documents.uploadStatus,
+      uploadedBy: documents.uploadedBy,
       createdAt: documents.createdAt,
     });
 

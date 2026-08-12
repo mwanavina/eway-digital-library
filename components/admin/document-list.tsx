@@ -62,6 +62,13 @@ export function AdminDocumentList({ documents, onDelete, onActivity }: AdminDocu
     }
   };
 
+  const formatFileSize = (bytes?: number | null) => {
+    if (!bytes || bytes <= 0) return '—';
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  };
+
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'completed':
@@ -154,7 +161,9 @@ export function AdminDocumentList({ documents, onDelete, onActivity }: AdminDocu
                   </div>
                 </td>
                 <td className="py-3 px-4 text-muted-foreground text-xs">
-                  {new Date(doc.created_at).toLocaleDateString()}
+                  <p>{doc.uploader_name ?? 'Unknown user'}</p>
+                  <p>{formatFileSize(doc.file_size)}</p>
+                  <p>{new Date(doc.uploaded_at ?? doc.created_at).toLocaleDateString()}</p>
                 </td>
                 <td className="py-3 px-4 text-center flex items-center justify-center gap-2">
                   {doc.file_url && (

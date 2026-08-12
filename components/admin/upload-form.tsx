@@ -24,6 +24,7 @@ interface PendingUpload {
   fileUrl: string;
   fileKey: string;
   fileName: string;
+  fileSize: number | null;
   thumbnailUrl: string | null;
 }
 
@@ -134,6 +135,7 @@ export function AdminUploadForm({
     const fileUrl = uploadedFile?.serverData?.fileUrl ?? uploadedFile?.url ?? uploadedFile?.ufsUrl;
     const fileKey = uploadedFile?.serverData?.fileKey ?? uploadedFile?.key;
     const fileName = uploadedFile?.name ?? uploadedFile?.fileName ?? 'document.pdf';
+    const fileSize = uploadedFile?.serverData?.fileSize ?? uploadedFile?.size ?? null;
 
     if (!fileUrl) {
       setError('PDF upload completed but no file URL was returned');
@@ -160,6 +162,7 @@ export function AdminUploadForm({
         fileUrl,
         fileKey,
         fileName,
+        fileSize: typeof fileSize === 'number' ? fileSize : null,
         thumbnailUrl,
       });
       setSuccess('PDF uploaded and thumbnail generated. Review below, then click Save to persist to the database.');
@@ -219,6 +222,7 @@ export function AdminUploadForm({
         fileKey: pendingUpload.fileKey,
         fileUrl: pendingUpload.fileUrl,
         fileName: pendingUpload.fileName,
+        fileSize: pendingUpload.fileSize ?? undefined,
         thumbnailUrl: pendingUpload.thumbnailUrl ?? undefined,
       });
 
