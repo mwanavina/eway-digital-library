@@ -2,8 +2,9 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { Home, LogOut, UserCircle2, BarChart3 } from 'lucide-react';
+import { Home, LogOut, UserCircle2 } from 'lucide-react';
 import { ThemeSwitcher } from '@/components/theme-switcher';
+import { BrandLogo } from '@/components/brand-logo';
 import { Button } from '@/components/ui/button';
 import {
   Popover,
@@ -35,20 +36,10 @@ export function AdminHeader({ onSignOut, userSession }: AdminHeaderProps & { use
       <div className="flex items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
         {/* Left: Logo and Title */}
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-linear-to-br from-[#1782C5] to-[#1F2557] p-1.5 shadow-sm">
-            <Image
-              src="/eway-logo.png"
-              alt="Eway Library Logo"
-              width={40}
-              height={40}
-              priority
-              className="h-8 w-8 object-contain"
-            />
-          </div>
-          <div className="hidden sm:block">
-            <h1 className="text-sm font-semibold text-slate-900 dark:text-white">Eway Library Admin</h1>
-            <p className="text-xs text-slate-500 dark:text-slate-400">Control center</p>
-          </div>
+          <BrandLogo variant="admin" />
+          <span className="hidden rounded-full bg-[#1782C5]/10 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wider text-[#1782C5] sm:inline-flex dark:bg-blue-500/15 dark:text-blue-300">
+            Admin
+          </span>
         </div>
 
         {/* Right: Actions */}
