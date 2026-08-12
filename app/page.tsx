@@ -19,6 +19,7 @@ import { DissertationsFilter } from '@/components/filters/dissertations-filter';
 import { CourseOutlinesFilter } from '@/components/filters/course-outlines-filter';
 import { FileText, BookOpen, Book, ClipboardList, Microscope, Menu, Sliders, LayoutGrid, List } from 'lucide-react';
 import { authClient } from '@/lib/auth-client';
+import { formatFileSize } from '@/lib/utils';
 
 interface Document {
   id: number;
@@ -31,6 +32,7 @@ interface Document {
   school_name: string;
   department_name: string;
   file_path: string;
+  file_size?: number | null;
   thumbnail_url?: string;
   download_count?: number;
   resource_type_id?: number;
@@ -568,13 +570,17 @@ function HomeContent() {
                       semester={doc.semester}
                       examType={doc.exam_type}
                       downloadCount={doc.download_count}
+                      fileSize={doc.file_size}
                       initialBookmarked={Boolean(doc.is_bookmarked)}
                     />
                   ))}
                 </div>
               ) : (
                 <div className="space-y-3">
-                  {documents.map((doc: Document) => (
+                  {documents.map((doc: Document) => {
+                    const fileSizeLabel = formatFileSize(doc.file_size);
+
+                    return (
                     <button
                       key={doc.id}
                       type="button"
@@ -597,13 +603,15 @@ function HomeContent() {
                         </p>
                         <p className="mt-1 text-xs text-gray-500 dark:text-slate-400">
                           {doc.school_name} • {doc.department_name}
+                          {fileSizeLabel ? ` • ${fileSizeLabel}` : ''}
                         </p>
                       </div>
                       <div className="ml-2 shrink-0 rounded-full bg-[#1782C5]/10 px-2.5 py-1 text-[11px] font-semibold text-[#1782C5] dark:bg-blue-500/20 dark:text-blue-300">
                         {doc.resource_type_name || 'Document'}
                       </div>
                     </button>
-                  ))}
+                    );
+                  })}
                 </div>
               )
             ) : (
