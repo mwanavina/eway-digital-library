@@ -5,6 +5,7 @@ import { Trash2, Eye, AlertCircle, CheckCircle2, Clock, XCircle } from 'lucide-r
 import { deleteDocument } from '@/app/actions/documents';
 import { PDFModal } from '@/components/pdf-modal';
 import { toast } from 'sonner';
+import { formatFileSize } from '@/lib/utils';
 import type { AdminActivity } from '@/components/admin/admin-types';
 
 interface AdminDocumentListProps {
@@ -60,13 +61,6 @@ export function AdminDocumentList({ documents, onDelete, onActivity }: AdminDocu
       toast.error(message);
       setDeleting(null);
     }
-  };
-
-  const formatFileSize = (bytes?: number | null) => {
-    if (!bytes || bytes <= 0) return '—';
-    if (bytes < 1024) return `${bytes} B`;
-    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
   };
 
   const getStatusIcon = (status: string) => {
@@ -162,7 +156,7 @@ export function AdminDocumentList({ documents, onDelete, onActivity }: AdminDocu
                 </td>
                 <td className="py-3 px-4 text-muted-foreground text-xs">
                   <p>{doc.uploader_name ?? 'Unknown user'}</p>
-                  <p>{formatFileSize(doc.file_size)}</p>
+                  <p>{formatFileSize(doc.file_size) ?? '—'}</p>
                   <p>{new Date(doc.uploaded_at ?? doc.created_at).toLocaleDateString()}</p>
                 </td>
                 <td className="py-3 px-4 text-center flex items-center justify-center gap-2">
