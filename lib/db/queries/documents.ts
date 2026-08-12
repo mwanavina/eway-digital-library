@@ -149,6 +149,7 @@ export async function getDocumentsForUser(options: GetDocumentsOptions) {
       school_name: schools.name,
       department_name: departments.name,
       file_path: documents.filePath,
+      file_size: documents.fileSize,
       thumbnail_url: documents.thumbnailUrl,
       download_count: documents.downloadCount,
       resource_type_id: documents.resourceTypeId,
