@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useEffect, useState, useTransition } from 'react';
+import { useTheme } from 'next-themes';
 import { Download, FileText, ChevronRight, Share2, MoreHorizontal, Bookmark as BookmarkIcon } from 'lucide-react';
 import Link from 'next/link';
 import { toggleBookmark, trackDownload } from '@/app/actions/documents';
@@ -52,6 +53,12 @@ export function ResourceCard({
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isBookmarked, setIsBookmarked] = useState(initialBookmarked);
   const [isPending, startTransition] = useTransition();
+  const [mounted, setMounted] = useState(false);
+  const { theme, resolvedTheme } = useTheme();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleCardClick = () => {
     if (filePath) {
@@ -132,8 +139,21 @@ export function ResourceCard({
     'Research Papers': '#D1FAE5',
   };
 
+  const typeDarkBackgrounds: { [key: string]: string } = {
+    'Past Papers': '#1e3a5f',
+    'Journals': '#2a1f3d',
+    'Dissertations': '#2a1f3d',
+    'Course Outlines': '#3d2e0f',
+    'Research Papers': '#0f3d2e',
+  };
+
   const typeColor = typeColors[resourceType] || '#1782C5';
   const typeBackground = typeBackgrounds[resourceType] || '#E3F2FD';
+  const typeDarkBackground = typeDarkBackgrounds[resourceType] || '#1e293b';
+
+  const currentTheme = mounted ? (theme === 'system' ? resolvedTheme : theme) : 'light';
+  const isDark = currentTheme === 'dark';
+  const cardBackground = isDark ? typeDarkBackground : typeBackground;
 
   // Mobile-optimized card with large icon display
   return (
@@ -151,7 +171,7 @@ export function ResourceCard({
         }}
       >
         {/* Card Background */}
-        <div className="p-3 dark:bg-slate-800" style={{ backgroundColor: typeBackground }}>
+        <div className="p-3" style={{ backgroundColor: cardBackground }}>
           {/* Type Badge and Overflow Menu */}
           <div className="relative mb-2 flex items-start justify-between gap-2">
             <span
@@ -258,15 +278,15 @@ export function ResourceCard({
           </div>
 
           {/* Title */}
-          <h3 className="font-semibold text-gray-900 dark:text-white text-sm line-clamp-2 mb-2">
+          <h3 className="font-semibold text-gray-900 dark:text-slate-50 text-sm line-clamp-2 mb-2">
             {title}
           </h3>
 
           {/* Course Code and Info */}
           <div className="flex items-center justify-center gap-1 text-[11px] mb-0 text-center">
             <p className="font-semibold text-gray-900 dark:text-white">{courseCode}</p>
-            <span className="text-gray-400 dark:text-gray-500">•</span>
-            <p className="truncate text-gray-600 dark:text-gray-400">{courseName}</p>
+            <span className="text-gray-400 dark:text-slate-300">•</span>
+            <p className="truncate text-gray-600 dark:text-slate-200">{courseName}</p>
           </div>
 
         </div>
