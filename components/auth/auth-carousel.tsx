@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 
 const SLIDES = [
@@ -42,32 +42,70 @@ const SLIDES = [
   },
 ];
 
+const TRANSITION_MS = 700;
+const extendedSlides = [...SLIDES, SLIDES[0]];
+
 export function AuthCarousel() {
   const [current, setCurrent] = useState(0);
+  const [enableTransition, setEnableTransition] = useState(true);
+
+  const activeSlideIndex = current === SLIDES.length ? 0 : current;
+  const slide = SLIDES[activeSlideIndex];
 
   useEffect(() => {
-    const timer = setInterval(
-      () => setCurrent((prev) => (prev + 1) % SLIDES.length),
-      4500,
-    );
+    const timer = setInterval(() => {
+      setCurrent((prev) => prev + 1);
+    }, 4500);
+
     return () => clearInterval(timer);
   }, []);
 
-  const slide = SLIDES[current];
+  useEffect(() => {
+    if (current !== SLIDES.length) return;
+
+    const timeout = window.setTimeout(() => {
+      setEnableTransition(false);
+      setCurrent(0);
+    }, TRANSITION_MS);
+
+    return () => window.clearTimeout(timeout);
+  }, [current]);
+
+  useEffect(() => {
+    if (enableTransition) return;
+
+    const frame = requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        setEnableTransition(true);
+      });
+    });
+
+    return () => cancelAnimationFrame(frame);
+  }, [enableTransition]);
+
+  const handleDotClick = useCallback((index: number) => {
+    setEnableTransition(true);
+    setCurrent(index);
+  }, []);
 
   return (
-    <div className="relative hidden h-full overflow-hidden bg-accent md:block">
+    <div className="relative hidden h-full overflow-hidden bg-[#1782C5] md:block">
       <div
-        className="flex h-full transition-transform duration-700 ease-[cubic-bezier(.77,0,.18,1)]"
-        style={{ transform: `translateX(-${current * 100}%)` }}
+        className="flex h-full will-change-transform"
+        style={{
+          transform: `translateX(-${current * 100}%)`,
+          transition: enableTransition
+            ? `transform ${TRANSITION_MS}ms cubic-bezier(0.77, 0, 0.18, 1)`
+            : "none",
+        }}
       >
-        {SLIDES.map((item) => (
+        {extendedSlides.map((item, index) => (
           <div
-            key={item.title}
-            className="relative min-w-full bg-cover bg-center"
+            key={`${item.title}-${index}`}
+            className="relative h-full w-full shrink-0 bg-cover bg-center"
             style={{ backgroundImage: `url('${item.image}')` }}
           >
-            <div className="absolute inset-0 bg-gradient-to-b from-accent/25 via-accent/55 to-accent/85" />
+            <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/40 to-black/70" />
           </div>
         ))}
       </div>
@@ -85,10 +123,10 @@ export function AuthCarousel() {
             key={index}
             type="button"
             aria-label={`Slide ${index + 1}`}
-            onClick={() => setCurrent(index)}
+            onClick={() => handleDotClick(index)}
             className={cn(
               "h-2 rounded-full bg-white/40 transition-all",
-              current === index ? "w-[22px] rounded bg-white" : "w-2",
+              activeSlideIndex === index ? "w-[22px] rounded bg-white" : "w-2",
             )}
           />
         ))}
