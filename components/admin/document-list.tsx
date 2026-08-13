@@ -44,7 +44,11 @@ export function AdminDocumentList({ documents, onDelete, onActivity }: AdminDocu
     setError('');
 
     try {
-      await deleteDocument(docId);
+      const result = await deleteDocument(docId);
+      if (!result.success) {
+        throw new Error(result.error ?? 'Failed to delete document');
+      }
+
       const deletedDocument = documents.find((doc) => doc.id === docId);
       onActivity?.({
         action: 'deleted',
