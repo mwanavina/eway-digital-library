@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Upload, AlertCircle } from 'lucide-react';
-import { UploadButton, UploadDropzone } from "@/utils/uploadthing";
+import { UploadDropzone } from "@/utils/uploadthing";
 import { createDocument } from '@/app/actions/documents';
 import { genUploader } from 'uploadthing/client';
 import { toast } from 'sonner';
@@ -151,6 +151,8 @@ export function AdminUploadForm({
     const fileKey = uploadedFile?.serverData?.fileKey ?? uploadedFile?.key;
     const fileName = uploadedFile?.name ?? uploadedFile?.fileName ?? 'document.pdf';
     const fileSize = uploadedFile?.serverData?.fileSize ?? uploadedFile?.size ?? null;
+    const existingThumbnailUrl = uploadedFile?.serverData?.thumbnailUrl ?? null;
+    const existingThumbnailKey = uploadedFile?.serverData?.thumbnailKey ?? null;
 
     if (!fileUrl) {
       setError('PDF upload completed but no file URL was returned');
@@ -162,14 +164,17 @@ export function AdminUploadForm({
     setSuccess('');
 
     try {
-      const thumbnailBlob = await generatePdfThumbnailBlob(fileUrl);
-      let thumbnailUrl: string | null = null;
-      let thumbnailKey: string | null = null;
+      let thumbnailUrl = existingThumbnailUrl;
+      let thumbnailKey = existingThumbnailKey;
 
-      if (thumbnailBlob) {
-        const thumbnailUpload = await uploadThumbnailBlob(thumbnailBlob);
-        thumbnailUrl = thumbnailUpload.thumbnailUrl;
-        thumbnailKey = thumbnailUpload.thumbnailKey;
+      if (!thumbnailUrl) {
+        const thumbnailBlob = await generatePdfThumbnailBlob(fileUrl);
+
+        if (thumbnailBlob) {
+          const thumbnailUpload = await uploadThumbnailBlob(thumbnailBlob);
+          thumbnailUrl = thumbnailUpload.thumbnailUrl;
+          thumbnailKey = thumbnailUpload.thumbnailKey;
+        }
       }
 
       setPendingUpload({
@@ -483,38 +488,7 @@ export function AdminUploadForm({
         <div className="border-2 border-dashed border-border rounded-lg p-8">
           <UploadDropzone
             endpoint="pdfUploader"
-            onClientUploadComplete={async (res) => {
-              const uploadedPdf = res?.[0];
-              if (!uploadedPdf) return;
-
-              const pdfUrl = uploadedPdf.serverData?.fileUrl ?? uploadedPdf.url ?? uploadedPdf.ufsUrl;
-              if (!pdfUrl) {
-                setError('PDF upload completed but no file URL was returned');
-                return;
-              }
-
-              const thumbnailBlob = await generatePdfThumbnailBlob(pdfUrl);
-              let thumbnailUrl: string | null = null;
-              let thumbnailKey: string | null = null;
-
-              if (thumbnailBlob) {
-                const thumbnailUpload = await uploadThumbnailBlob(thumbnailBlob);
-                thumbnailUrl = thumbnailUpload.thumbnailUrl;
-                thumbnailKey = thumbnailUpload.thumbnailKey;
-              }
-
-              await handleUploadComplete({
-                0: {
-                  ...uploadedPdf,
-                  serverData: {
-                    ...(uploadedPdf.serverData ?? {}),
-                    fileUrl: pdfUrl,
-                    thumbnailUrl,
-                    thumbnailKey,
-                  },
-                },
-              });
-            }}
+            onClientUploadComplete={handleUploadComplete}
             onUploadError={(error: Error) => {
               setError(`Upload failed: ${error.message}`);
             }}
