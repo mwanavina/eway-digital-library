@@ -18,6 +18,7 @@ interface CreateDocumentInput {
   fileName?: string;
   fileSize?: number;
   thumbnailUrl?: string;
+  thumbnailKey?: string;
   levelId?: number;
   resourceTypeId?: number;
   author?: string | null;
@@ -52,6 +53,7 @@ export async function createDocument(input: CreateDocumentInput): Promise<any> {
       fileKey: input.fileKey,
       fileSize: input.fileSize ?? null,
       thumbnailUrl: input.thumbnailUrl ?? null,
+      thumbnailKey: input.thumbnailKey ?? null,
       uploadStatus: 'completed',
       uploadedBy: currentUser.id,
       uploadedAt: new Date(),
@@ -68,6 +70,7 @@ export async function createDocument(input: CreateDocumentInput): Promise<any> {
       fileKey: documents.fileKey,
       fileSize: documents.fileSize,
       thumbnailUrl: documents.thumbnailUrl,
+      thumbnailKey: documents.thumbnailKey,
       uploadStatus: documents.uploadStatus,
       uploadedBy: documents.uploadedBy,
       createdAt: documents.createdAt,
