@@ -63,9 +63,12 @@ export async function generatePdfThumbnailUrl(pdfUrl: string, originalName: stri
     ]);
 
     const uploadedFile = Array.isArray(result) ? result[0] : result;
-    return uploadedFile?.data?.url ?? null;
+    return {
+      url: uploadedFile?.data?.url ?? null,
+      key: uploadedFile?.data?.key ?? null,
+    };
   } catch (error) {
     console.error('Failed to generate pdf thumbnail:', error);
-    return null;
+    return { url: null, key: null };
   }
 }
