@@ -2,6 +2,7 @@
 
 import { and, eq } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
+import { UTApi } from 'uploadthing/server';
 import { db } from '@/lib/db';
 import { bookmarks, documents, downloadLogs } from '@/lib/db/schema';
 import { getServerSession } from '@/lib/server/session';
@@ -112,13 +113,57 @@ export async function getAllDocuments(): Promise<any> {
 /**
  * Delete document and cleanup from Uploadthing
  */
-export async function deleteDocument(documentId: number): Promise<any> {
+export async function deleteDocument(documentId: number): Promise<{ success: boolean; error?: string }> {
   try {
-    console.log('Document deleted:', documentId);
+    const session = await getServerSession();
+    const currentUser = session?.user as { id: string; role?: string } | undefined;
+
+    if (!currentUser?.id) {
+      return { success: false, error: 'Unauthorized' };
+    }
+
+    if (currentUser.role !== 'admin') {
+      return { success: false, error: 'Forbidden' };
+    }
+
+    const normalizedDocumentId = Number(documentId);
+    const [existingDocument] = await db
+      .select({
+        id: documents.id,
+        fileKey: documents.fileKey,
+        thumbnailKey: documents.thumbnailKey,
+      })
+      .from(documents)
+      .where(eq(documents.id, normalizedDocumentId))
+      .limit(1);
+
+    if (!existingDocument) {
+      return { success: false, error: 'Document not found' };
+    }
+
+    const fileKeys = [existingDocument.fileKey, existingDocument.thumbnailKey].filter(
+      (key): key is string => Boolean(key),
+    );
+
+    if (fileKeys.length > 0) {
+      try {
+        const utapi = new UTApi();
+        await utapi.deleteFiles(fileKeys);
+      } catch (uploadError) {
+        console.error('[v0] Error deleting files from Uploadthing:', uploadError);
+      }
+    }
+
+    await db.delete(documents).where(eq(documents.id, normalizedDocumentId));
+
+    revalidatePath('/admin');
+    revalidatePath('/');
+    revalidatePath('/bookmarks');
+
     return { success: true };
   } catch (error) {
     console.error('Error deleting document:', error);
-    throw error;
+    return { success: false, error: 'Failed to delete document' };
   }
 }
 
