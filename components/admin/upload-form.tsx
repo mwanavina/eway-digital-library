@@ -26,6 +26,7 @@ interface PendingUpload {
   fileName: string;
   fileSize: number | null;
   thumbnailUrl: string | null;
+  thumbnailKey: string | null;
 }
 
 interface UploadFormProps {
@@ -124,6 +125,20 @@ export function AdminUploadForm({
     }
   };
 
+  const uploadThumbnailBlob = async (thumbnailBlob: Blob) => {
+    const thumbnailFile = new File([thumbnailBlob], 'thumbnail.png', { type: 'image/png' });
+    const imageUploadResult = await uploadFiles('imageUploader', {
+      files: [thumbnailFile],
+    });
+    const uploadedImage = imageUploadResult?.[0];
+
+    return {
+      thumbnailUrl:
+        uploadedImage?.serverData?.fileUrl ?? uploadedImage?.url ?? uploadedImage?.ufsUrl ?? null,
+      thumbnailKey: uploadedImage?.serverData?.fileKey ?? uploadedImage?.key ?? null,
+    };
+  };
+
   const handleUploadComplete = async (res: any) => {
     if (!res || !res[0]) {
       setError('Upload failed');
@@ -149,13 +164,12 @@ export function AdminUploadForm({
     try {
       const thumbnailBlob = await generatePdfThumbnailBlob(fileUrl);
       let thumbnailUrl: string | null = null;
+      let thumbnailKey: string | null = null;
 
       if (thumbnailBlob) {
-        const thumbnailFile = new File([thumbnailBlob], 'thumbnail.png', { type: 'image/png' });
-        const imageUploadResult = await uploadFiles('imageUploader', {
-          files: [thumbnailFile],
-        });
-        thumbnailUrl = imageUploadResult?.[0]?.serverData?.fileUrl ?? imageUploadResult?.[0]?.url ?? imageUploadResult?.[0]?.ufsUrl ?? null;
+        const thumbnailUpload = await uploadThumbnailBlob(thumbnailBlob);
+        thumbnailUrl = thumbnailUpload.thumbnailUrl;
+        thumbnailKey = thumbnailUpload.thumbnailKey;
       }
 
       setPendingUpload({
@@ -164,6 +178,7 @@ export function AdminUploadForm({
         fileName,
         fileSize: typeof fileSize === 'number' ? fileSize : null,
         thumbnailUrl,
+        thumbnailKey,
       });
       setSuccess('PDF uploaded and thumbnail generated. Review below, then click Save to persist to the database.');
       toast.success('PDF uploaded. Review and save the document to finish.');
@@ -224,6 +239,7 @@ export function AdminUploadForm({
         fileName: pendingUpload.fileName,
         fileSize: pendingUpload.fileSize ?? undefined,
         thumbnailUrl: pendingUpload.thumbnailUrl ?? undefined,
+        thumbnailKey: pendingUpload.thumbnailKey ?? undefined,
       });
 
       if (result.success) {
@@ -477,41 +493,14 @@ export function AdminUploadForm({
                 return;
               }
 
-              const generatePdfThumbnailBlob = async (pdfUrl: string) => {
-                try {
-                  const pdfjsLib = await loadPdfJs();
-                  const pdf = await pdfjsLib.getDocument({ url: pdfUrl }).promise;
-                  const page = await pdf.getPage(1);
-                  const scale = 1.5;
-                  const viewport = page.getViewport({ scale });
-
-                  const canvas = document.createElement('canvas');
-                  const context = canvas.getContext('2d');
-                  if (!context) throw new Error('Failed to get canvas context');
-
-                  canvas.width = viewport.width;
-                  canvas.height = viewport.height;
-
-                  await page.render({ canvas, canvasContext: context, viewport }).promise;
-
-                  return await new Promise<Blob | null>((resolve) => {
-                    canvas.toBlob((blob) => resolve(blob), 'image/png');
-                  });
-                } catch (error) {
-                  console.error('Failed to generate PDF thumbnail in browser:', error);
-                  return null;
-                }
-              };
-
               const thumbnailBlob = await generatePdfThumbnailBlob(pdfUrl);
               let thumbnailUrl: string | null = null;
+              let thumbnailKey: string | null = null;
 
               if (thumbnailBlob) {
-                const thumbnailFile = new File([thumbnailBlob], 'thumbnail.png', { type: 'image/png' });
-                const imageUploadResult = await uploadFiles('imageUploader', {
-                  files: [thumbnailFile],
-                });
-                thumbnailUrl = imageUploadResult?.[0]?.serverData?.fileUrl ?? imageUploadResult?.[0]?.url ?? imageUploadResult?.[0]?.ufsUrl ?? null;
+                const thumbnailUpload = await uploadThumbnailBlob(thumbnailBlob);
+                thumbnailUrl = thumbnailUpload.thumbnailUrl;
+                thumbnailKey = thumbnailUpload.thumbnailKey;
               }
 
               await handleUploadComplete({
@@ -521,6 +510,7 @@ export function AdminUploadForm({
                     ...(uploadedPdf.serverData ?? {}),
                     fileUrl: pdfUrl,
                     thumbnailUrl,
+                    thumbnailKey,
                   },
                 },
               });
