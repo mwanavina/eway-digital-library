@@ -270,16 +270,16 @@ export function ResourceCard({
           </div>
 
           {/* Thumbnail Image Container */}
-          <div className="mb-3 aspect-5/3 bg-linear-to-b from-gray-50 to-gray-100 dark:from-slate-700 dark:to-slate-800 rounded-lg overflow-hidden border border-gray-200/70 dark:border-slate-700 flex items-center justify-center">
+          <div className="mb-3 aspect-5/3 overflow-hidden rounded-lg border border-gray-200/70 bg-linear-to-b from-gray-50 to-gray-100 dark:border-slate-700 dark:from-slate-700 dark:to-slate-800">
             {thumbnailUrl ? (
               <img
                 src={thumbnailUrl}
                 alt={title}
-                className="w-full h-full object-cover object-center"
+                className="h-full w-full object-cover object-top"
               />
             ) : (
               <div
-                className="w-full h-full flex items-center justify-center text-white"
+                className="flex h-full w-full items-center justify-center text-white"
                 style={{ backgroundColor: typeColor }}
               >
                 <FileText size={36} className="opacity-80" />
