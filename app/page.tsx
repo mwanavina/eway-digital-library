@@ -599,7 +599,9 @@ function HomeContent() {
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-sm font-semibold text-gray-900 dark:text-slate-100">{doc.title}</p>
                         <p className="mt-1 text-xs text-gray-600 dark:text-slate-300">
-                          {doc.course_name} • {doc.course_code}
+                          {doc.course_name && !doc.title.toLowerCase().includes(doc.course_name.toLowerCase())
+                            ? `${doc.course_name} • ${doc.course_code}`
+                            : doc.course_code}
                         </p>
                         <p className="mt-1 text-xs text-gray-500 dark:text-slate-400">
                           {doc.school_name} • {doc.department_name}
