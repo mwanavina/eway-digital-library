@@ -293,21 +293,24 @@ export function ResourceCard({
           </h3>
 
           {/* Course Code and Info */}
-          <div className="flex items-center justify-center gap-1 text-[11px] mb-0 text-center">
-            {courseCode && <p className="font-semibold text-gray-900 dark:text-white">{courseCode}</p>}
-            {!courseAlreadyInTitle && courseName && (
-              <>
-                <span className="text-gray-400 dark:text-slate-300">•</span>
-                <p className="truncate text-gray-600 dark:text-slate-200">{courseName}</p>
-              </>
+          <div className="mt-2 flex items-center justify-between gap-2 text-[11px]">
+            <div className="flex min-w-0 items-center gap-1 text-left">
+              {courseCode && <p className="truncate font-semibold text-gray-900 dark:text-white">{courseCode}</p>}
+              {!courseAlreadyInTitle && courseName && (
+                <>
+                  <span className="text-gray-400 dark:text-slate-300">•</span>
+                  <p className="truncate text-gray-600 dark:text-slate-200">{courseName}</p>
+                </>
+              )}
+            </div>
+
+            {formattedFileSize && (
+              <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-white/70 px-2 py-1 font-medium text-gray-600 dark:bg-slate-800/80 dark:text-slate-200">
+                <FileText size={11} />
+                {formattedFileSize}
+              </span>
             )}
           </div>
-
-          {formattedFileSize && (
-            <p className="mt-1 text-center text-[10px] font-medium text-gray-500 dark:text-slate-400">
-              {formattedFileSize}
-            </p>
-          )}
 
         </div>
 
