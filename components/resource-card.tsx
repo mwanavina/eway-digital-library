@@ -163,6 +163,7 @@ export function ResourceCard({
   const isDark = currentTheme === 'dark';
   const cardBackground = isDark ? typeDarkBackground : typeBackground;
   const formattedFileSize = formatFileSize(fileSize);
+  const courseAlreadyInTitle = Boolean(courseName && title.toLowerCase().includes(courseName.toLowerCase()));
 
   // Mobile-optimized card with large icon display
   return (
@@ -293,9 +294,13 @@ export function ResourceCard({
 
           {/* Course Code and Info */}
           <div className="flex items-center justify-center gap-1 text-[11px] mb-0 text-center">
-            <p className="font-semibold text-gray-900 dark:text-white">{courseCode}</p>
-            <span className="text-gray-400 dark:text-slate-300">•</span>
-            <p className="truncate text-gray-600 dark:text-slate-200">{courseName}</p>
+            {courseCode && <p className="font-semibold text-gray-900 dark:text-white">{courseCode}</p>}
+            {!courseAlreadyInTitle && courseName && (
+              <>
+                <span className="text-gray-400 dark:text-slate-300">•</span>
+                <p className="truncate text-gray-600 dark:text-slate-200">{courseName}</p>
+              </>
+            )}
           </div>
 
           {formattedFileSize && (
