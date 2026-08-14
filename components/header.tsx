@@ -79,11 +79,11 @@ export function Header({ onSearchChange, onMenuClick, onSearchClick, onFilterCli
             <span className="text-sm font-medium">Dashboard</span>
           </Link> */}
 
-          {/* Admin Dashboard Button - Desktop Only */}
+          {/* Admin Dashboard Button */}
           {isAdmin && (
             <Link
               href="/admin"
-              className="hidden md:flex items-center gap-2 px-3 py-2 hover:bg-[#1F2557] dark:hover:bg-slate-700 rounded-lg transition-colors"
+              className="flex items-center gap-2 px-3 py-2 hover:bg-[#1F2557] dark:hover:bg-slate-700 rounded-lg transition-colors"
               aria-label="Admin"
             >
               <Shield size={18} />
