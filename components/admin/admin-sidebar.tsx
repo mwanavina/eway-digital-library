@@ -53,6 +53,7 @@ export function AdminSidebar({
   const academicTabs = ['schools', 'departments', 'programs', 'courses', 'levels', 'resource-types'];
   const systemTabs = ['users', 'analytics'];
   const isUploadActive = activeTab === 'upload' || pathname === '/admin/upload';
+  const isDocumentsActive = pathname === '/admin/documents' || (pathname !== '/admin' && activeTab === 'documents');
 
   // Minimized view with icon buttons
   if (isMinimized) {
@@ -228,31 +229,33 @@ export function AdminSidebar({
       </div>
 
       {/* Documents & Library */}
-      <div className="mb-6">
-        <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Library</h3>
-        <div className="mt-3 space-y-1">
-          {tabs
-            .filter((tab) => tab.id === 'documents')
-            .map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => {
-                  onTabChange(tab.id);
-                  onDocumentsTabClick();
-                }}
-                className={cn(
-                  'flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm transition-all duration-200',
-                  activeTab === tab.id
-                    ? 'bg-linear-to-r from-[#1782C5] to-[#1F2557] text-white shadow-md'
-                    : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800'
-                )}
-              >
-                <span className="shrink-0">{iconMap[tab.id]}</span>
-                <span>{tab.label}</span>
-              </button>
-            ))}
+      {pathname !== '/admin' && (
+        <div className="mb-6">
+          <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Library</h3>
+          <div className="mt-3 space-y-1">
+            {tabs
+              .filter((tab) => tab.id === 'documents')
+              .map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => {
+                    onTabChange(tab.id);
+                    onDocumentsTabClick();
+                  }}
+                  className={cn(
+                    'flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm transition-all duration-200',
+                    isDocumentsActive
+                      ? 'bg-linear-to-r from-[#1782C5] to-[#1F2557] text-white shadow-md'
+                      : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800'
+                  )}
+                >
+                  <span className="shrink-0">{iconMap[tab.id]}</span>
+                  <span>{tab.label}</span>
+                </button>
+              ))}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Spacer */}
       <div className="flex-1" />
