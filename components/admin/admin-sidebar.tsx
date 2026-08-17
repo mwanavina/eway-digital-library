@@ -1,5 +1,7 @@
 'use client';
 
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import {
   UploadCloud,
   Database,
@@ -46,27 +48,27 @@ export function AdminSidebar({
   onDocumentsTabClick,
   isMinimized = false,
 }: AdminSidebarProps) {
+  const pathname = usePathname();
   const quickActionTabs = ['upload', 'documents'];
   const academicTabs = ['schools', 'departments', 'programs', 'courses', 'levels', 'resource-types'];
   const systemTabs = ['users', 'analytics'];
+  const isUploadActive = activeTab === 'upload' || pathname === '/admin/upload';
 
   // Minimized view with icon buttons
   if (isMinimized) {
     return (
       <aside className="flex h-full flex-col items-center gap-2">
         {/* Quick Actions */}
-        <button
-          onClick={() => onTabChange('upload')}
+        <Link
+          href="/admin/upload"
           className={cn(
-            'rounded-lg p-2.5 transition-all duration-200',
-            activeTab === 'upload'
-              ? 'bg-linear-to-r from-[#1782C5] to-[#1F2557] text-white shadow-md'
-              : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800'
+            'rounded-lg p-2.5 transition-all duration-200 text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800',
+            isUploadActive && 'bg-linear-to-r from-[#1782C5] to-[#1F2557] text-white shadow-md'
           )}
           title="Upload Documents"
         >
           <UploadCloud size={20} />
-        </button>
+        </Link>
         <button
           onClick={() => {
             onTabChange('schools');
@@ -137,18 +139,16 @@ export function AdminSidebar({
       <div className="mb-6">
         <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Quick Actions</h3>
         <div className="mt-3 space-y-2">
-          <button
-            onClick={() => onTabChange('upload')}
+          <Link
+            href="/admin/upload"
             className={cn(
-              'flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium transition-all duration-200',
-              activeTab === 'upload'
-                ? 'bg-linear-to-r from-[#1782C5] to-[#1F2557] text-white shadow-md'
-                : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800'
+              'flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium transition-all duration-200 text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800',
+              isUploadActive && 'bg-linear-to-r from-[#1782C5] to-[#1F2557] text-white shadow-md'
             )}
           >
             <UploadCloud size={18} className="shrink-0" />
             <span>Upload Documents</span>
-          </button>
+          </Link>
           <button
             onClick={() => {
               onTabChange('schools');
