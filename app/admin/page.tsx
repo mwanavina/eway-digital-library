@@ -362,7 +362,7 @@ export default function AdminPage() {
         if (tab === 'documents') loadDocuments();
       }}
       onCreateClick={openCreateModal}
-      onDocumentsTabClick={loadDocuments}
+      onDocumentsTabClick={() => router.push('/admin/documents')}
       isMinimized={isMinimized}
     />
   );
