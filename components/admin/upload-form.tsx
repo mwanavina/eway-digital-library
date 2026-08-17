@@ -485,7 +485,7 @@ export function AdminUploadForm({
       {/* PDF Upload */}
       <div className="space-y-2">
         <label className="block text-sm font-medium text-foreground">Upload PDF</label>
-        <div className="border-2 border-dashed border-border rounded-lg p-8">
+        {/* <div className="border-2 border-dashed border-border rounded-lg p-8"> */}
           <UploadDropzone
             endpoint="pdfUploader"
             onClientUploadComplete={handleUploadComplete}
@@ -494,7 +494,7 @@ export function AdminUploadForm({
             }}
             disabled={!selectedCourse || isUploading || Boolean(pendingUpload)}
           />
-        </div>
+        {/* </div> */}
       </div>
 
       {pendingUpload && (
