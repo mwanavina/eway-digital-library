@@ -70,6 +70,16 @@ export function AdminSidebar({
         >
           <UploadCloud size={20} />
         </Link>
+        <Link
+          href="/admin/documents"
+          className={cn(
+            'rounded-lg p-2.5 transition-all duration-200 text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800',
+            isDocumentsActive && 'bg-linear-to-r from-[#1782C5] to-[#1F2557] text-white shadow-md'
+          )}
+          title="Manage Documents"
+        >
+          <FileText size={20} />
+        </Link>
         <button
           onClick={() => {
             onTabChange('schools');
@@ -159,6 +169,16 @@ export function AdminSidebar({
           >
             <UploadCloud size={18} className="shrink-0" />
             <span>Upload Documents</span>
+          </Link>
+          <Link
+            href="/admin/documents"
+            className={cn(
+              'flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium transition-all duration-200 text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800',
+              isDocumentsActive && 'bg-linear-to-r from-[#1782C5] to-[#1F2557] text-white shadow-md'
+            )}
+          >
+            <FileText size={18} className="shrink-0" />
+            <span>Manage Documents</span>
           </Link>
           <button
             onClick={() => {
