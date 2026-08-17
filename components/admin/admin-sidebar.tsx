@@ -140,6 +140,16 @@ export function AdminSidebar({
         <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Quick Actions</h3>
         <div className="mt-3 space-y-2">
           <Link
+            href="/admin"
+            className={cn(
+              'flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium transition-all duration-200 text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800',
+              pathname === '/admin' && 'bg-linear-to-r from-[#1782C5] to-[#1F2557] text-white shadow-md'
+            )}
+          >
+            <LayoutGrid size={18} className="shrink-0" />
+            <span>Admin Home</span>
+          </Link>
+          <Link
             href="/admin/upload"
             className={cn(
               'flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium transition-all duration-200 text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800',
