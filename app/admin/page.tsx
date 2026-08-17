@@ -53,7 +53,7 @@ export default function AdminPage() {
     error,
   } = authClient.useSession();
 
-  const [activeTab, setActiveTab] = useState<Tab>('documents');
+  const [activeTab, setActiveTab] = useState<Tab>('users');
   const [schools, setSchools] = useState<AdminItem[]>([]);
   const [departments, setDepartments] = useState<AdminItem[]>([]);
   const [programs, setPrograms] = useState<AdminItem[]>([]);
@@ -75,7 +75,10 @@ export default function AdminPage() {
     const tabFromUrl = searchParams.get('tab') as Tab | null;
     if (tabFromUrl && ['documents', 'users', 'analytics', 'schools', 'departments', 'programs', 'courses', 'levels', 'resource-types'].includes(tabFromUrl)) {
       setActiveTab(tabFromUrl);
+      return;
     }
+
+    setActiveTab('users');
   }, [searchParams]);
 
   useEffect(() => {
