@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import {
   createSchool,
   deleteSchool,
@@ -46,13 +46,14 @@ import { fetchAdminActivities, logAdminActivity } from '@/app/actions/admin-acti
 
 export default function AdminPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const {
     data: session,
     isPending,
     error,
   } = authClient.useSession();
 
-  const [activeTab, setActiveTab] = useState<Tab>('upload');
+  const [activeTab, setActiveTab] = useState<Tab>('documents');
   const [schools, setSchools] = useState<AdminItem[]>([]);
   const [departments, setDepartments] = useState<AdminItem[]>([]);
   const [programs, setPrograms] = useState<AdminItem[]>([]);
@@ -69,6 +70,13 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(false);
 
   const user = session?.user;
+
+  useEffect(() => {
+    const tabFromUrl = searchParams.get('tab') as Tab | null;
+    if (tabFromUrl && ['documents', 'users', 'analytics', 'schools', 'departments', 'programs', 'courses', 'levels', 'resource-types'].includes(tabFromUrl)) {
+      setActiveTab(tabFromUrl);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     if (!user) return;
@@ -324,7 +332,6 @@ export default function AdminPage() {
   }
 
   const tabs: { id: Tab; label: string }[] = [
-    { id: 'upload', label: 'Upload Documents' },
     { id: 'documents', label: 'Manage Documents' },
     { id: 'users', label: 'Users' },
     { id: 'analytics', label: 'Analytics' },
@@ -343,6 +350,14 @@ export default function AdminPage() {
       activeTab={activeTab}
       tabs={tabs}
       onTabChange={(tab) => {
+        if (tab === 'upload') {
+          router.push('/admin/upload');
+          return;
+        }
+
+        const params = new URLSearchParams(searchParams.toString());
+        params.set('tab', tab);
+        router.push(`/admin?${params.toString()}`);
         setActiveTab(tab);
         if (tab === 'documents') loadDocuments();
       }}
@@ -355,7 +370,7 @@ export default function AdminPage() {
   const mainContent = (
     <>
       <div className="space-y-6">
-        {(activeTab === 'upload' || activeTab === 'documents') && (
+        {activeTab === 'documents' && (
           <AdminOverview
             documentsCount={documents.length}
             coursesCount={courses.length}
