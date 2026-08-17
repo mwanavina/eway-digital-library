@@ -388,7 +388,7 @@ export default function AdminPage() {
           <AdminUsersList />
         ) : activeTab === 'analytics' ? (
           <AdminAnalytics />
-        ) : (
+        ) : activeTab === 'documents' ? null : (
           <AdminContent
             activeTab={activeTab}
             schools={schools}
