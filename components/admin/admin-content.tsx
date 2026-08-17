@@ -107,16 +107,6 @@ export function AdminContent({
       </div>
 
       <div className="mt-4 rounded-3xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900 md:p-6">
-        {activeTab === 'documents' && (
-          <div className="space-y-6">
-            <div>
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white">{activeMeta.title}</h2>
-              <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{activeMeta.subtitle}</p>
-            </div>
-            <AdminDocumentList documents={documents} onDelete={onUploadSuccess} onActivity={onActivity} />
-          </div>
-        )}
-
         {(activeTab === 'schools' || activeTab === 'departments' || activeTab === 'programs' || activeTab === 'courses' || activeTab === 'levels' || activeTab === 'resource-types') && (
           <div className="space-y-6">
             <div className="flex flex-wrap items-center justify-between gap-3">
