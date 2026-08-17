@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { Suspense, useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import {
   createSchool,
@@ -45,6 +45,14 @@ import { toast } from 'sonner';
 import { fetchAdminActivities, logAdminActivity } from '@/app/actions/admin-activity';
 
 export default function AdminPage() {
+  return (
+    <Suspense fallback={<AdminPageLoading />}>
+      <AdminPageContent />
+    </Suspense>
+  );
+}
+
+function AdminPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const {
@@ -90,13 +98,7 @@ export default function AdminPage() {
   }, [user]);
 
   if (isPending) {
-    return (
-      // spinnner
-      <div className="flex h-screen items-center justify-center">
-        <p className="text-lg font-semibold text-slate-700 dark:text-slate-300">Loading...</p>
-        <div className="ml-2 h-4 w-4 animate-bounce rounded-full bg-slate-700 dark:bg-slate-300"></div>
-      </div>
-    );
+    return <AdminPageLoading />;
   }
 
   if (error) {
@@ -449,4 +451,13 @@ export default function AdminPage() {
   );
 
   return <AdminLayout sidebar={sidebarContent} header={headerContent} content={mainContent} />;
+}
+
+function AdminPageLoading() {
+  return (
+    <div className="flex h-screen items-center justify-center">
+      <p className="text-lg font-semibold text-slate-700 dark:text-slate-300">Loading...</p>
+      <div className="ml-2 h-4 w-4 animate-bounce rounded-full bg-slate-700 dark:bg-slate-300"></div>
+    </div>
+  );
 }
