@@ -107,25 +107,6 @@ export function AdminContent({
       </div>
 
       <div className="mt-4 rounded-3xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900 md:p-6">
-        {activeTab === 'upload' && (
-          <div className="space-y-6">
-            <div>
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white">{activeMeta.title}</h2>
-              <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{activeMeta.subtitle}</p>
-            </div>
-            <AdminUploadForm
-              schools={schools}
-              departments={departments}
-              programs={programs}
-              courses={courses}
-              levels={levels}
-              resourceTypes={resources}
-              onSuccess={onUploadSuccess}
-              onActivity={onActivity}
-            />
-          </div>
-        )}
-
         {activeTab === 'documents' && (
           <div className="space-y-6">
             <div>
