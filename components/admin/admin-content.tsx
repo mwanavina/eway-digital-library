@@ -96,17 +96,7 @@ export function AdminContent({
 
   return (
     <div className="min-w-0 rounded-3xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900 md:p-6">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="min-w-0">
-          <p className="text-sm font-semibold text-slate-900 dark:text-white">Workspace controls</p>
-          <p className="text-sm text-slate-500 dark:text-slate-400">Move between management areas and keep the library organized.</p>
-        </div>
-        {/* <div className="inline-flex w-fit items-center rounded-full bg-emerald-50 px-3 py-1 text-sm font-medium text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300">
-          Live workspace
-        </div> */}
-      </div>
-
-      <div className="mt-4 rounded-3xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900 md:p-6">
+      <div className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900 md:p-6">
         {(activeTab === 'schools' || activeTab === 'departments' || activeTab === 'programs' || activeTab === 'courses' || activeTab === 'levels' || activeTab === 'resource-types') && (
           <div className="space-y-6">
             <div className="flex flex-wrap items-center justify-between gap-3">
