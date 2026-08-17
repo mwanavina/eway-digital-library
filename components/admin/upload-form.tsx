@@ -498,37 +498,37 @@ export function AdminUploadForm({
       </div>
 
       {pendingUpload && (
-        <div className="space-y-4 p-4 bg-slate-50 border border-border rounded-lg">
+        <div className="space-y-4 rounded-lg border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-900">
           <div className="flex items-center justify-between gap-4">
             <div>
-              <h3 className="text-lg font-semibold text-foreground">Preview</h3>
-              <p className="text-sm text-muted-foreground">Review the uploaded PDF and thumbnail before saving.</p>
+              <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Preview</h3>
+              <p className="text-sm text-slate-600 dark:text-slate-400">Review the uploaded PDF and thumbnail before saving.</p>
             </div>
             <button
               type="button"
               onClick={() => setPendingUpload(null)}
-              className="rounded-lg px-3 py-2 border border-border text-sm hover:bg-muted"
+              className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow-sm transition-colors hover:bg-slate-100 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700"
             >
               Reset upload
             </button>
           </div>
 
           <div className="grid gap-4 lg:grid-cols-[1.5fr_1fr]">
-            <div className="border border-border rounded-lg overflow-hidden h-90">
+            <div className="h-90 overflow-hidden rounded-lg border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-950">
               <iframe
                 src={`${pendingUpload.fileUrl}#toolbar=0&navpanes=0&scrollbar=1`}
-                className="w-full h-full"
+                className="h-full w-full"
                 title={pendingUpload.fileName}
               />
             </div>
             <div className="space-y-4">
               <div>
-                <p className="text-sm font-medium text-foreground">Thumbnail</p>
-                <div className="mt-2 rounded-lg border border-border bg-white h-64 overflow-hidden flex items-center justify-center">
+                <p className="text-sm font-medium text-slate-900 dark:text-slate-100">Thumbnail</p>
+                <div className="mt-2 flex h-64 items-center justify-center overflow-hidden rounded-lg border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-800">
                   {pendingUpload.thumbnailUrl ? (
-                    <img src={pendingUpload.thumbnailUrl} alt="PDF thumbnail" className="w-full h-full object-cover" />
+                    <img src={pendingUpload.thumbnailUrl} alt="PDF thumbnail" className="h-full w-full object-cover" />
                   ) : (
-                    <div className="text-sm text-muted-foreground">Thumbnail generation failed or is unavailable.</div>
+                    <div className="text-sm text-slate-600 dark:text-slate-400">Thumbnail generation failed or is unavailable.</div>
                   )}
                 </div>
               </div>
