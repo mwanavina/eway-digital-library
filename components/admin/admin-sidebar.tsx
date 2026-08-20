@@ -249,7 +249,7 @@ export function AdminSidebar({
       </div>
 
       {/* Documents & Library */}
-      {pathname !== '/admin' && (
+      {pathname !== '/admin' && !pathname?.startsWith('/admin/documents') && (
         <div className="mb-6">
           <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Library</h3>
           <div className="mt-3 space-y-1">
