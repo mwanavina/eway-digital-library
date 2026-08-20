@@ -83,11 +83,11 @@ export function Header({ onSearchChange, onMenuClick, onSearchClick, onFilterCli
           {isAdmin && (
             <Link
               href="/admin"
-              className="flex items-center gap-2 px-3 py-2 hover:bg-[#1F2557] dark:hover:bg-slate-700 rounded-lg transition-colors"
+              className="flex items-center gap-2 p-2 md:px-3 md:py-2 hover:bg-[#1F2557] dark:hover:bg-slate-700 rounded-lg transition-colors"
               aria-label="Admin"
             >
               <Shield size={18} />
-              <span className="text-sm font-medium">Admin</span>
+              <span className="hidden md:inline text-sm font-medium">Admin</span>
             </Link>
           )}
 
