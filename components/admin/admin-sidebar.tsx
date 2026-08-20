@@ -158,7 +158,7 @@ export function AdminSidebar({
             )}
           >
             <LayoutGrid size={18} className="shrink-0" />
-            <span>Admin Home</span>
+            <span className="hidden md:inline">Admin Home</span>
           </Link>
           <Link
             href="/admin/upload"
