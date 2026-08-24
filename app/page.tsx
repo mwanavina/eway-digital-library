@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, Suspense } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { Header } from '@/components/header';
+import { BrandLogo } from '@/components/brand-logo';
 import { FilterSidebar } from '@/components/filter-sidebar';
 import { DocumentCard } from '@/components/document-card';
 import { ResourceCard } from '@/components/resource-card';
@@ -234,10 +235,12 @@ function HomeContent() {
   
   if (isPending) {
     return (
-      <div className="flex h-screen items-center justify-center">
-        <div className="flex items-center gap-2 text-lg font-semibold text-slate-700 dark:text-slate-300">
-          <Spinner data-icon="inline-start" />
-          <span>Loading...</span>
+      <div className="flex h-screen items-center justify-center bg-slate-50 dark:bg-slate-950">
+        <div className="flex items-center justify-center rounded-full bg-white/80 p-4 shadow-lg ring-1 ring-slate-200/80 backdrop-blur-sm dark:bg-slate-900/80 dark:ring-slate-700/80">
+          <BrandLogo
+            variant="auth"
+            className="animate-pulse shadow-[0_0_0_10px_rgba(23,130,197,0.08)]"
+          />
         </div>
       </div>
     );
@@ -632,10 +635,12 @@ function HomeContent() {
 export default function Home() {
   return (
     <Suspense fallback={(
-      <div className="flex h-screen items-center justify-center">
-        <div className="flex items-center gap-2 text-lg font-semibold text-slate-700 dark:text-slate-300">
-          <Spinner data-icon="inline-start" />
-          <span>Loading...</span>
+      <div className="flex h-screen items-center justify-center bg-slate-50 dark:bg-slate-950">
+        <div className="flex items-center justify-center rounded-full bg-white/80 p-4 shadow-lg ring-1 ring-slate-200/80 backdrop-blur-sm dark:bg-slate-900/80 dark:ring-slate-700/80">
+          <BrandLogo
+            variant="auth"
+            className="animate-pulse shadow-[0_0_0_10px_rgba(23,130,197,0.08)]"
+          />
         </div>
       </div>
     )}>
