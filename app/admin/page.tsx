@@ -40,6 +40,7 @@ import { AdminForm } from '@/components/admin/admin-form';
 import { AdminAnalytics } from '@/components/admin/admin-analytics';
 import { AdminUsersList } from '@/components/admin/admin-users-list';
 import { AdminLayout } from '@/components/admin/admin-layout';
+import { BrandLogo } from '@/components/brand-logo';
 import { Tab, AdminItem, AdminFormData, type AdminActivity } from '@/components/admin/admin-types';
 import { toast } from 'sonner';
 import { fetchAdminActivities, logAdminActivity } from '@/app/actions/admin-activity';
@@ -455,9 +456,13 @@ function AdminPageContent() {
 
 function AdminPageLoading() {
   return (
-    <div className="flex h-screen items-center justify-center">
-      <p className="text-lg font-semibold text-slate-700 dark:text-slate-300">Loading...</p>
-      <div className="ml-2 h-4 w-4 animate-bounce rounded-full bg-slate-700 dark:bg-slate-300"></div>
+    <div className="flex h-screen items-center justify-center bg-slate-50 dark:bg-slate-950">
+      <div className="flex items-center justify-center rounded-full bg-white/80 p-4 shadow-lg ring-1 ring-slate-200/80 backdrop-blur-sm dark:bg-slate-900/80 dark:ring-slate-700/80">
+        <BrandLogo
+          variant="auth"
+          className="animate-pulse shadow-[0_0_0_10px_rgba(23,130,197,0.08)]"
+        />
+      </div>
     </div>
   );
 }
