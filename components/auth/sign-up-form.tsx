@@ -115,7 +115,7 @@ export function SignUpForm() {
               <FormControl>
                 <Input
                   type="email"
-                  placeholder="Use school email only..."
+                  placeholder="Enter your email"
                   autoComplete="email"
                   className="h-11 bg-muted"
                   {...field}
