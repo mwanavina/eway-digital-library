@@ -513,14 +513,17 @@ export async function fetchAllResourceTypes() {
       name: resourceTypes.name,
       slug: resourceTypes.slug,
       description: resourceTypes.description,
+      icon: resourceTypes.icon,
+      color: resourceTypes.color,
       createdAt: resourceTypes.createdAt,
     }).from(resourceTypes).orderBy(asc(resourceTypes.name));
 
     if (rows.length === 0) {
       const fallbackTypes = [
-        { id: 1, name: 'Past Papers', slug: 'past-papers', description: 'Past examination papers' },
-        { id: 2, name: 'Course Outlines', slug: 'course-outlines', description: 'Course outlines and study guides' },
-        { id: 3, name: 'Syllabi', slug: 'syllabi', description: 'Syllabus and academic plans' },
+        { id: 1, name: 'Past Papers', slug: 'past-papers', description: 'Past examination papers', icon: 'FileText', color: '#1782C5' },
+        { id: 2, name: 'Course Outlines', slug: 'course-outlines', description: 'Course outlines and study guides', icon: 'ClipboardList', color: '#F59E0B' },
+        { id: 3, name: 'Books', slug: 'books', description: 'Books and learning resources for students', icon: 'Book', color: '#2563EB' },
+        { id: 4, name: 'Syllabi', slug: 'syllabi', description: 'Syllabus and academic plans', icon: 'BookOpen', color: '#1F2557' },
       ];
 
       return { success: true, data: fallbackTypes };
