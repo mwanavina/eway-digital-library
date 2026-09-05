@@ -22,6 +22,15 @@ import { FileText, BookOpen, Book, ClipboardList, Microscope, Menu, Sliders, Lay
 import { authClient } from '@/lib/auth-client';
 import { formatFileSize } from '@/lib/utils';
 
+interface ResourceTypeOption {
+  id: number;
+  name: string;
+  slug: string;
+  description?: string | null;
+  icon?: string | null;
+  color?: string | null;
+}
+
 interface Document {
   id: number;
   title: string;
@@ -44,17 +53,25 @@ interface Document {
   is_bookmarked?: boolean;
 }
 
-type ResourceType = 'all' | 'past-papers' | 'journals' | 'dissertations' | 'course-outlines' | 'research-papers';
 type ViewMode = 'grid' | 'list';
 
-const RESOURCE_TYPES = [
-  { id: 'all', name: 'All Resources', icon: FileText, color: '#6B7280' },
-  { id: 'past-papers', name: 'Past Papers', icon: FileText, color: '#1782C5' },
-  // { id: 'journals', name: 'Journals', icon: BookOpen, color: '#1F2557' },
-  // { id: 'dissertations', name: 'Dissertations', icon: Book, color: '#8B5A8F' },
-  { id: 'course-outlines', name: 'Course Outlines', icon: ClipboardList, color: '#F59E0B' },
-  // { id: 'research-papers', name: 'Research Papers', icon: Microscope, color: '#10B981' },
-];
+const RESOURCE_TYPE_ICON_MAP: Record<string, any> = {
+  'Past Papers': FileText,
+  'Journals': BookOpen,
+  'Dissertations': Book,
+  'Course Outlines': ClipboardList,
+  'Research Papers': Microscope,
+  'Books': Book,
+};
+
+const fallbackResourceTypeColors: Record<string, string> = {
+  'Past Papers': '#1782C5',
+  'Journals': '#1F2557',
+  'Dissertations': '#8B5A8F',
+  'Course Outlines': '#F59E0B',
+  'Research Papers': '#10B981',
+  'Books': '#2563EB',
+};
 
 function HomeContent() {
   const {
@@ -72,13 +89,14 @@ function HomeContent() {
   const [loading, setLoading] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState(() => searchParams.get('q') ?? '');
-  const [activeResourceType, setActiveResourceType] = useState<ResourceType>('all');
+  const [activeResourceType, setActiveResourceType] = useState('all');
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [selectedDocument, setSelectedDocument] = useState<Document | null>(null);
   const [schools, setSchools] = useState<any[]>([]);
   const [departments, setDepartments] = useState<any[]>([]);
   const [programs, setPrograms] = useState<any[]>([]);
   const [courses, setCourses] = useState<any[]>([]);
+  const [resourceTypes, setResourceTypes] = useState<ResourceTypeOption[]>([]);
   const [filters, setFilters] = useState({
     schoolId: '',
     departmentId: '',
@@ -96,14 +114,10 @@ function HomeContent() {
       const params = new URLSearchParams();
 
       if (activeResourceType !== 'all') {
-        const typeMap: { [key: string]: string } = {
-          'past-papers': 'Past Papers',
-          'journals': 'Journals',
-          'dissertations': 'Dissertations',
-          'course-outlines': 'Course Outlines',
-          'research-papers': 'Research Papers',
-        };
-        params.append('resourceType', typeMap[activeResourceType]);
+        const selectedResourceTypeName = resourceTypes.find((type) => type.slug === activeResourceType)?.name;
+        if (selectedResourceTypeName) {
+          params.append('resourceType', selectedResourceTypeName);
+        }
       }
 
       if (filters.schoolId) params.append('schoolId', filters.schoolId);
@@ -129,7 +143,7 @@ function HomeContent() {
     } finally {
       setLoading(false);
     }
-  }, [filters, searchQuery, activeResourceType]);
+  }, [filters, searchQuery, activeResourceType, resourceTypes]);
 
   useEffect(() => {
     const urlQuery = searchParams.get('q') ?? '';
@@ -151,6 +165,7 @@ function HomeContent() {
           setDepartments(data.departments || data.data?.departments || []);
           setPrograms(data.programs || data.data?.programs || []);
           setCourses(data.courses || data.data?.courses || []);
+          setResourceTypes(data.resourceTypes || data.data?.resourceTypes || []);
         }
       } catch (error) {
         console.error('[v0] Error fetching filter options:', error);
@@ -160,7 +175,7 @@ function HomeContent() {
   }, []);
 
   // Handle resource type change - reset filters
-  const handleResourceTypeChange = (newType: ResourceType) => {
+  const handleResourceTypeChange = (newType: string) => {
     setActiveResourceType(newType);
     setFilters({
       schoolId: '',
@@ -193,6 +208,28 @@ function HomeContent() {
       examType: '',
     });
   };
+
+  const activeResourceTypeName = activeResourceType === 'all'
+    ? 'all'
+    : resourceTypes.find((type) => type.slug === activeResourceType)?.name ?? '';
+
+  const selectableResourceTypes: Array<{ slug: string; name: string; color: string; icon?: any }> = [
+    { slug: 'all', name: 'All Resources', color: '#6B7280', icon: FileText },
+    ...resourceTypes.map((type) => ({
+      slug: type.slug,
+      name: type.name,
+      color: type.color || fallbackResourceTypeColors[type.name] || '#1782C5',
+      icon: type.icon ? RESOURCE_TYPE_ICON_MAP[type.icon] || RESOURCE_TYPE_ICON_MAP[type.name] || FileText : (RESOURCE_TYPE_ICON_MAP[type.name] || FileText),
+    })),
+  ];
+
+  const shouldShowTypeSpecificFilter = activeResourceType !== 'all' && (
+    activeResourceTypeName === 'Past Papers' ||
+    activeResourceTypeName === 'Journals' ||
+    activeResourceTypeName === 'Dissertations' ||
+    activeResourceTypeName === 'Course Outlines' ||
+    activeResourceTypeName === 'Research Papers'
+  );
 
   useEffect(() => {
     const shouldFetch = searchQuery || Object.values(filters).some((v) => v !== '') || activeResourceType !== 'all';
@@ -309,7 +346,7 @@ function HomeContent() {
         departments={departments}
         programs={programs}
         courses={courses}
-        activeResourceType={activeResourceType}
+        activeResourceType={activeResourceType as any}
       />
       
       <div className="flex h-[calc(100vh-64px)] flex-col md:flex-row">
@@ -323,7 +360,7 @@ function HomeContent() {
 
         {/* Filter Sidebar - Resource Specific */}
         <div className="hidden lg:block lg:w-64 lg:border-r lg:border-gray-200 lg:overflow-hidden lg:bg-background dark:lg:bg-slate-950">
-          {activeResourceType === 'all' && (
+          {(activeResourceType === 'all' || !shouldShowTypeSpecificFilter) && (
             <AllResourcesFilter
               schools={schools}
               departments={departments}
@@ -336,7 +373,7 @@ function HomeContent() {
               onClose={() => setSidebarOpen(false)}
             />
           )}
-          {activeResourceType === 'past-papers' && (
+          {activeResourceTypeName === 'Past Papers' && (
             <PastPapersFilter
               schools={schools}
               departments={departments}
@@ -349,7 +386,7 @@ function HomeContent() {
               onClose={() => setSidebarOpen(false)}
             />
           )}
-          {(activeResourceType === 'journals' || activeResourceType === 'research-papers') && (
+          {(activeResourceTypeName === 'Journals' || activeResourceTypeName === 'Research Papers') && (
             <JournalsFilter
               schools={schools}
               departments={departments}
@@ -362,7 +399,7 @@ function HomeContent() {
               onClose={() => setSidebarOpen(false)}
             />
           )}
-          {activeResourceType === 'dissertations' && (
+          {activeResourceTypeName === 'Dissertations' && (
             <DissertationsFilter
               schools={schools}
               departments={departments}
@@ -375,7 +412,7 @@ function HomeContent() {
               onClose={() => setSidebarOpen(false)}
             />
           )}
-          {activeResourceType === 'course-outlines' && (
+          {activeResourceTypeName === 'Course Outlines' && (
             <CourseOutlinesFilter
               schools={schools}
               departments={departments}
@@ -393,7 +430,7 @@ function HomeContent() {
         {/* Mobile Filter Sidebar */}
         {sidebarOpen && (
           <>
-            {activeResourceType === 'all' && (
+            {(activeResourceType === 'all' || !shouldShowTypeSpecificFilter) && (
               <AllResourcesFilter
                 schools={schools}
                 departments={departments}
@@ -406,7 +443,7 @@ function HomeContent() {
                 onClose={() => setSidebarOpen(false)}
               />
             )}
-            {activeResourceType === 'past-papers' && (
+            {activeResourceTypeName === 'Past Papers' && (
               <PastPapersFilter
                 schools={schools}
                 departments={departments}
@@ -419,7 +456,7 @@ function HomeContent() {
                 onClose={() => setSidebarOpen(false)}
               />
             )}
-            {(activeResourceType === 'journals' || activeResourceType === 'research-papers') && (
+            {(activeResourceTypeName === 'Journals' || activeResourceTypeName === 'Research Papers') && (
               <JournalsFilter
                 schools={schools}
                 departments={departments}
@@ -432,7 +469,7 @@ function HomeContent() {
                 onClose={() => setSidebarOpen(false)}
               />
             )}
-            {activeResourceType === 'dissertations' && (
+            {activeResourceTypeName === 'Dissertations' && (
               <DissertationsFilter
                 schools={schools}
                 departments={departments}
@@ -445,7 +482,7 @@ function HomeContent() {
                 onClose={() => setSidebarOpen(false)}
               />
             )}
-            {activeResourceType === 'course-outlines' && (
+            {activeResourceTypeName === 'Course Outlines' && (
               <CourseOutlinesFilter
                 schools={schools}
                 departments={departments}
@@ -467,43 +504,39 @@ function HomeContent() {
             {/* Mobile Filter Pills - Horizontally Scrollable */}
             <div className="md:hidden mb-6 flex gap-2 items-center overflow-x-auto pb-2 -mx-4 px-4">
               {/* Quick Filter Pills */}
-              {[
-                { id: 'all', label: 'All' },
-                { id: 'past-papers', label: 'Past Papers' },
-                // { id: 'journals', label: 'Journals' },
-                // { id: 'dissertations', label: 'Dissertations' },
-                { id: 'course-outlines', label: 'Course Outlines' },
-              ].map((type) => (
+              {selectableResourceTypes.map((type) => (
                 <button
-                  key={type.id}
-                  onClick={() => handleResourceTypeChange(type.id as ResourceType)}
+                  key={type.slug}
+                  onClick={() => handleResourceTypeChange(type.slug)}
                   className={`px-4 py-2 rounded-full text-xs font-semibold transition-all shrink-0 whitespace-nowrap ${
-                    activeResourceType === type.id
+                    activeResourceType === type.slug
                       ? 'bg-[#1782C5] text-white'
                       : 'bg-gray-100 text-gray-700'
                   }`}
                 >
-                  {type.label}
+                  {type.name}
                 </button>
               ))}
             </div>
 
             {/* Desktop Resource Type Pills - Horizontally Scrollable */}
             <div className="hidden md:flex mb-4 lg:mb-6 gap-2 overflow-x-auto pb-2 -mx-6 px-6">
-              {RESOURCE_TYPES.map((type) => {
-                const isActive = activeResourceType === type.id;
+              {selectableResourceTypes.map((type) => {
+                const isActive = activeResourceType === type.slug;
+                const IconComponent = type.slug === 'all' ? FileText : (type.icon ?? RESOURCE_TYPE_ICON_MAP[type.name] ?? FileText);
                 return (
                   <button
-                    key={type.id}
-                    onClick={() => handleResourceTypeChange(type.id as ResourceType)}
-                    className={`px-3 lg:px-4 py-1.5 lg:py-2 rounded-full text-xs lg:text-sm font-medium transition-all shrink-0 whitespace-nowrap ${
+                    key={type.slug}
+                    onClick={() => handleResourceTypeChange(type.slug)}
+                    className={`flex items-center gap-2 px-3 lg:px-4 py-1.5 lg:py-2 rounded-full text-xs lg:text-sm font-medium transition-all shrink-0 whitespace-nowrap ${
                       isActive
                         ? 'text-white'
                         : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                     }`}
                     style={isActive ? { backgroundColor: type.color } : {}}
                   >
-                    {type.name}
+                    <IconComponent size={14} />
+                    <span>{type.name}</span>
                   </button>
                 );
               })}
