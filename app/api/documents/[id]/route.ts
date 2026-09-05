@@ -50,9 +50,12 @@ export async function GET(
         file_path: documents.filePath,
         download_count: documents.downloadCount,
         resource_type_name: resourceTypes.name,
-        author: sql<string | null>`NULL`,
-        publication_date: sql<string | null>`NULL`,
-        abstract: sql<string | null>`NULL`,
+        author: documents.author,
+        publisher: documents.publisher,
+        isbn: documents.isbn,
+        publication_date: documents.publicationDate,
+        abstract: documents.abstract,
+        edition: documents.edition,
         level_id: documents.levelId,
       })
       .from(documents)
