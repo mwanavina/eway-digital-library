@@ -44,10 +44,30 @@ export function SearchPageClient({ initialQuery, initialResults, resourceTypeCou
   const resourceTypes = useMemo(() => {
     const countMap = new Map(resourceTypeCounts.map((item) => [item.resourceTypeName?.toLowerCase(), item.count]));
 
-    return [
+    const defaults = [
       { id: 'past-papers', label: 'Past Papers', icon: FileText, color: '#4A90E2', count: countMap.get('past papers') ?? 0 },
       { id: 'course-outlines', label: 'Course Outlines', icon: GraduationCap, color: '#F39C12', count: countMap.get('course outlines') ?? 0 },
+      { id: 'books', label: 'Books', icon: Book, color: '#2563EB', count: countMap.get('books') ?? 0 },
     ];
+
+    const dynamicTypes = resourceTypeCounts
+      .filter((item) => item.resourceTypeName)
+      .map((item) => {
+        const label = item.resourceTypeName!;
+        const normalized = label.toLowerCase();
+        const icon = normalized.includes('paper') ? FileText : normalized.includes('book') ? Book : normalized.includes('outline') ? GraduationCap : BookOpen;
+
+        return {
+          id: label.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+          label,
+          icon,
+          color: normalized.includes('books') ? '#2563EB' : '#4A90E2',
+          count: item.count,
+        };
+      })
+      .filter((type) => !defaults.some((defaultType) => defaultType.label.toLowerCase() === type.label.toLowerCase()));
+
+    return [...defaults, ...dynamicTypes];
   }, [resourceTypeCounts]);
 
   useEffect(() => {
