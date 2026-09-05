@@ -1,24 +1,16 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Upload, AlertCircle } from 'lucide-react';
 import { UploadDropzone } from "@/utils/uploadthing";
 import { createDocument } from '@/app/actions/documents';
+import { createPdfThumbnail } from '@/app/actions/thumbnail';
+import { generatePdfThumbnailBlobFromFile } from '@/lib/pdf-thumbnail-client';
 import { genUploader } from 'uploadthing/client';
 import { toast } from 'sonner';
 import type { AdminActivity } from '@/components/admin/admin-types';
 
 const { uploadFiles } = genUploader();
-
-const loadPdfJs = async () => {
-  if (typeof window === 'undefined') {
-    throw new Error('PDF.js can only run in the browser');
-  }
-
-  const pdfjsLib = await import('pdfjs-dist/legacy/build/pdf.mjs');
-  pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.mjs';
-  return pdfjsLib;
-};
 
 interface PendingUpload {
   fileUrl: string;
@@ -71,6 +63,7 @@ export function AdminUploadForm({
   const [pendingUpload, setPendingUpload] = useState<PendingUpload | null>(null);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const pendingFileRef = useRef<File | null>(null);
 
   const getValue = (item: any, keys: string[]) => {
     for (const key of keys) {
@@ -106,32 +99,6 @@ export function AdminUploadForm({
   const filteredCourses = selectedProgram
     ? courses.filter((c) => Number(getValue(c, ['program_id', 'programId'])) === Number(selectedProgram))
     : [];
-
-  const generatePdfThumbnailBlob = async (pdfUrl: string) => {
-    try {
-      const pdfjsLib = await loadPdfJs();
-      const pdf = await pdfjsLib.getDocument({ url: pdfUrl }).promise;
-      const page = await pdf.getPage(1);
-      const scale = 1.5;
-      const viewport = page.getViewport({ scale });
-
-      const canvas = document.createElement('canvas');
-      const context = canvas.getContext('2d');
-      if (!context) throw new Error('Failed to get canvas context');
-
-      canvas.width = viewport.width;
-      canvas.height = viewport.height;
-
-      await page.render({ canvas, canvasContext: context, viewport }).promise;
-
-      return await new Promise<Blob | null>((resolve) => {
-        canvas.toBlob((blob) => resolve(blob), 'image/png');
-      });
-    } catch (error) {
-      console.error('Failed to generate PDF thumbnail in browser:', error);
-      return null;
-    }
-  };
 
   const uploadThumbnailBlob = async (thumbnailBlob: Blob) => {
     const thumbnailFile = new File([thumbnailBlob], 'thumbnail.png', { type: 'image/png' });
@@ -176,12 +143,17 @@ export function AdminUploadForm({
       let thumbnailKey = existingThumbnailKey;
 
       if (!thumbnailUrl) {
-        const thumbnailBlob = await generatePdfThumbnailBlob(fileUrl);
+        const localFile = pendingFileRef.current;
+        let thumbnailBlob = localFile ? await generatePdfThumbnailBlobFromFile(localFile) : null;
 
         if (thumbnailBlob) {
           const thumbnailUpload = await uploadThumbnailBlob(thumbnailBlob);
           thumbnailUrl = thumbnailUpload.thumbnailUrl;
           thumbnailKey = thumbnailUpload.thumbnailKey;
+        } else {
+          const serverThumbnail = await createPdfThumbnail(fileUrl, fileName);
+          thumbnailUrl = serverThumbnail.url;
+          thumbnailKey = serverThumbnail.key;
         }
       }
 
@@ -201,6 +173,7 @@ export function AdminUploadForm({
       setError(message);
       toast.error(message);
     } finally {
+      pendingFileRef.current = null;
       setIsUploading(false);
     }
   };
@@ -607,11 +580,16 @@ export function AdminUploadForm({
         {/* <div className="border-2 border-dashed border-border rounded-lg p-8"> */}
           <UploadDropzone
             endpoint="pdfUploader"
+            onBeforeUploadBegin={(files) => {
+              pendingFileRef.current = files[0] ?? null;
+              return files;
+            }}
             onClientUploadComplete={handleUploadComplete}
             onUploadError={(error: Error) => {
+              pendingFileRef.current = null;
               setError(`Upload failed: ${error.message}`);
             }}
-            disabled={!selectedCourse || isUploading || Boolean(pendingUpload)}
+            disabled={(!isBookResource && !selectedCourse) || isUploading || Boolean(pendingUpload)}
           />
         {/* </div> */}
       </div>
