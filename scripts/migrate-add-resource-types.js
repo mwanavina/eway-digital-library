@@ -39,13 +39,14 @@ async function migrate() {
     // Add columns to documents table if they don't exist
     try {
       await sql`
-        ALTER TABLE documents 
-        ADD COLUMN IF NOT EXISTS resource_type_id INTEGER DEFAULT 1,
+        ALTER TABLE documents
+        ADD COLUMN IF NOT EXISTS resource_type_id INTEGER,
         ADD COLUMN IF NOT EXISTS author VARCHAR(255),
-        ADD COLUMN IF NOT EXISTS abstract TEXT,
-        ADD COLUMN IF NOT EXISTS doi VARCHAR(100),
+        ADD COLUMN IF NOT EXISTS publisher VARCHAR(255),
+        ADD COLUMN IF NOT EXISTS isbn VARCHAR(100),
         ADD COLUMN IF NOT EXISTS publication_date DATE,
-        ADD COLUMN IF NOT EXISTS keywords VARCHAR(500)
+        ADD COLUMN IF NOT EXISTS edition VARCHAR(50),
+        ADD COLUMN IF NOT EXISTS abstract TEXT
       `;
       console.log('[v0] documents table columns added');
     } catch (e) {
