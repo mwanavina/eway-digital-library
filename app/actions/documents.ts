@@ -9,9 +9,9 @@ import { getServerSession } from '@/lib/server/session';
 
 interface CreateDocumentInput {
   title: string;
-  courseId: number;
-  year?: number;
-  semester?: number;
+  courseId?: number | null;
+  year?: number | null;
+  semester?: number | null;
   examType?: string;
   fileKey: string;
   fileUrl: string;
@@ -19,10 +19,13 @@ interface CreateDocumentInput {
   fileSize?: number;
   thumbnailUrl?: string;
   thumbnailKey?: string;
-  levelId?: number;
+  levelId?: number | null;
   resourceTypeId?: number;
   author?: string | null;
+  publisher?: string | null;
+  isbn?: string | null;
   publicationDate?: string | null;
+  edition?: string | null;
   abstract?: string | null;
 }
 
@@ -43,12 +46,18 @@ export async function createDocument(input: CreateDocumentInput): Promise<any> {
 
     const [createdDocument] = await db.insert(documents).values({
       title: input.title,
-      courseId: input.courseId,
+      courseId: input.courseId ?? null,
       levelId: input.levelId ?? null,
       resourceTypeId: input.resourceTypeId ?? null,
       year: input.year ?? null,
       semester: input.semester ?? null,
       examType: input.examType?.trim() || null,
+      author: input.author?.trim() || null,
+      publisher: input.publisher?.trim() || null,
+      isbn: input.isbn?.trim() || null,
+      publicationDate: input.publicationDate || null,
+      edition: input.edition?.trim() || null,
+      abstract: input.abstract?.trim() || null,
       filePath: input.fileUrl,
       fileKey: input.fileKey,
       fileSize: input.fileSize ?? null,
