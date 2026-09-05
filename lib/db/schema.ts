@@ -137,6 +137,8 @@ export const resourceTypes = pgTable("resource_types", {
   name: varchar("name", { length: 255 }).notNull().unique(),
   slug: varchar("slug", { length: 100 }).notNull().unique(),
   description: text("description"),
+  icon: varchar("icon", { length: 50 }).default('FileText'),
+  color: varchar("color", { length: 20 }).default('#1782C5'),
   createdAt: timestamp("created_at", { withTimezone: false }).defaultNow().notNull(),
 });
 
