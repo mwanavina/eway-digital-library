@@ -59,6 +59,13 @@ export function AdminUploadForm({
   const [year, setYear] = useState(new Date().getFullYear().toString());
   const [semester, setSemester] = useState('1');
   const [examType, setExamType] = useState('Mid-semester');
+  const [bookTitle, setBookTitle] = useState('');
+  const [bookAuthor, setBookAuthor] = useState('');
+  const [bookPublisher, setBookPublisher] = useState('');
+  const [bookIsbn, setBookIsbn] = useState('');
+  const [bookPublicationDate, setBookPublicationDate] = useState('');
+  const [bookEdition, setBookEdition] = useState('');
+  const [bookAbstract, setBookAbstract] = useState('');
   const [isUploading, setIsUploading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [pendingUpload, setPendingUpload] = useState<PendingUpload | null>(null);
@@ -82,6 +89,7 @@ export function AdminUploadForm({
 
   const selectedResourceTypeDetails = resourceTypes.find((resourceType) => String(resourceType.id) === String(selectedResourceType));
   const isPastPaperResource = selectedResourceTypeDetails?.name === 'Past Papers';
+  const isBookResource = selectedResourceTypeDetails?.name === 'Books';
   const yearOptions = Array.from({ length: 15 }, (_, index) => new Date().getFullYear() - index);
 
   // Filter departments based on school
@@ -203,23 +211,33 @@ export function AdminUploadForm({
       return;
     }
 
-    if (!selectedCourse) {
-      setError('Please select a course before saving');
-      return;
-    }
-
-    if (!selectedLevel) {
-      setError('Please select a level before saving');
-      return;
-    }
-
     if (!selectedResourceType) {
       setError('Please select a resource type before saving');
       return;
     }
 
+    if (!isBookResource && !selectedCourse) {
+      setError('Please select a course before saving');
+      return;
+    }
+
+    if (!isBookResource && !selectedLevel) {
+      setError('Please select a level before saving');
+      return;
+    }
+
     if (isPastPaperResource && !examType.trim()) {
       setError('Please select an exam type for past papers');
+      return;
+    }
+
+    if (isBookResource && !bookTitle.trim()) {
+      setError('Please enter the book title before saving');
+      return;
+    }
+
+    if (isBookResource && !bookAuthor.trim()) {
+      setError('Please enter the book author before saving');
       return;
     }
 
@@ -231,14 +249,22 @@ export function AdminUploadForm({
       const selectedCourseName = courses.find((c) => c.id === parseInt(selectedCourse))?.name;
       const selectedLevelName = levels.find((l) => l.id === parseInt(selectedLevel))?.name;
 
+      const generatedTitle = `${selectedCourseName ?? 'Document'} - ${selectedLevelName ?? ''} ${year} Sem${semester}${isPastPaperResource ? ` ${examType}` : ''}`.trim();
+
       const result = await createDocument({
-        title: `${selectedCourseName ?? 'Document'} - ${selectedLevelName ?? ''} ${year} Sem${semester}${isPastPaperResource ? ` ${examType}` : ''}`.trim(),
-        courseId: parseInt(selectedCourse),
-        levelId: parseInt(selectedLevel),
+        title: isBookResource ? (bookTitle.trim() || generatedTitle) : generatedTitle,
+        courseId: isBookResource ? null : parseInt(selectedCourse),
+        levelId: isBookResource ? null : parseInt(selectedLevel),
         resourceTypeId: parseInt(selectedResourceType),
-        year: parseInt(year),
-        semester: parseInt(semester),
+        year: isBookResource ? null : parseInt(year),
+        semester: isBookResource ? null : parseInt(semester),
         examType: isPastPaperResource ? examType : undefined,
+        author: isBookResource ? bookAuthor.trim() || null : null,
+        publisher: isBookResource ? bookPublisher.trim() || null : null,
+        isbn: isBookResource ? bookIsbn.trim() || null : null,
+        publicationDate: isBookResource && bookPublicationDate ? bookPublicationDate : undefined,
+        edition: isBookResource ? bookEdition.trim() || null : null,
+        abstract: isBookResource ? bookAbstract.trim() || null : null,
         fileKey: pendingUpload.fileKey,
         fileUrl: pendingUpload.fileUrl,
         fileName: pendingUpload.fileName,
@@ -266,6 +292,13 @@ export function AdminUploadForm({
         setYear(new Date().getFullYear().toString());
         setSemester('1');
         setExamType('Mid-semester');
+        setBookTitle('');
+        setBookAuthor('');
+        setBookPublisher('');
+        setBookIsbn('');
+        setBookPublicationDate('');
+        setBookEdition('');
+        setBookAbstract('');
 
         setTimeout(() => {
           onSuccess?.();
@@ -331,134 +364,138 @@ export function AdminUploadForm({
           </select>
         </div>
 
-        {/* School Selection */}
-        <div className="space-y-2">
-          <label className={labelClassName}>School</label>
-          <select
-            value={selectedSchool}
-            onChange={(e) => {
-              setSelectedSchool(e.target.value);
-              setSelectedDepartment('');
-              setSelectedProgram('');
-              setSelectedCourse('');
-            }}
-            className={selectClassName}
-          >
-            <option value="">Select a school...</option>
-            {schools.map((school) => (
-              <option key={school.id} value={school.id}>
-                {school.name}
-              </option>
-            ))}
-          </select>
-        </div>
+        {!isBookResource && (
+          <>
+            {/* School Selection */}
+            <div className="space-y-2">
+              <label className={labelClassName}>School</label>
+              <select
+                value={selectedSchool}
+                onChange={(e) => {
+                  setSelectedSchool(e.target.value);
+                  setSelectedDepartment('');
+                  setSelectedProgram('');
+                  setSelectedCourse('');
+                }}
+                className={selectClassName}
+              >
+                <option value="">Select a school...</option>
+                {schools.map((school) => (
+                  <option key={school.id} value={school.id}>
+                    {school.name}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-        {/* Department Selection */}
-        <div className="space-y-2">
-          <label className={labelClassName}>Department</label>
-          <select
-            value={selectedDepartment}
-            onChange={(e) => {
-              setSelectedDepartment(e.target.value);
-              setSelectedProgram('');
-              setSelectedCourse('');
-            }}
-            disabled={!selectedSchool}
-            className={selectClassName}
-          >
-            <option value="">Select a department...</option>
-            {filteredDepartments.map((dept) => (
-              <option key={dept.id} value={dept.id}>
-                {dept.name}
-              </option>
-            ))}
-          </select>
-        </div>
+            {/* Department Selection */}
+            <div className="space-y-2">
+              <label className={labelClassName}>Department</label>
+              <select
+                value={selectedDepartment}
+                onChange={(e) => {
+                  setSelectedDepartment(e.target.value);
+                  setSelectedProgram('');
+                  setSelectedCourse('');
+                }}
+                disabled={!selectedSchool}
+                className={selectClassName}
+              >
+                <option value="">Select a department...</option>
+                {filteredDepartments.map((dept) => (
+                  <option key={dept.id} value={dept.id}>
+                    {dept.name}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-        {/* Program Selection */}
-        <div className="space-y-2">
-          <label className={labelClassName}>Program</label>
-          <select
-            value={selectedProgram}
-            onChange={(e) => {
-              setSelectedProgram(e.target.value);
-              setSelectedCourse('');
-            }}
-            disabled={!selectedDepartment}
-            className={selectClassName}
-          >
-            <option value="">Select a program...</option>
-            {filteredPrograms.map((prog) => (
-              <option key={prog.id} value={prog.id}>
-                {prog.name}
-              </option>
-            ))}
-          </select>
-        </div>
+            {/* Program Selection */}
+            <div className="space-y-2">
+              <label className={labelClassName}>Program</label>
+              <select
+                value={selectedProgram}
+                onChange={(e) => {
+                  setSelectedProgram(e.target.value);
+                  setSelectedCourse('');
+                }}
+                disabled={!selectedDepartment}
+                className={selectClassName}
+              >
+                <option value="">Select a program...</option>
+                {filteredPrograms.map((prog) => (
+                  <option key={prog.id} value={prog.id}>
+                    {prog.name}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-        {/* Course Selection */}
-        <div className="space-y-2">
-          <label className={labelClassName}>Course</label>
-          <select
-            value={selectedCourse}
-            onChange={(e) => setSelectedCourse(e.target.value)}
-            disabled={!selectedProgram}
-            className={selectClassName}
-          >
-            <option value="">Select a course...</option>
-            {filteredCourses.map((course) => (
-              <option key={course.id} value={course.id}>
-                {course.name} ({course.code})
-              </option>
-            ))}
-          </select>
-        </div>
+            {/* Course Selection */}
+            <div className="space-y-2">
+              <label className={labelClassName}>Course</label>
+              <select
+                value={selectedCourse}
+                onChange={(e) => setSelectedCourse(e.target.value)}
+                disabled={!selectedProgram}
+                className={selectClassName}
+              >
+                <option value="">Select a course...</option>
+                {filteredCourses.map((course) => (
+                  <option key={course.id} value={course.id}>
+                    {course.name} ({course.code})
+                  </option>
+                ))}
+              </select>
+            </div>
 
-        {/* Year Selection */}
-        <div className="space-y-2">
-          <label className={labelClassName}>Year</label>
-          <select
-            value={year}
-            onChange={(e) => setYear(e.target.value)}
-            className={selectClassName}
-          >
-            {yearOptions.map((y) => (
-              <option key={y} value={y}>
-                {y}
-              </option>
-            ))}
-          </select>
-        </div>
+            {/* Year Selection */}
+            <div className="space-y-2">
+              <label className={labelClassName}>Year</label>
+              <select
+                value={year}
+                onChange={(e) => setYear(e.target.value)}
+                className={selectClassName}
+              >
+                {yearOptions.map((y) => (
+                  <option key={y} value={y}>
+                    {y}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-        {/* Level Selection */}
-        <div className="space-y-2">
-          <label className={labelClassName}>Level</label>
-          <select
-            value={selectedLevel}
-            onChange={(e) => setSelectedLevel(e.target.value)}
-            className={selectClassName}
-          >
-            <option value="">Select a level...</option>
-            {levels.map((level) => (
-              <option key={level.id} value={level.id}>
-                Level {level.level_number}{level.description ? ` - ${level.description}` : ''}
-              </option>
-            ))}
-          </select>
-        </div>
+            {/* Level Selection */}
+            <div className="space-y-2">
+              <label className={labelClassName}>Level</label>
+              <select
+                value={selectedLevel}
+                onChange={(e) => setSelectedLevel(e.target.value)}
+                className={selectClassName}
+              >
+                <option value="">Select a level...</option>
+                {levels.map((level) => (
+                  <option key={level.id} value={level.id}>
+                    Level {level.level_number}{level.description ? ` - ${level.description}` : ''}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-        {/* Semester Selection */}
-        <div className="space-y-2">
-          <label className={labelClassName}>Semester</label>
-          <select
-            value={semester}
-            onChange={(e) => setSemester(e.target.value)}
-            className={selectClassName}
-          >
-            <option value="1">Semester 1</option>
-            <option value="2">Semester 2</option>
-          </select>
-        </div>
+            {/* Semester Selection */}
+            <div className="space-y-2">
+              <label className={labelClassName}>Semester</label>
+              <select
+                value={semester}
+                onChange={(e) => setSemester(e.target.value)}
+                className={selectClassName}
+              >
+                <option value="1">Semester 1</option>
+                <option value="2">Semester 2</option>
+              </select>
+            </div>
+          </>
+        )}
       </div>
 
       {isPastPaperResource && (
@@ -478,6 +515,88 @@ export function AdminUploadForm({
                 <span className="text-sm text-foreground">{type}</span>
               </label>
             ))}
+          </div>
+        </div>
+      )}
+
+      {isBookResource && (
+        <div className="space-y-4 rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-900/50">
+          <div className="flex items-center justify-between">
+            <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">Book details</h3>
+            <span className="rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-700 dark:bg-blue-500/20 dark:text-blue-300">Required for books</span>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-4">
+            <div className="space-y-2 md:col-span-2">
+              <label className={labelClassName}>Book title</label>
+              <input
+                value={bookTitle}
+                onChange={(e) => setBookTitle(e.target.value)}
+                className={selectClassName}
+                placeholder="e.g. Digital Marketing Fundamentals"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className={labelClassName}>Author</label>
+              <input
+                value={bookAuthor}
+                onChange={(e) => setBookAuthor(e.target.value)}
+                className={selectClassName}
+                placeholder="Author name"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className={labelClassName}>Publisher</label>
+              <input
+                value={bookPublisher}
+                onChange={(e) => setBookPublisher(e.target.value)}
+                className={selectClassName}
+                placeholder="Publisher"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className={labelClassName}>ISBN</label>
+              <input
+                value={bookIsbn}
+                onChange={(e) => setBookIsbn(e.target.value)}
+                className={selectClassName}
+                placeholder="978-1-2345-6789-0"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className={labelClassName}>Publication date</label>
+              <input
+                type="date"
+                value={bookPublicationDate}
+                onChange={(e) => setBookPublicationDate(e.target.value)}
+                className={selectClassName}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className={labelClassName}>Edition</label>
+              <input
+                value={bookEdition}
+                onChange={(e) => setBookEdition(e.target.value)}
+                className={selectClassName}
+                placeholder="1st edition"
+              />
+            </div>
+
+            <div className="space-y-2 md:col-span-2">
+              <label className={labelClassName}>Short description / abstract</label>
+              <textarea
+                value={bookAbstract}
+                onChange={(e) => setBookAbstract(e.target.value)}
+                rows={3}
+                className={selectClassName}
+                placeholder="Brief summary of the book"
+              />
+            </div>
           </div>
         </div>
       )}
