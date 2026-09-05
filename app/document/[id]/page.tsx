@@ -23,8 +23,11 @@ interface DocumentDetail {
   download_count?: number;
   resource_type_name?: string;
   author?: string | null;
+  publisher?: string | null;
+  isbn?: string | null;
   publication_date?: string | null;
   abstract?: string | null;
+  edition?: string | null;
 }
 
 export default function DocumentDetailPage() {
@@ -119,6 +122,7 @@ export default function DocumentDetailPage() {
 
   const typeColors: { [key: string]: string } = {
     'Past Papers': '#1782C5',
+    'Books': '#2563EB',
     'Journals': '#1F2557',
     'Dissertations': '#8B5A8F',
     'Course Outlines': '#F59E0B',
