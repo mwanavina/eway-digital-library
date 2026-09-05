@@ -117,7 +117,7 @@ export async function GET(request: Request) {
 
       case 'resourceTypes': {
         const rows = await db
-          .select({ id: resourceTypes.id, name: resourceTypes.name, slug: resourceTypes.slug })
+          .select({ id: resourceTypes.id, name: resourceTypes.name, slug: resourceTypes.slug, icon: resourceTypes.icon, color: resourceTypes.color })
           .from(resourceTypes)
           .orderBy(asc(resourceTypes.name));
 
@@ -134,7 +134,7 @@ export async function GET(request: Request) {
           db.selectDistinct({ year: documents.year }).from(documents).where(sql`${documents.year} IS NOT NULL`).orderBy(asc(documents.year)),
           db.selectDistinct({ semester: documents.semester }).from(documents).where(sql`${documents.semester} IS NOT NULL`).orderBy(asc(documents.semester)),
           db.selectDistinct({ name: documents.examType }).from(documents).where(sql`${documents.examType} IS NOT NULL`).orderBy(asc(documents.examType)),
-          db.select({ id: resourceTypes.id, name: resourceTypes.name, slug: resourceTypes.slug }).from(resourceTypes).orderBy(asc(resourceTypes.name)),
+          db.select({ id: resourceTypes.id, name: resourceTypes.name, slug: resourceTypes.slug, icon: resourceTypes.icon, color: resourceTypes.color }).from(resourceTypes).orderBy(asc(resourceTypes.name)),
         ]);
 
         return Response.json({
