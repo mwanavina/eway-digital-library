@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
 
-type ResourceType = 'all' | 'past-papers' | 'journals' | 'dissertations' | 'course-outlines' | 'research-papers';
+type ResourceType = 'all' | 'past-papers' | 'journals' | 'dissertations' | 'course-outlines' | 'research-papers' | 'books';
 
 interface FilterDrawerProps {
   isOpen: boolean;
@@ -190,6 +190,7 @@ export function FilterDrawer({
       'dissertations': 'Dissertations Filters',
       'course-outlines': 'Course Outlines Filters',
       'research-papers': 'Research Papers Filters',
+      'books': 'Books Filters',
     };
     return titles[activeResourceType];
   };
