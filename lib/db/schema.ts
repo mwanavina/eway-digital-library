@@ -1,6 +1,7 @@
 import { relations } from "drizzle-orm";
 import {
   boolean,
+  date,
   index,
   integer,
   pgEnum,
@@ -145,14 +146,18 @@ export const resourceTypes = pgTable("resource_types", {
 export const documents = pgTable("documents", {
   id: serial("id").primaryKey(),
   title: varchar("title", { length: 255 }).notNull(),
-  courseId: integer("course_id")
-    .notNull()
-    .references(() => courses.id, { onDelete: "cascade" }),
+  courseId: integer("course_id").references(() => courses.id, { onDelete: "cascade" }),
   levelId: integer("level_id").references(() => levels.id, { onDelete: "set null" }),
   resourceTypeId: integer("resource_type_id").references(() => resourceTypes.id, { onDelete: "set null" }),
   year: integer("year"),
   semester: integer("semester"),
   examType: varchar("exam_type", { length: 100 }),
+  author: varchar("author", { length: 255 }),
+  publisher: varchar("publisher", { length: 255 }),
+  isbn: varchar("isbn", { length: 100 }),
+  publicationDate: date("publication_date"),
+  edition: varchar("edition", { length: 50 }),
+  abstract: text("abstract"),
   filePath: varchar("file_path", { length: 500 }),
   fileKey: varchar("file_key", { length: 500 }),
   fileSize: integer("file_size"),
